@@ -1,0 +1,29 @@
+
+
+lua原始修改点
+
+============= 1 ===================
+    lualib.h:  LUALIB_API char * getLuaFilename(const char* moduleName);
+    lualib.c
+    //============= self ==========
+      if(filename == NULL){
+        filename = getLuaFilename(name);
+      }
+    //============ end self =======
+
+
+=============lbaselib.c ==========
+luaB_print():
+
+
+#ifdef EXT_PRINT
+  #define __printImpl(s, l, f) \
+        ext_print(s, l, f)
+   #define __flushPrint()  \
+        ext_print("", 0, 1)
+#else
+ #define __printImpl(s, l, f) \
+       lua_writestring(s,l)
+#define __flushPrint()  \
+       lua_writeline();
+#endif

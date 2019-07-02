@@ -68,7 +68,6 @@ add_library( # Sets the name of the library.
         src/main/jni/luaext_java/LuaWrapper.cpp
         src/main/jni/luaext_java/LuaState.cpp
         src/main/jni/luaext_java/java_env.cpp
-        src/main/jni/luajava/luajava.c
         )
 
 

@@ -1,6 +1,8 @@
 package com.heaven7.java.lua;
 
+import android.support.annotation.Keep;
 import android.support.v4.util.ArraySet;
+import android.util.Log;
 
 import java.util.Set;
 
@@ -10,6 +12,7 @@ import java.util.Set;
 public final class LuaWrapper {
 
     private final Set<LuaSearcher> mList = new ArraySet<>();
+    private final StringBuilder mSb = new StringBuilder();
 
     private static class Creator{
         static LuaWrapper INSTANCE = new LuaWrapper();
@@ -31,6 +34,19 @@ public final class LuaWrapper {
     public void unregisterLuaSearchers(){
         mList.clear();
     }
+
+    @Keep
+    public void print(String str, boolean concat){
+        if(concat){
+            mSb.append(str);
+        }else {
+            String content = mSb.toString();
+            mSb.delete(0, mSb.length());
+            //log it
+            Log.i("Lua_Print", content);
+        }
+    }
+    @Keep //called by native
     public String searchModule(String module){
         for (LuaSearcher s : mList){
             String filepath = s.getLuaFilepath(module);

@@ -7,27 +7,50 @@
 #include <android/log.h>
 #include "java_env.h"
 
-extern "C" {
-#include "../luajava/luajava.h"
-}
-
-#define TAG "JavaReflect"
+#define TAG "JavaEnv"
 #define LOGD(...) __android_log_print(ANDROID_LOG_DEBUG, TAG, __VA_ARGS__)
+#define LOGW(...) __android_log_print(ANDROID_LOG_WARN, TAG, __VA_ARGS__)
 
 JavaVM *g_jvm;
 
+Registration createRegistration(char *clazz, JNINativeMethod methods[], int len) {
+    Registration res;
+    res.clazz = clazz;
+    res.methods = methods;
+    res.len = len;
+    return res;
+}
 
-extern "C" JNIEXPORT jint JNI_OnLoad(JavaVM *vm, void *reserved) {
-    JNIEnv* env;
-    if(vm->GetEnv((void **)(&env), JNI_VERSION_1_4) != JNI_OK){
+int registerMethods(JNIEnv *env, Registration n) {
+    LOGD("Registration: len = %d", n.len);
+    jclass clazz = env->FindClass(n.clazz);
+    if (clazz == nullptr) {
+        LOGW("can't find class %s", n.clazz);
         return JNI_ERR;
     }
-   // __JNI_OnLoad(env);
+    int result;
+    if ((env)->RegisterNatives(clazz, n.methods, n.len) < 0) {
+        LOGW("register method failed");
+        result = JNI_ERR;
+    } else {
+        result = JNI_OK;
+    }
+    env->DeleteLocalRef(clazz);
+    return result;
+}
+
+JNIEXPORT jint JNI_OnLoad(JavaVM *vm, void *reserved) {
+    JNIEnv *env;
+    if (vm->GetEnv((void **) (&env), JNI_VERSION_1_4) != JNI_OK) {
+        return JNI_ERR;
+    }
+    // __JNI_OnLoad(env);
+    registerMethods(env, getLuaStateRegistration());
     g_jvm = vm;
     return JNI_VERSION_1_4;
 }
 
-extern "C" JNIEXPORT void JNI_OnUnload(JavaVM *vm, void *reserved) {
+JNIEXPORT void JNI_OnUnload(JavaVM *vm, void *reserved) {
     LOGD("JNI_OnUnload ------");
     g_jvm = NULL;
 }

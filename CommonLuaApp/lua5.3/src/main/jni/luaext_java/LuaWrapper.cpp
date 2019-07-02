@@ -5,7 +5,7 @@
 #include <jni.h>
 #include <string>
 
-// c++ 导入c的最好都加上 extern
+// import c.h for cpp often need { extern "C"}
 extern  "C" {
     #include "../luaextra/lua_extra.h"
 }
@@ -13,10 +13,13 @@ extern  "C" {
 #include "LuaWrapper.h"
 
 #define SEARCH_METHOD "searchModule"
+#define PRINT_METHOD "print"
+#define PRINT_METHOD_SIG "(Ljava/lang/String;Z)V"
 #define SEARCH_METHOD_SIG "(Ljava/lang/String;)Ljava/lang/String;"
 
 WeakObjectM weakM;
 jmethodID mid_search;
+jmethodID mid_print;
 
 extern "C" char* search(const char* moduleName){
     JNIEnv * pEnv = getJNIEnv();
@@ -24,13 +27,34 @@ extern "C" char* search(const char* moduleName){
         pEnv = attachJNIEnv();
     }
     jstring name = pEnv->NewStringUTF(moduleName);
+    if(name == nullptr){
+        return nullptr;
+    }
     jobject obj = weakM.getRefObject();
     jstring result = static_cast<jstring>(pEnv->CallObjectMethod(obj, mid_search, name));
+    pEnv->DeleteLocalRef(name);
     pEnv->DeleteLocalRef(obj);
     if(result == nullptr){
         return nullptr;
     }
-    return const_cast<char *>(pEnv->GetStringUTFChars(result, nullptr));
+    char * str = const_cast<char *>(pEnv->GetStringUTFChars(result, nullptr));
+    pEnv->DeleteLocalRef(result);
+    return str;
+}
+
+extern "C" void Lua_printImpl(char* cs, int len, int flag){
+    JNIEnv * pEnv = getJNIEnv();
+    if(pEnv == nullptr){
+        pEnv = attachJNIEnv();
+    }
+    jobject obj = weakM.getRefObject();
+    jstring str = pEnv->NewStringUTF(cs);
+    jboolean concat = static_cast<jboolean>(flag != 1); // 1 means end
+    pEnv->CallVoidMethod(obj, mid_print, str, concat);
+
+    // recycle
+    pEnv->DeleteLocalRef(obj);
+    pEnv->DeleteLocalRef(str);
 }
 
 extern "C" JNIEXPORT
@@ -40,8 +64,10 @@ void JNICALL Java_com_heaven7_java_lua_LuaWrapper_nNativeInit(
 
     jclass clazz = env->GetObjectClass(obj);
     mid_search = env->GetMethodID(clazz, SEARCH_METHOD, SEARCH_METHOD_SIG );
+    mid_print = env->GetMethodID(clazz, PRINT_METHOD, PRINT_METHOD_SIG);
     env->DeleteLocalRef(clazz);
 
     //undefined reference to 'setLuaSearcher(char* (*)(char const*))'
     ext_setLuaSearcher(search);
+    ext_setLua_print(Lua_printImpl);
 }

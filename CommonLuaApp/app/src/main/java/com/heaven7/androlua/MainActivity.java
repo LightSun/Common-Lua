@@ -1,25 +1,33 @@
 package com.heaven7.androlua;
 
+import android.Manifest;
 import android.app.Activity;
 import android.os.Bundle;
-import android.util.Log;
+import android.os.Environment;
 import android.view.View;
 
 import com.heaven7.core.util.Logger;
+import com.heaven7.core.util.PermissionHelper;
 import com.heaven7.java.base.util.IOUtils;
 import com.heaven7.java.lua.LuaSearcher;
+import com.heaven7.java.lua.LuaState;
 import com.heaven7.java.lua.LuaWrapper;
+import com.heaven7.java.pc.schedulers.Schedulers;
 
-import org.keplerproject.luajava.LuaException;
-import org.keplerproject.luajava.LuaState;
-import org.keplerproject.luajava.LuaStateFactory;
 
+import java.io.BufferedReader;
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.io.Reader;
 
+//adb logcat | ndk-stack -sym arm64-v8a
 public class MainActivity extends Activity {
 
     private static final String TAG = "MainActivity";
+    private static final String LUA_DIR = Environment.getExternalStorageDirectory() + "/vida/lua";
+    private static final String LUA_PARENT_DIR = Environment.getExternalStorageDirectory() + "/vida";
+    private final PermissionHelper mHelper = new PermissionHelper(this);
 
     private LuaState mLuaState;
 
@@ -27,18 +35,21 @@ public class MainActivity extends Activity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        initLua();
+
+        mHelper.startRequestPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE, 1, new PermissionHelper.ICallback() {
+            @Override
+            public void onRequestPermissionResult(String s, int i, boolean b) {
+                if(b){
+                    initLua();
+                }
+            }
+        });
     }
 
     @Override
-    protected void onDestroy() {
-        if (mLuaState != null && !mLuaState.isClosed()) {
-            mLuaState.close();
-            mLuaState = null;
-        }
-        super.onDestroy();
+    public void onRequestPermissionsResult(int requestCode,String[] permissions,int[] grantResults) {
+        mHelper.onRequestPermissionsResult(requestCode, permissions, grantResults);
     }
-
     public void onClickTestLuaObject(View view) {
         /* Schedulers.io().newWorker().schedule(new Runnable() {
             @Override
@@ -54,32 +65,25 @@ public class MainActivity extends Activity {
         executeLuaFile();
     }
 
-    /**
-     * 只是在第一次调用，如果升级脚本也不需要重复初始化
-     */
     private void initLua() {
-        mLuaState = LuaStateFactory.newLuaState();
-        mLuaState.openLibs();
+        mLuaState = new LuaState();
         LuaWrapper.getDefault().registerLuaSearcher(new LuaSearcher() {
             @Override
             public String getLuaFilepath(String module) {
                 Logger.d(TAG, "getLuaFilepath", "module = " + module);
-                return null;
+                return LUA_DIR + "/" + module + ".lua";
             }
         });
-        //为了lua能使用系统日志，传入Log
-        try {
-            //push一个对象到对象到栈中
-            mLuaState.pushObjectValue(Log.class);
-            //设置为全局变量
-            mLuaState.setGlobal("Log");
-        } catch (LuaException e1) {
-            // TODO Auto-generated catch block
-            e1.printStackTrace();
-        }
+        Schedulers.io().newWorker().schedule(new Runnable() {
+            @Override
+            public void run() {
+                AssetsFileCopyUtils.copyAll(getApplicationContext(), "lua", LUA_PARENT_DIR);
+                Logger.d(TAG, "run", "lua script copy done");
+            }
+        });
     }
 
-    public void loadLua(String file) {
+    public void loadLuaAssets(String file) {
         InputStreamReader in = null;
         try {
             in = new InputStreamReader(getAssets().open(file));
@@ -91,13 +95,13 @@ public class MainActivity extends Activity {
             IOUtils.closeQuietly(in);
         }
     }
-
     public void loadLuaRaw(int file) {
         InputStreamReader in = null;
         try {
             in = new InputStreamReader(getResources().openRawResource(file));
-            int state = mLuaState.LdoString(IOUtils.readString(in));
-            Logger.i(TAG, "loadLua", "state = " + state);
+            int state = mLuaState.LdoString(readStringWithLine(in));
+            String msg = mLuaState.toString(-1);
+            Logger.i(TAG, "loadLua", "state = " + state + " ,msg = " + msg);
         } catch (IOException e) {
             e.printStackTrace();
         } finally {
@@ -147,5 +151,16 @@ public class MainActivity extends Activity {
         } catch (Exception e) {
             e.printStackTrace();
         }
+    }
+
+    public static String readStringWithLine(Reader r) throws IOException {
+        BufferedReader br = r instanceof BufferedReader ? (BufferedReader) r : new BufferedReader(r);
+
+        String str;
+        StringBuilder sb = new StringBuilder();
+        while ((str = br.readLine()) != null) {
+            sb.append(str).append("\n");
+        }
+        return sb.toString();
     }
 }

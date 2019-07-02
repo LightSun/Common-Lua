@@ -19,6 +19,7 @@
 
 //get the lua file path by target module. which often used by 'require'
 typedef char* (*LuaFileSearcher)(const char * moduleName);
+typedef void (*Lua_print)(char* cs, int len, int flag);
 
 // map function to lua. any like: int (*lua_CFunction) (lua_State *L);
 LUALIB_API void lua_BindFunctions(lua_State *L, luaL_Reg funcs[], int flag);
@@ -28,6 +29,8 @@ LUALIB_API void lua_BindFunctions(lua_State *L, luaL_Reg funcs[], int flag);
  * @param searcher the lua file searcher
  */
 void ext_setLuaSearcher(LuaFileSearcher s);
+
+void ext_setLua_print(Lua_print lp);
 
 int ext_loadLuaFile(lua_State* L, char* filename);
 
@@ -42,7 +45,7 @@ lua_State* ext_newLuaState();
  * @param L the main state
  * @return the new state.
  */
-lua_State *lua_newthread (lua_State *L);
+lua_State* ext_lua_newthread(lua_State *L);
 
 void ext_closeLuaState(lua_State* ls);
 

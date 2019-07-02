@@ -1,13 +1,5 @@
---
--- Created by IntelliJ IDEA.
--- User: Administrator
--- Date: 2019/6/21
--- Time: 下午 12:30
--- To change this template use File | Settings | File Templates.
---
 
-local a = require("test");
-a.c()
+local tu = require("TableUtils");
 
 local MyClass = {} -- the table representing the class, which will double as the metatable for the instances
 MyClass.__index = MyClass -- failed table lookups on the instances should fallback to the class table, to get methods
@@ -39,3 +31,5 @@ print(i:get_value()) --> 6
 local j = MyClass.new(99)
 print(i:get_value())
 print(j:get_value())
+
+tu.logTable(j);

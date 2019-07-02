@@ -20,6 +20,27 @@
 #include "lauxlib.h"
 #include "lualib.h"
 
+/**
+ * print the string . if success return 1. or else return 0.
+ * @param cs
+ * @param len
+ * @param flag the flag of this print. if 1 means print right now. or else concat str
+ */
+LUALIB_API void ext_print(char* cs, int len, int flag);
+
+#define EXIT_PRINT
+
+#ifdef EXIT_PRINT
+  #define __printImpl(s, l, f) \
+        ext_print(s, l, f)
+  #define __flushPrint()  \
+        ext_print("", 0, 1)
+#else
+ #define __printImpl(s, l, f) \
+       lua_writestring(s,l)
+#define __flushPrint()  \
+       lua_writeline();
+#endif
 
 static int luaB_print (lua_State *L) {
   int n = lua_gettop(L);  /* number of arguments */
@@ -34,14 +55,15 @@ static int luaB_print (lua_State *L) {
     s = lua_tolstring(L, -1, &l);  /* get result */
     if (s == NULL)
       return luaL_error(L, "'tostring' must return a string to 'print'");
-    if (i>1) lua_writestring("\t", 1);
-    lua_writestring(s, l);
+    if (i>1) {
+      __printImpl("\t", 1, 0);
+    }
+    __printImpl(s, l, 0);
     lua_pop(L, 1);  /* pop result */
   }
-  lua_writeline();
+  __flushPrint();
   return 0;
 }
-
 
 #define SPACECHARS	" \f\n\r\t\v"
 
