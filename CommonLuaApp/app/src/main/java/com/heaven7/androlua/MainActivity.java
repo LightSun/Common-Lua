@@ -16,7 +16,6 @@ import com.heaven7.java.pc.schedulers.Schedulers;
 
 
 import java.io.BufferedReader;
-import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.Reader;
@@ -110,7 +109,7 @@ public class MainActivity extends Activity {
     }
 
     private void executeLuaFile() {
-        try {
+       /* try {
             //载入脚本
             mLuaState.LdoString(IOUtils.readString(new InputStreamReader(getResources().openRawResource(R.raw.luafile))));
 
@@ -150,7 +149,7 @@ public class MainActivity extends Activity {
             mLuaState.call(0, 0);
         } catch (Exception e) {
             e.printStackTrace();
-        }
+        }*/
     }
 
     public static String readStringWithLine(Reader r) throws IOException {
