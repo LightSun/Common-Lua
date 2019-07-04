@@ -29,13 +29,13 @@ JNIEXPORT void Java_com_heaven7_java_lua_LuaState_nRelease(JNIEnv *env, jobject 
     ext_closeLuaState(state);
 }
 
-jint LuaState_doString(JNIEnv *env, jclass clazz, jlong ptr, jstring str) {
+jint luaL_dostring_(JNIEnv *env, jclass clazz, jlong ptr, jstring str) {
     lua_State *L = reinterpret_cast<lua_State *>(ptr);
     const char *utfStr = (env)->GetStringUTFChars(str, NULL);
     return (jint) luaL_dostring(L, utfStr);
 }
 
-jint LuaState_getGlobal(JNIEnv *env, jclass clazz, jlong ptr, jstring str) {
+jint lua_getglobal_(JNIEnv *env, jclass clazz, jlong ptr, jstring str) {
     lua_State *L = reinterpret_cast<lua_State *>(ptr);
     const char *chz = (env)->GetStringUTFChars(str, NULL);
 
@@ -43,7 +43,7 @@ jint LuaState_getGlobal(JNIEnv *env, jclass clazz, jlong ptr, jstring str) {
     (env)->ReleaseStringUTFChars(str, chz);
     return result;
 }
-jstring LuaState_pushString(JNIEnv *env, jclass clazz, jlong ptr, jstring str) {
+jstring lua_pushString_(JNIEnv *env, jclass clazz, jlong ptr, jstring str) {
     lua_State *L = reinterpret_cast<lua_State *>(ptr);
 
     const char *uniStr = (env)->GetStringUTFChars(str, NULL);
@@ -52,24 +52,34 @@ jstring LuaState_pushString(JNIEnv *env, jclass clazz, jlong ptr, jstring str) {
     (env)->ReleaseStringUTFChars(str, uniStr);
     return env->NewStringUTF(result);
 }
-void LuaState_pushNumber(JNIEnv *env, jclass clazz, jlong ptr, jdouble val) {
+void lua_pushNumber_(JNIEnv *env, jclass clazz, jlong ptr, jdouble val) {
     lua_State *L = reinterpret_cast<lua_State *>(ptr);
     lua_pushnumber(L, (lua_Number) val);
 }
-jstring LuaState_toString(JNIEnv *env, jclass clazz, jlong ptr, jint idx) {
+jstring lua_tostring_(JNIEnv *env, jclass clazz, jlong ptr, jint idx) {
     lua_State *L = reinterpret_cast<lua_State *>(ptr);
     const char *str = lua_tostring(L, idx);
     return (env)->NewStringUTF(str);
 }
-jint LuaState_pcall(JNIEnv *env, jclass clazz, jlong ptr, jint nArgs, jint nResults, jint errFunc) {
+jint lua_pcall_(JNIEnv *env, jclass clazz, jlong ptr, jint nArgs, jint nResults, jint errFunc) {
     lua_State *L = reinterpret_cast<lua_State *>(ptr);
     return lua_pcall(L, nArgs, nResults, errFunc);
 }
 void
-LuaState_call(JNIEnv *env, jclass clazz, jlong ptr, jint nArgs, jint nResults) {
+lua_call_(JNIEnv *env, jclass clazz, jlong ptr, jint nArgs, jint nResults) {
     lua_State *L = reinterpret_cast<lua_State *>(ptr);
     lua_call(L, nArgs, nResults);
 }
+void lua_pushBoolean_(JNIEnv *env, jclass clazz, jlong ptr, jboolean val){
+    lua_State *L = reinterpret_cast<lua_State *>(ptr);
+    lua_pushboolean(L, val ? 1 : 0);
+}
+void lua_pushnil_(JNIEnv *env, jclass clazz, jlong ptr){
+    lua_State *L = reinterpret_cast<lua_State *>(ptr);
+    lua_pushnil(L);
+    //lua_pushcfunction()
+}
+//---------------------------------------------------
 
 void pushJNIEnv(JNIEnv *env, lua_State *L) {
     JNIEnv **udEnv;
@@ -113,12 +123,12 @@ JNIEnv *getEnvFromState(lua_State *L) {
 JNINativeMethod lua_state_methods[] = {
        /* {"nCreate",         "()J",                            (void *) LuaState_nCreate},
         {"nRelease",        "(J)V",                           (void *) LuaState_nRelease},*/
-        {"_evaluateScript", "(J" SIG_JSTRING ")I",            (void *) LuaState_doString},
-        {"_getGlobal",      "(J" SIG_JSTRING ")I",            (void *) LuaState_getGlobal},
-        {"_pushString",     "(J" SIG_JSTRING ")" SIG_JSTRING, (void *) LuaState_pushString},
-        {"_pushNumber",     "(JD)V",                          (void *) LuaState_pushNumber},
-        {"_toString",       "(JI)" SIG_JSTRING,               (void *) LuaState_toString},
-        {"_pcall",          "(JIII)I",                        (void *) LuaState_pcall},
+        {"_evaluateScript", "(J" SIG_JSTRING ")I",            (void *) luaL_dostring_},
+        {"_getGlobal",      "(J" SIG_JSTRING ")I",            (void *) lua_getglobal_},
+        {"_pushString",     "(J" SIG_JSTRING ")" SIG_JSTRING, (void *) lua_pushString_},
+        {"_pushNumber",     "(JD)V",                          (void *) lua_pushNumber_},
+        {"_toString",       "(JI)" SIG_JSTRING,               (void *) lua_tostring_},
+        {"_pcall",          "(JIII)I",                        (void *) lua_pcall_},
         {"_call",           "(JII)V",                         (void *) LuaState_call},
 };
 

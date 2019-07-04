@@ -4,6 +4,7 @@ import android.support.annotation.Keep;
 import android.support.v4.util.ArraySet;
 import android.util.Log;
 
+import java.util.Map;
 import java.util.Set;
 
 /**
@@ -12,6 +13,7 @@ import java.util.Set;
 public final class LuaWrapper {
 
     private final Set<LuaSearcher> mList = new ArraySet<>();
+  //  private final Map<String, LuaFunction>
     private final StringBuilder mSb = new StringBuilder();
 
     private static class Creator{
