@@ -78,6 +78,9 @@ public class MainActivity extends Activity {
     public void onClickTestCJson(View view){
         loadLuaAssets("lua/cjson_encode.lua");
     }
+    public void onClickTestLuaExtend(View view){
+        loadLuaAssets("lua/extend2.lua");
+    }
 
     public void onClickTestLuaScript(View view) {
         executeLuaFile();
