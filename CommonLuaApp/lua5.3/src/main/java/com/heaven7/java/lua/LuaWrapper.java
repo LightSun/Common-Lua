@@ -49,9 +49,19 @@ public final class LuaWrapper {
         }
     }
     @Keep //called by native
-    public String searchModule(String module){
+    public String searchLuaModule(String module){
         for (LuaSearcher s : mList){
             String filepath = s.getLuaFilepath(module);
+            if(filepath != null){
+                return filepath;
+            }
+        }
+        return null;
+    }
+    @Keep //called by native
+    public String searchCModule(String module){
+        for (LuaSearcher s : mList){
+            String filepath = s.getClibFilepath(module);
             if(filepath != null){
                 return filepath;
             }

@@ -4,7 +4,8 @@ lua原始修改点
 
 ============= 1 ===================
     lualib.h:  LUALIB_API char * getLuaFilename(const char* moduleName);
-    lualib.c
+
+    loadlib.c
     //============= self ==========
       if(filename == NULL){
         filename = getLuaFilename(name);

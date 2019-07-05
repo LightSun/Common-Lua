@@ -9,6 +9,7 @@ import android.support.annotation.Keep;
 public final class LuaState extends INativeObject.BaseNativeObject{
 
     static {
+        System.loadLibrary("lua");
         System.loadLibrary("luajava");
     }
 

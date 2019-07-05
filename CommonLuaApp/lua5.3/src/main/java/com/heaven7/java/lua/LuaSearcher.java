@@ -6,4 +6,6 @@ package com.heaven7.java.lua;
 public interface LuaSearcher {
 
     String getLuaFilepath(String module);
+
+    String getClibFilepath(String module);
 }

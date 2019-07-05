@@ -17,6 +17,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <dlfcn.h>
 
 #include "lua.h"
 
@@ -248,24 +249,52 @@ static lua_CFunction lsys_sym (lua_State *L, void *lib, const char *sym) {
 
 
 #define DLMSG	"dynamic libraries not enabled; check your Lua installation"
+/*
+** Macro to convert pointer-to-void* to pointer-to-function. This cast
+** is undefined according to ISO C, but POSIX assumes that it works.
+** (The '__extension__' in gnu compilers is only to avoid warnings.)
+*/
+#if defined(__GNUC__)
+#define cast_func(p) (__extension__ (lua_CFunction)(p))
+#else
+#define cast_func(p) ((lua_CFunction)(p))
+#endif
 
-
-static void lsys_unloadlib (void *lib) {
-  (void)(lib);  /* not used */
+/*static void lsys_unloadlib (void *lib) {
+  (void)(lib);  *//* not used *//*
 }
 
 
 static void *lsys_load (lua_State *L, const char *path, int seeglb) {
-  (void)(path); (void)(seeglb);  /* not used */
+  (void)(path); (void)(seeglb);  *//* not used *//*
   lua_pushliteral(L, DLMSG);
   return NULL;
 }
 
 
 static lua_CFunction lsys_sym (lua_State *L, void *lib, const char *sym) {
-  (void)(lib); (void)(sym);  /* not used */
+  (void)(lib); (void)(sym);  *//* not used *//*
   lua_pushliteral(L, DLMSG);
   return NULL;
+}*/
+
+static void lsys_unloadlib (void *lib) {
+    dlclose(lib);
+}
+
+
+static void *lsys_load (lua_State *L, const char *path, int seeglb) {
+    //android N protected to dynamic load lib outside.
+    void *lib = dlopen(path, RTLD_NOW | (seeglb ? RTLD_GLOBAL : RTLD_LOCAL));
+    if (lib == NULL) lua_pushstring(L, dlerror());
+    return lib;
+}
+
+
+static lua_CFunction lsys_sym (lua_State *L, void *lib, const char *sym) {
+    lua_CFunction f = cast_func(dlsym(lib, sym));
+    if (f == NULL) lua_pushstring(L, dlerror());
+    return f;
 }
 
 /* }====================================================== */
@@ -441,7 +470,6 @@ static const char *findfile (lua_State *L, const char *name,
   return searchpath(L, name, path, ".", dirsep);
 }
 
-
 static int checkload (lua_State *L, int stat, const char *filename) {
   if (stat) {  /* module loaded successfully? */
     lua_pushstring(L, filename);  /* will be 2nd argument to module */
@@ -495,6 +523,13 @@ static int loadfunc (lua_State *L, const char *filename, const char *modname) {
 static int searcher_C (lua_State *L) {
   const char *name = luaL_checkstring(L, 1);
   const char *filename = findfile(L, name, "cpath", LUA_CSUBSEP);
+
+    //============= self ==========
+    if(filename == NULL){
+        filename = getCLibFilename(name);
+    }
+    //============ end self =======
+
   if (filename == NULL) return 1;  /* module not found in this path */
   return checkload(L, (loadfunc(L, filename, name) == 0), filename);
 }
@@ -508,6 +543,7 @@ static int searcher_Croot (lua_State *L) {
   if (p == NULL) return 0;  /* is root */
   lua_pushlstring(L, name, p - name);
   filename = findfile(L, lua_tostring(L, -1), "cpath", LUA_CSUBSEP);
+
   if (filename == NULL) return 1;  /* root not found */
   if ((stat = loadfunc(L, filename, name)) != 0) {
     if (stat != ERRFUNC)

@@ -5,7 +5,8 @@
 #include "lua_extra.h"
 #include "../lua/luaconf.h"
 
-LuaFileSearcher searcher;
+FileSearcher luaSearcher;
+FileSearcher clibSearcher;
 Lua_print lua_print;
 
 //flag 1 to global. function. must end with   {NULL, NULL}
@@ -18,14 +19,23 @@ LUALIB_API void lua_BindFunctions(lua_State *L, struct luaL_Reg funcs[], int glo
     }
 }
 
-void ext_setLuaSearcher(LuaFileSearcher s){
-    searcher = s;
+void ext_setLuaSearcher(FileSearcher s){
+    luaSearcher = s;
+}
+void ext_setClibSearcher(FileSearcher s){
+    clibSearcher = s;
 }
 
 //the full file name
 LUALIB_API char * getLuaFilename(const char* moduleName){
-    if(searcher != NULL){
-        return searcher(moduleName);
+    if(luaSearcher != NULL){
+        return luaSearcher(moduleName);
+    }
+    return NULL;
+}
+LUALIB_API char * getCLibFilename(const char* moduleName){
+    if(clibSearcher != NULL){
+        return clibSearcher(moduleName);
     }
     return NULL;
 }
@@ -41,8 +51,8 @@ void ext_print(char* cs, int len, int flag){
 }
 
 int ext_loadLuaFile(lua_State* L, char* filename){
-    if(searcher != NULL){
-        filename = searcher(filename);
+    if(luaSearcher != NULL){
+        filename = luaSearcher(filename);
     }
     return luaL_dofile(L, filename);
 }

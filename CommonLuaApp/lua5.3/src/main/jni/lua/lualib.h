@@ -12,6 +12,7 @@
 
 //============= self ==========
 LUALIB_API char * getLuaFilename(const char* moduleName);
+LUALIB_API char * getCLibFilename(const char* moduleName);
 //============ end self =======
 
 LUAMOD_API int (luaopen_base) (lua_State *L);

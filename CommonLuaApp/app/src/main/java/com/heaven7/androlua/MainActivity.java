@@ -16,11 +16,27 @@ import com.heaven7.java.pc.schedulers.Schedulers;
 
 
 import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.OutputStream;
 import java.io.Reader;
+import java.util.HashMap;
+import java.util.Map;
 
 //adb logcat | ndk-stack -sym arm64-v8a
+
+/**
+ *   final public static int LUA_OK = 0;
+ *   final public static int LUA_YIELD = 1;
+ *   final public static int LUA_ERRRUN = 2;
+ *   final public static int LUA_ERRSYNTAX = 3;
+ *   final public static int LUA_ERRMEM = 4;
+ *   final public static int LUA_ERRGCMM = 5;
+ *   final public static int LUA_ERRERR = 6;
+ */
 public class MainActivity extends Activity {
 
     private static final String TAG = "MainActivity";
@@ -59,6 +75,9 @@ public class MainActivity extends Activity {
         });*/
         loadLuaRaw(R.raw.my_class);
     }
+    public void onClickTestCJson(View view){
+        loadLuaAssets("lua/cjson_encode.lua");
+    }
 
     public void onClickTestLuaScript(View view) {
         executeLuaFile();
@@ -66,17 +85,46 @@ public class MainActivity extends Activity {
 
     private void initLua() {
         mLuaState = new LuaState();
+        final Map<String, Boolean> mCMap = new HashMap<>();
+        mCMap.put("cjson", true);
         LuaWrapper.getDefault().registerLuaSearcher(new LuaSearcher() {
             @Override
             public String getLuaFilepath(String module) {
+                if(mCMap.containsKey(module)){
+                    return null;
+                }
                 Logger.d(TAG, "getLuaFilepath", "module = " + module);
                 return LUA_DIR + "/" + module + ".lua";
+            }
+            @Override
+            public String getClibFilepath(String module) {
+                Logger.d(TAG, "getClibFilepath", "module = " + module);
+                //return LUA_DIR + "/lib" + module + ".so";
+                return new File(getFilesDir(), "libcjson.so").getPath();
             }
         });
         Schedulers.io().newWorker().schedule(new Runnable() {
             @Override
             public void run() {
                 AssetsFileCopyUtils.copyAll(getApplicationContext(), "lua", LUA_PARENT_DIR);
+                File dst = new File(getFilesDir(), "libcjson.so");
+                System.out.println("libcjson: path is " + dst.getPath());
+                if(dst.exists()){
+                    System.out.println("libcjson load ok(already copied).");
+                    return;
+                }
+                //lua load libcjson .the c json can't be put to sdcard.
+                try {
+                    InputStream in = getAssets().open("clua/libcjson.so");
+                    OutputStream out = new FileOutputStream(dst);
+                    IOUtils.copyLarge(in, out);
+                    IOUtils.closeQuietly(in);
+                    IOUtils.closeQuietly(out);
+                    System.out.println("libcjson load ok.");
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+
                 Logger.d(TAG, "run", "lua script copy done");
             }
         });
@@ -86,7 +134,7 @@ public class MainActivity extends Activity {
         InputStreamReader in = null;
         try {
             in = new InputStreamReader(getAssets().open(file));
-            int state = mLuaState.LdoString(IOUtils.readString(in));
+            int state = mLuaState.LdoString(readStringWithLine(in));
             Logger.i(TAG, "loadLua", "state = " + state);
         } catch (IOException e) {
             e.printStackTrace();

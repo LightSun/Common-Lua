@@ -11,12 +11,18 @@ cmake_minimum_required(VERSION 3.4.1)
 # Gradle automatically packages shared libraries with your APK.
 
 include_directories(src/main/jni/lua)
+include_directories(src/main/jni/cjson)
 
+#aux_source_directory(src/main/jni/lua SRC_LUA)
+#aux_source_directory(src/main/jni/luaextra SRC_LUA_EXTRA)
+aux_source_directory(src/main/jni/cjson SRC_CJSON)
+aux_source_directory(src/main/jni/luaext_java SRC_LUA_JAVA)
 add_library( # Sets the name of the library.
         lua
 
         # Sets the library as a shared library.
-        STATIC
+        #STATIC
+        SHARED
 
         # Provides a relative path to your source file(s).
         src/main/jni/lua/lapi.c
@@ -58,6 +64,14 @@ add_library( # Sets the name of the library.
         src/main/jni/luaextra/lua_extra.c
         )
 
+add_library(
+        cjson
+
+        SHARED
+
+        ${SRC_CJSON}
+)
+
 add_library( # Sets the name of the library.
         luajava
 
@@ -65,9 +79,7 @@ add_library( # Sets the name of the library.
         SHARED
 
         # Provides a relative path to your source file(s).
-        src/main/jni/luaext_java/LuaWrapper.cpp
-        src/main/jni/luaext_java/LuaState.cpp
-        src/main/jni/luaext_java/java_env.cpp
+        ${SRC_LUA_JAVA}
         )
 
 
@@ -91,11 +103,15 @@ find_library( # Sets the name of the path variable.
 
 
 target_link_libraries( # Specifies the target library.
-        luajava
-
         # Links the target library to the log library
         # included in the NDK.
+        luajava
         lua
-
         ${log-lib}
+        )
+target_link_libraries( # Specifies the target library.
+        # Links the target library to the log library
+        # included in the NDK.
+        cjson
+        lua
         )

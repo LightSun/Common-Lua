@@ -14,16 +14,16 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="15dp"
-            android:text="test lua object"
             android:onClick="onClickTestLuaObject"
+            android:text="base test"
             />
 
         <Button
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="15dp"
-            android:onClick="onClickTestLuaScript"
-            android:text="android调用Lua脚本文件" />
+            android:onClick="onClickTestCJson"
+            android:text="test cjson" />
 
         <Button
             android:layout_width="match_parent"
