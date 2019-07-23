@@ -11,6 +11,7 @@ import com.heaven7.core.util.PermissionHelper;
 import com.heaven7.java.base.util.IOUtils;
 import com.heaven7.java.lua.LuaSearcher;
 import com.heaven7.java.lua.LuaState;
+import com.heaven7.java.lua.LuaTest;
 import com.heaven7.java.lua.LuaWrapper;
 import com.heaven7.java.pc.schedulers.Schedulers;
 
@@ -81,6 +82,10 @@ public class MainActivity extends Activity {
     public void onClickTestLuaExtend(View view){
         loadLuaAssets("lua/extend2.lua");
     }
+    public void onClickTestBindCpp(View view){
+        String script = loadLuaAssetsAsString("lua/LuaTest.lua");
+        LuaTest.testBindCpp1(mLuaState, script);
+    }
 
     public void onClickTestLuaScript(View view) {
         executeLuaFile();
@@ -141,6 +146,17 @@ public class MainActivity extends Activity {
             Logger.i(TAG, "loadLua", "state = " + state);
         } catch (IOException e) {
             e.printStackTrace();
+        } finally {
+            IOUtils.closeQuietly(in);
+        }
+    }
+    public String loadLuaAssetsAsString(String file) {
+        InputStreamReader in = null;
+        try {
+            in = new InputStreamReader(getAssets().open(file));
+            return readStringWithLine(in);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
         } finally {
             IOUtils.closeQuietly(in);
         }

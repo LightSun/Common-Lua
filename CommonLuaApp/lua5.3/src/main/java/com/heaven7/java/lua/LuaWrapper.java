@@ -42,6 +42,9 @@ public final class LuaWrapper {
         if(concat){
             mSb.append(str);
         }else {
+            if(str != null){
+                mSb.append(str);
+            }
             String content = mSb.toString();
             mSb.delete(0, mSb.length());
             //log it

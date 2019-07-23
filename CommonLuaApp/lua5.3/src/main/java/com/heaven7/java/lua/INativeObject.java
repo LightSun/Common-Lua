@@ -12,7 +12,7 @@ public interface INativeObject {
     long getNativePointer();
 
     /**
-     * this method should called in {@linkplain Object#finalize()}.
+     * this method should called in 'Object.finalize()'.
      */
     void destroyNative();
 

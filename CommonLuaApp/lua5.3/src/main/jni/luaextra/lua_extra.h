@@ -12,7 +12,6 @@
 #include "../lua/lualib.h"
 #include "../lua/lauxlib.h"
 #include "../lua/luaconf.h"
-#include "../lua/lua.h"
 
 #define ext_loadLuaScript(L, S) \
         luaL_dostring(L, S)
@@ -37,6 +36,7 @@ void ext_setLuaSearcher(FileSearcher s);
 void ext_setClibSearcher(FileSearcher s);
 
 void ext_setLua_print(Lua_print lp);
+Lua_print ext_getLuaPrint();
 
 int ext_loadLuaFile(lua_State* L, char* filename);
 

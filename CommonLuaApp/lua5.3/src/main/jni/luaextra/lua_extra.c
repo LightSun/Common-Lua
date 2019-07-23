@@ -43,7 +43,11 @@ LUALIB_API char * getCLibFilename(const char* moduleName){
 void ext_setLua_print(Lua_print lp){
     lua_print = lp;
 }
+Lua_print ext_getLuaPrint(){
+    return lua_print;
+}
 
+// flag == 1means end
 void ext_print(char* cs, int len, int flag){
     if(lua_print != NULL){
         lua_print(cs, len, flag);
