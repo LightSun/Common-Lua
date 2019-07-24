@@ -20,27 +20,8 @@
 #include "lauxlib.h"
 #include "lualib.h"
 
-/**
- * print the string . if success return 1. or else return 0.
- * @param cs
- * @param len
- * @param flag the flag of this print. if 1 means print right now. or else concat str
- */
-LUALIB_API void ext_print(char* cs, int len, int flag);
+#include "../luaextra/lua_internal.h"
 
-#define EXIT_PRINT
-
-#ifdef EXIT_PRINT
-  #define __printImpl(s, l, f) \
-        ext_print(s, l, f)
-  #define __flushPrint()  \
-        ext_print("", 0, 1)
-#else
- #define __printImpl(s, l, f) \
-       lua_writestring(s,l)
-#define __flushPrint()  \
-       lua_writeline();
-#endif
 
 static int luaB_print (lua_State *L) {
   int n = lua_gettop(L);  /* number of arguments */
@@ -498,6 +479,9 @@ static const luaL_Reg base_funcs[] = {
   {"tostring", luaB_tostring},
   {"type", luaB_type},
   {"xpcall", luaB_xpcall},
+//=========================== add this ========
+  {"dumpStack", luaB_dumpStack},
+//===================
   /* placeholders */
   {"_G", NULL},
   {"_VERSION", NULL},

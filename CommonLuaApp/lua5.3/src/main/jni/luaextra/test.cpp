@@ -71,12 +71,12 @@ const LuaPort<FooWrapper>::RegType FooWrapper::Register[] = {
         {"add", &FooWrapper::add},
         {"setV", &FooWrapper::setV},
         {"getV", &FooWrapper::getV},
-        {0, 0}
+        {nullptr, nullptr}
 };
 
 
 void call_testLua(lua_State* L, char* luacontent){
-    LuaPort<FooWrapper>::Register(L);
+    LuaPort<FooWrapper>::Register(L); // ok
 
     int code = luaL_dostring(L, luacontent);
     const char* msg = lua_tostring(L, -1);

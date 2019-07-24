@@ -9,10 +9,9 @@
 #define lualib_h
 
 #include "lua.h"
+#include "../luaextra/lua_internal.h"
 
-//============= self ==========
-LUALIB_API char * getLuaFilename(const char* moduleName);
-LUALIB_API char * getCLibFilename(const char* moduleName);
+
 //============ end self =======
 
 LUAMOD_API int (luaopen_base) (lua_State *L);
