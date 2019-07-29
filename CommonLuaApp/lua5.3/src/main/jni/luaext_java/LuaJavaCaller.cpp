@@ -102,7 +102,7 @@ public:
                 }
                 
                 //prepare string array
-                jobjectArray const msgArr = env->NewObjectArray(1, env->FindClass("java/long/String"), nullptr);
+                jobjectArray const msgArr = env->NewObjectArray(1, env->FindClass("java/lang/String"), nullptr);
                 jvalue values[4];
                 values[0].l = env->NewStringUTF(classname);
                 values[1].l = env->NewStringUTF(name);
