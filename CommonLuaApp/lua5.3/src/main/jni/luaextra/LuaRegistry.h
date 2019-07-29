@@ -111,9 +111,10 @@ public:
     void* value;
 };
 void getLuaParam(lua_State* L, int id_value, LuaParam* lp);
+void setTempLuaState(lua_State * L);
+lua_State *getTempLuaState();
 
 class LuaMediator{
-
 public:
     LuaMediator(int count){
         this->count = count;
@@ -133,13 +134,17 @@ public:
     int resultType;
 };
 
-/** the temp lua state. which assigned on start and null on end for constructor and method call. */
-lua_State * __tempL;
 class LuaBridgeCaller{
 public:
-    virtual const void* call(const char* mName,  LuaMediator& holder) = 0;
+    virtual void* call(const char* mName,  LuaMediator& holder) = 0;
+
+    //opt impl. used for user data.
+    void* getCObject(){
+        return nullptr;
+    };
+
     void luaError(const char* msg){
-        luaL_error(__tempL, msg);
+        luaL_error(getTempLuaState(), msg);
     }
 };
 
@@ -159,7 +164,7 @@ public:
         ext_print("LuaBridge is removed.", 0 , 1);
     }
     LuaBridge(lua_State *L){
-        __tempL = L;
+        setTempLuaState(L);
         const lua_Integer count = lua_tointeger(L, -1);
         const char* mname = luaL_checkstring(L, -1 - count - 1);
         LuaMediator* holder = new LuaMediator(count);
@@ -168,11 +173,11 @@ public:
         obj = Create(mname, *holder);
         cn = mname;
         delete holder;
-        __tempL = nullptr;
+        setTempLuaState(nullptr);
     }
     const int call(lua_State *L){
-        //br.call(method, size, args...)
-         __tempL = L;
+        //br.call(method, args..., size)
+        setTempLuaState(L);
         const lua_Integer count = lua_tointeger(L, -1);
         const char* mname = luaL_checkstring(L, -1 - count - 1);
         LuaMediator* holder = new LuaMediator(count);
@@ -182,7 +187,7 @@ public:
 
         const int rType = holder->resultType;
         delete holder;
-        __tempL = nullptr;
+        setTempLuaState(nullptr);
 
         switch (rType){
             case LUA_TNUMBER:{
@@ -208,6 +213,11 @@ public:
                 return 0;
             }
 
+            case LUA_TLIGHTUSERDATA:{ // for light-userdata .you need managed self.
+                lua_pushlightuserdata(L, const_cast<void *>(result));
+                return 1;
+            }
+
             default:
                 std::stringstream out;
                 out << "not support result type = " << rType
@@ -215,6 +225,13 @@ public:
                 luaL_error(L, out.str().c_str());
                 return LUA_ERRRUN;
         }
+    }
+
+    const char* getClassname(){
+        return cn;
+    }
+    void* getCObject(){
+        return obj->getCObject();
     }
 
 private:
@@ -225,8 +242,8 @@ private:
         //br.call(method, size, args...)
         //luaB_dumpStack(L);
         if(count > 0){
-            for (int i = 0; i < count; ++i) {
-                getLuaParam(L, startIdx - (i + 1), &holder->lp[i]);
+            for (int i = 0; i < count; ++i) { //reverse order
+                getLuaParam(L, startIdx - (i + 1), &holder->lp[count - 1 - i]);
             }
         }
     }

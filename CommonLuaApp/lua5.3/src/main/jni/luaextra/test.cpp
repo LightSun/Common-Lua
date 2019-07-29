@@ -93,7 +93,7 @@ class LuaBridgeCallerImpl : public LuaBridgeCaller{
 public:
     LuaBridgeCallerImpl(const char *classname, LuaMediator &holder){
     }
-    const void* call(const char* mName,  LuaMediator& holder){
+    void* call(const char* mName,  LuaMediator& holder){
         if(holder.count <= 0){
             lua_Number * a = new lua_Number();
             *a = 10086;

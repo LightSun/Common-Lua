@@ -6,6 +6,7 @@
 #define COMMONLUAAPP_JAVA_ENV_H
 
 #include <jni.h>
+#include "LuaJavaCaller.h"
 #define SIG_JSTRING "Ljava/lang/String;"
 
 typedef struct Registration{

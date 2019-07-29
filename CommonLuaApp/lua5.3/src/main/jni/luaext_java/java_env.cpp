@@ -47,11 +47,13 @@ JNIEXPORT jint JNI_OnLoad(JavaVM *vm, void *reserved) {
     // __JNI_OnLoad(env);
     registerMethods(env, getLuaStateRegistration());
     g_jvm = vm;
+    initLuaJavaCaller();
     return JNI_VERSION_1_4;
 }
 
 JNIEXPORT void JNI_OnUnload(JavaVM *vm, void *reserved) {
     LOGD("JNI_OnUnload ------");
+    deInitLuaJavaCaller();
     g_jvm = NULL;
 }
 
