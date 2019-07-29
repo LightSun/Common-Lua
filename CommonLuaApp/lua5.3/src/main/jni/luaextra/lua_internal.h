@@ -36,5 +36,9 @@ LUALIB_API int luaB_dumpStack(lua_State* L);
        lua_writeline();
 #endif
 
+#define ext_prints(cs) \
+        ext_print(cs, 0, 0)
+#define ext_println(cs) \
+        ext_print((char* )cs, 0, 1)
 
 #endif //COMMONLUAAPP_LUA_INTERNAL_H

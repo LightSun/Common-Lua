@@ -1,5 +1,6 @@
 --
--- LUA_TSTRING = 4
+--  ::int/byte/short/long float/double/boolean/
+
 local bridge = LuaBridge("com.heaven7.test", 0);
 local result = bridge:call("size", 0);
 print(result);

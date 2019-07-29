@@ -133,15 +133,20 @@ public:
     int resultType;
 };
 
+/** the temp lua state. which assigned on start and null on end for constructor and method call. */
+lua_State * __tempL;
 class LuaBridgeCaller{
 public:
     virtual const void* call(const char* mName,  LuaMediator& holder) = 0;
+    void luaError(const char* msg){
+        luaL_error(__tempL, msg);
+    }
 };
 
 //=========================
 typedef LuaBridgeCaller* (*LBCCreator)(const char* classname, LuaMediator& holder);
 void setLuaBridgeCallerCreator(LBCCreator creator);
-LuaBridgeCaller* Create(const char* classname, LuaMediator& holder);
+LuaBridgeCaller *Create(const char *classname, LuaMediator &holder);
 //=========================
 
 class LuaBridge{
@@ -154,6 +159,7 @@ public:
         ext_print("LuaBridge is removed.", 0 , 1);
     }
     LuaBridge(lua_State *L){
+        __tempL = L;
         const lua_Integer count = lua_tointeger(L, -1);
         const char* mname = luaL_checkstring(L, -1 - count - 1);
         LuaMediator* holder = new LuaMediator(count);
@@ -162,9 +168,11 @@ public:
         obj = Create(mname, *holder);
         cn = mname;
         delete holder;
+        __tempL = nullptr;
     }
     const int call(lua_State *L){
         //br.call(method, size, args...)
+         __tempL = L;
         const lua_Integer count = lua_tointeger(L, -1);
         const char* mname = luaL_checkstring(L, -1 - count - 1);
         LuaMediator* holder = new LuaMediator(count);
@@ -174,6 +182,7 @@ public:
 
         const int rType = holder->resultType;
         delete holder;
+        __tempL = nullptr;
 
         switch (rType){
             case LUA_TNUMBER:{

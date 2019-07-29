@@ -64,5 +64,4 @@ void ext_closeLuaState(lua_State* ls);
  */
 void ext_closeLuaThread(lua_State *main,lua_State* ls);
 
-
 #endif //COMMONLUAAPP_LUA_EXTRA_H

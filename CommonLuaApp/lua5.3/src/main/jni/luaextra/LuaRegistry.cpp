@@ -48,7 +48,7 @@ LBCCreator __creator = nullptr;
 void initLuaBridge(lua_State* L){
     LuaRegistry<LuaBridge>::Register(L);
 }
-LuaBridgeCaller* Create(const char* classname, LuaMediator& holder){
+LuaBridgeCaller* Create(const char *classname, LuaMediator &holder, LuaMediator mediator) {
     if(__creator == nullptr){
         return nullptr;
     }
