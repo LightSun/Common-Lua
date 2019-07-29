@@ -66,14 +66,13 @@ public class MainActivity extends Activity {
     public void onRequestPermissionsResult(int requestCode,String[] permissions,int[] grantResults) {
         mHelper.onRequestPermissionsResult(requestCode, permissions, grantResults);
     }
+    public void onClickDetachLua(View view) {
+        if(mLuaState != null){
+            mLuaState.destroyNative();
+            mLuaState = null;
+        }
+    }
     public void onClickTestLuaObject(View view) {
-        /* Schedulers.io().newWorker().schedule(new Runnable() {
-            @Override
-            public void run() {
-                // loadLua("MyClass.lua");
-                loadLuaRaw(R.raw.my_class);
-            }
-        });*/
         loadLuaRaw(R.raw.my_class);
     }
     public void onClickTestCJson(View view){
@@ -85,6 +84,10 @@ public class MainActivity extends Activity {
     public void onClickTestBindCpp(View view){
         String script = loadLuaAssetsAsString("lua/LuaTest.lua");
         LuaTest.testBindCpp1(mLuaState, script);
+    }
+    public void onClickTestLuaRegistry(View view){
+        String script = loadLuaAssetsAsString("lua/luaregistry_test.lua");
+        LuaTest.testLuaRegistry(mLuaState, script);
     }
 
     public void onClickTestLuaScript(View view) {

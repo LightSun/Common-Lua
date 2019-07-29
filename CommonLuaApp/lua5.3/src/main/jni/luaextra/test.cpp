@@ -7,6 +7,8 @@ extern "C"{
 #include "lua_extra.h"
 }
 
+#include "LuaRegistry.h"
+
 class Foo{
 
 public:
@@ -51,7 +53,7 @@ public:
         int b = luaL_checknumber(L, -2);
         int res = Foo::add(a, b);
         lua_pushnumber(L, res);
-        return 1; //lua返回值的个数
+        return 1; //push的个数
     }
 
     const int setV(lua_State* L){
@@ -84,6 +86,44 @@ void call_testLua(lua_State* L, char* luacontent){
 
     char a[50];
     sprintf(a, "call_testLua(). result code is %d", code);
+    ext_getLuaPrint()(a, 50, 1);
+}
+
+class LuaBridgeCallerImpl : public LuaBridgeCaller{
+public:
+    LuaBridgeCallerImpl(const char *classname, LuaMediator &holder){
+    }
+    const void* call(const char* mName,  LuaMediator& holder){
+        if(holder.count <= 0){
+            lua_Number * a = new lua_Number();
+            *a = 10086;
+            holder.resultType = LUA_TNUMBER;
+            return a;
+        } else{
+            LuaParam* param = &holder.lp[0];
+            holder.resultType = param->type;
+            return param->value;
+        }
+    }
+};
+
+
+extern void initLuaBridge(lua_State* L);
+
+void call_testLuaRegistry(lua_State* L, char* luacontent){
+    //c++ 11支持函数表达式
+    auto creator = [](const char *classname, LuaMediator &holder){
+        return (LuaBridgeCaller*)new LuaBridgeCallerImpl(classname, holder);
+    };
+    setLuaBridgeCallerCreator(creator);
+    initLuaBridge(L);
+
+    int code = luaL_dostring(L, luacontent);
+    const char* msg = lua_tostring(L, -1);
+    ext_getLuaPrint()(const_cast<char *>(msg), 50, 1);
+
+    char a[50];
+    sprintf(a, "call_testLuaRegistry(). result code is %d", code);
     ext_getLuaPrint()(a, 50, 1);
 }
 

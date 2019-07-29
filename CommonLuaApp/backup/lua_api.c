@@ -276,7 +276,7 @@ static char *get_fn_string(lua_State *L, int i) {
     // stack = [..]
     lua_getglobal(L, "_G");
     // stack = [.., _G]
-    lua_pushnil(L);
+    lua_pushnil(L); //循环遍历(lua_next)时使用
     // stack = [.., _G, nil]
     while (lua_next(L, -2)) {
         // stack = [.., _G, key, value]

@@ -9,13 +9,19 @@
         android:layout_height="match_parent"
         android:layout_margin="10dp"
         android:orientation="vertical" >
-
+        <Button
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="15dp"
+            android:onClick="onClickDetachLua"
+            android:text="Test Lua detach"
+            />
         <Button
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="15dp"
             android:onClick="onClickTestLuaObject"
-            android:text="base test"
+            android:text="Test Lua Object"
             />
 
         <Button
@@ -38,6 +44,13 @@
             android:layout_marginTop="15dp"
             android:onClick="onClickTestBindCpp"
             android:text="test_bindCpp" />
+
+        <Button
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="15dp"
+            android:onClick="onClickTestLuaRegistry"
+            android:text="test_lua_registry" />
 
     </LinearLayout>
 

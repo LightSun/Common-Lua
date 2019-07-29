@@ -16,7 +16,9 @@ extern "C"{
 };
 
 //调用测试的lua
-void call_testLua(lua_State* L, char* file);
+void call_testLua(lua_State* L, char* content);
+
+void call_testLuaRegistry(lua_State* L, char* content);
 
 
 template <class T>
@@ -61,11 +63,15 @@ public:
 
         // 4. 设置lua userdata的元表. 将之前Register函数注册的元表取出来 ,然后放入到新对象中。
         luaL_getmetatable(L, T::className);
+        luaB_dumpStack(L);
         lua_setmetatable(L, -2); // 等价于lua内 setmetatable(userdata, meta).将栈顶的 meta设置给 -2位置的table. 并出栈
+
+        luaB_dumpStack(L);
 
         // 5. tt[0] = userdata
         lua_pushnumber(L, 0);
-        lua_insert(L, -2); //move 栈顶userdata 到 -2的位置
+        lua_insert(L, -2); //move 栈顶 '0'(lua_pushnumber) 到 -2的位置 (-1 是栈顶)
+        luaB_dumpStack(L);
         lua_settable(L, -3);
 
         // 6. 向table中注入c++函数 tt[1]

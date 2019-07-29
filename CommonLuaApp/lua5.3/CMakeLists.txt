@@ -63,6 +63,7 @@ add_library( # Sets the name of the library.
 
         src/main/jni/luaextra/lua_extra.c
         src/main/jni/luaextra/lua_internal.c
+        src/main/jni/luaextra/LuaRegistry.cpp
         # test
         src/main/jni/luaextra/test.cpp
         )
