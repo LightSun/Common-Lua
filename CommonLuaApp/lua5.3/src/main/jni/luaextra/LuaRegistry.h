@@ -132,6 +132,7 @@ public:
     int count;
     LuaParam* lp;
     int resultType;
+    const char* className;
 };
 
 class LuaBridgeCaller{
@@ -161,7 +162,7 @@ public:
 
     ~LuaBridge(){
         delete(obj);
-        ext_print("LuaBridge is removed.", 0 , 1);
+        //ext_print("LuaBridge is removed.", 0 , 1);
     }
     LuaBridge(lua_State *L){
         setTempLuaState(L);
@@ -181,6 +182,7 @@ public:
         const lua_Integer count = lua_tointeger(L, -1);
         const char* mname = luaL_checkstring(L, -1 - count - 1);
         LuaMediator* holder = new LuaMediator(count);
+        holder->className = cn;
 
         getParams(L, holder, count, -1);
         const void* result = obj->call(mname, *holder);

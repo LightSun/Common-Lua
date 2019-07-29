@@ -16,6 +16,7 @@
 #define SIG_INVOKE "("##OBJECT_NAME##STRING_NAME##STRING_NAME##"["##OBJECT_NAME##"["##STRING_NAME##")"##OBJECT_NAME
 
 static jclass __callerClass;
+static jclass __objectClass;
 static jmethodID __mid_create;
 static jmethodID __mid_invoke;
 
@@ -52,6 +53,7 @@ const char * getStringValue(LuaBridgeCaller* owner, LuaParam* lp){
 void initLuaJavaCaller(){
     JNIEnv *const env = getJNIEnv();
     __callerClass = env->FindClass(CALLER_CLASS);
+    __objectClass = env->FindClass("java/lang/Object");
     __mid_create = env->GetMethodID(__callerClass, MNAME_CREATE ,SIG_CREATE);
     __mid_invoke = env->GetMethodID(__callerClass, MNAME_INVOKE ,SIG_INVOKE);
 }
@@ -59,6 +61,7 @@ void initLuaJavaCaller(){
 void deInitLuaJavaCaller(){
     JNIEnv *const env = getJNIEnv();
     env->DeleteLocalRef(__callerClass);
+    env->DeleteLocalRef(__objectClass);
     __callerClass = nullptr;
     __mid_create = nullptr;
     __mid_invoke = nullptr;
@@ -88,7 +91,32 @@ public:
             if(holder.count == 0){
                 jobj = env->AllocObject(jclazz); //default constructor
             } else{
-               // env->CallStaticObjectMethodA(__callerClass, __mid_create, )
+                const char* name = getStringValue(this, &holder.lp[0]);
+                int size = holder.count - 1;
+                jobjectArray const arr = env->NewObjectArray(size, __objectClass, nullptr);
+                for (int i = 0; i < size; ++i) {
+                    const char *const str = getStringValue(this, &holder.lp[i + 1]);
+                    //if(str == null . means it is
+                    jstring const jstr = env->NewStringUTF(str);
+                    env->SetObjectArrayElement(arr, i, jstr);
+                }
+                
+                //prepare string array
+                jobjectArray const msgArr = env->NewObjectArray(1, env->FindClass("java/long/String"), nullptr);
+                jvalue values[4];
+                values[0].l = env->NewStringUTF(classname);
+                values[1].l = env->NewStringUTF(name);
+                values[2].l = arr;
+                values[3].l = msgArr;
+
+                jobject const result = env->CallStaticObjectMethodA(__callerClass, __mid_create, values);
+                jstring const msg = static_cast<jstring const>(env->GetObjectArrayElement(msgArr, 0));
+                if(msg != nullptr){
+                   const jchar *const chs = env->GetStringChars(msg, nullptr);
+                   luaError(reinterpret_cast<const char *>(chs));
+                } else{
+                    jobj = result;
+                }
             }
         }
     }
