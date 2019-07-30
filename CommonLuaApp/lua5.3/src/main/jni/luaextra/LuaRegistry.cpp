@@ -54,9 +54,10 @@ void getLuaParam(lua_State* L, int id_value, LuaParam* lp){
             //unpack for LuaBridge. only class can be dynamic cast.
             LuaBridge* lbPtr = static_cast<LuaBridge *>(data);
             if(lbPtr != nullptr){
-               // lp->className = const_cast<char *>(lbPtr->getClassname());
+                lp->className = const_cast<char *>(lbPtr->getClassname());
                 lp->value = lbPtr->getCObject();
             } else{
+                //todo need convert ?
                 lp->value = data;
             }
             break;

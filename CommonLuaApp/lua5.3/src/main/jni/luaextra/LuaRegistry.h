@@ -109,6 +109,7 @@ public:
     }
     int type;
     void* value;
+    const char* className;
 };
 void getLuaParam(lua_State* L, int id_value, LuaParam* lp);
 void setTempLuaState(lua_State * L);

@@ -20,8 +20,9 @@ static jclass __objectClass;
 static jmethodID __mid_create;
 static jmethodID __mid_invoke;
 
-const char * getStringValue(LuaBridgeCaller* owner, LuaParam* lp){
+const char * getStringValue(LuaParam* lp, bool* state){
     int type = lp->type;
+    *state = true;
     switch (type) {
         case LUA_TNUMBER: {
             lua_Number *a = static_cast<lua_Number *>(lp->value);
@@ -43,9 +44,7 @@ const char * getStringValue(LuaBridgeCaller* owner, LuaParam* lp){
         }
 
         default:
-            std::stringstream out;
-            out << "not support type = " << type;
-            owner->luaError(out.str().c_str());
+            *state = false;
             return nullptr;
     }
 }
@@ -67,7 +66,6 @@ void deInitLuaJavaCaller(){
     __mid_invoke = nullptr;
 }
 
-// 适配java 8大基本类型和自定义对象？
 class LuaJavaCaller: public LuaBridgeCaller{
 
     jobject jobj;
@@ -91,14 +89,29 @@ public:
             if(holder.count == 0){
                 jobj = env->AllocObject(jclazz); //default constructor
             } else{
-                const char* name = getStringValue(this, &holder.lp[0]);
+                bool success;
+                const char* name = getStringValue(&holder.lp[0], &success);
+                if(name == nullptr){
+                    luaError("the first param of create object must be constructor name. like '<init>'");
+                }
                 int size = holder.count - 1;
+                //params
                 jobjectArray const arr = env->NewObjectArray(size, __objectClass, nullptr);
                 for (int i = 0; i < size; ++i) {
-                    const char *const str = getStringValue(this, &holder.lp[i + 1]);
-                    //if(str == null . means it is
-                    jstring const jstr = env->NewStringUTF(str);
-                    env->SetObjectArrayElement(arr, i, jstr);
+                    const char *const str = getStringValue(&holder.lp[i + 1], &success);
+                    if(success){
+                        jstring const jstr = str != nullptr ? env->NewStringUTF(str) : nullptr;
+                        env->SetObjectArrayElement(arr, i, jstr);
+                    } else{
+                        //TODO support array types-- lua-table.
+                        //failed means it not base types.
+                        void *const value = holder.lp[i + 1].value;
+                        if(value != nullptr){
+                            env->SetObjectArrayElement(arr, i, static_cast<jobject>(value));
+                        } else{
+                            env->SetObjectArrayElement(arr, i, nullptr);
+                        }
+                    }
                 }
                 
                 //prepare string array
@@ -108,7 +121,7 @@ public:
                 values[1].l = env->NewStringUTF(name);
                 values[2].l = arr;
                 values[3].l = msgArr;
-
+                //create
                 jobject const result = env->CallStaticObjectMethodA(__callerClass, __mid_create, values);
                 jstring const msg = static_cast<jstring const>(env->GetObjectArrayElement(msgArr, 0));
                 if(msg != nullptr){
@@ -122,7 +135,45 @@ public:
     }
     void* call(const char* mName,  LuaMediator& holder){
         JNIEnv *const env = getJNIEnv();
-       //TODO  env->GetMethodID(jclazz, mName, )
+        int size = holder.count;
+        //params
+        bool success;
+        jobjectArray const arr = env->NewObjectArray(size, __objectClass, nullptr);
+        for (int i = 0; i < size; ++i) {
+            const char *const str = getStringValue(&holder.lp[i], &success);
+            if(success){
+                jstring const jstr = str != nullptr ? env->NewStringUTF(str) : nullptr;
+                env->SetObjectArrayElement(arr, i, jstr);
+            } else{
+                //TODO support array types-- lua-table.
+                //failed means it not base types.
+                void *const value = holder.lp[i].value;
+                if(value != nullptr){
+                    env->SetObjectArrayElement(arr, i, static_cast<jobject>(value));
+                } else{
+                    env->SetObjectArrayElement(arr, i, nullptr);
+                }
+            }
+        }
+
+        //prepare string array
+        jobjectArray const msgArr = env->NewObjectArray(1, env->FindClass("java/lang/String"), nullptr);
+        jvalue values[4];
+        values[0].l = env->NewStringUTF(holder.className);
+        values[1].l = env->NewStringUTF(mName);
+        values[2].l = arr;
+        values[3].l = msgArr;
+        //create
+        jobject const result = env->CallStaticObjectMethodA(__callerClass, __mid_invoke, values);
+        jstring const msg = static_cast<jstring const>(env->GetObjectArrayElement(msgArr, 0));
+        if(msg != nullptr){
+            const jchar *const chs = env->GetStringChars(msg, nullptr);
+            luaError(reinterpret_cast<const char *>(chs));
+            return nullptr;
+        } else{
+            //TODO need convert java object to lua.
+            return result;
+        }
        // holder.resultType = LUA_TNUMBER;
     }
 };
