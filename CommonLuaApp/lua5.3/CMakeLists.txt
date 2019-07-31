@@ -16,6 +16,7 @@ include_directories(src/main/jni/cjson)
 #aux_source_directory(src/main/jni/lua SRC_LUA)
 #aux_source_directory(src/main/jni/luaextra SRC_LUA_EXTRA)
 aux_source_directory(src/main/jni/cjson SRC_CJSON)
+aux_source_directory(src/main/jni/common SRC_COMMON)
 aux_source_directory(src/main/jni/luaext_java SRC_LUA_JAVA)
 add_library( # Sets the name of the library.
         lua
@@ -25,6 +26,7 @@ add_library( # Sets the name of the library.
         SHARED
 
         # Provides a relative path to your source file(s).
+        ${SRC_COMMON}
         src/main/jni/lua/lapi.c
         src/main/jni/lua/lauxlib.c
         src/main/jni/lua/lbaselib.c
@@ -64,6 +66,7 @@ add_library( # Sets the name of the library.
         src/main/jni/luaextra/lua_extra.c
         src/main/jni/luaextra/lua_internal.c
         src/main/jni/luaextra/LuaRegistry.cpp
+
         # test
         src/main/jni/luaextra/test.cpp
         )

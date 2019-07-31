@@ -5,6 +5,7 @@
 #include "../luaextra/LuaRegistry.h"
 #include "../luaextra/lua_extra.h"
 #include "sstream"
+#include "class_info.h"
 
 #define STRING_NAME "Ljava/lang/String;"
 #define OBJECT_NAME "Ljava/lang/Object;"
@@ -12,8 +13,8 @@
 #define MNAME_CREATE "create"
 #define MNAME_INVOKE "invoke"
 
-#define SIG_CREATE "("##STRING_NAME##STRING_NAME##"["##OBJECT_NAME##"["##STRING_NAME##")"##OBJECT_NAME
-#define SIG_INVOKE "("##OBJECT_NAME##STRING_NAME##STRING_NAME##"["##OBJECT_NAME##"["##STRING_NAME##")"##OBJECT_NAME
+#define SIG_CREATE "(" STRING_NAME STRING_NAME"[" OBJECT_NAME "[" STRING_NAME ")" OBJECT_NAME
+#define SIG_INVOKE "(" OBJECT_NAME STRING_NAME STRING_NAME "[" OBJECT_NAME "[" STRING_NAME ")" OBJECT_NAME
 
 static jclass __callerClass;
 static jclass __objectClass;
@@ -172,6 +173,9 @@ public:
             return nullptr;
         } else{
             //TODO need convert java object to lua.
+            if(result == nullptr){
+               // return
+            }
             return result;
         }
        // holder.resultType = LUA_TNUMBER;

@@ -14,4 +14,5 @@
 #define DTYPE_LIST 7
 #define DTYPE_MAP 8
 
+
 #endif //COMMONLUAAPP_LUA_BRIDGE_H

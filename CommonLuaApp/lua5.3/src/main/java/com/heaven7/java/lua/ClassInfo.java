@@ -1,7 +1,6 @@
 package com.heaven7.java.lua;
 
 import java.lang.reflect.Constructor;
-import java.lang.reflect.Executable;
 import java.lang.reflect.Method;
 import java.util.HashMap;
 import java.util.Map;
