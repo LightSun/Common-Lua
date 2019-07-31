@@ -11,14 +11,15 @@
 #include "../common/map2.h"
 
 namespace LUA_JAVA {
-    class MethodInfo{
+    class MethodInfo {
     public:
         std::string name;
         std::string sig;
         List<jclass> types;
 
-        MethodInfo(){}
-        ~MethodInfo(){
+        MethodInfo() {}
+
+        ~MethodInfo() {
             JNIEnv *const pEnv = getJNIEnv();
             for (int i = 0, size = types.size(); i < size; ++i) {
                 pEnv->DeleteLocalRef(types.getAt(i));
@@ -27,8 +28,12 @@ namespace LUA_JAVA {
         }
     };
 
-    class ClassInfo{
-
+    class ClassInfo {
+    private:
+        std::string className;
+        Map<std::string, MethodInfo> mMethodMap;
+        Map<std::string, MethodInfo> mConstructorMap;
+    public:
     };
 }
 #endif //COMMONLUAAPP_CLASS_INFO_H
