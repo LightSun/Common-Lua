@@ -148,6 +148,9 @@ public:
         }
         return *this;
     }
+    T& operator[](const int key){
+        return array[key];
+    }
 
     const std::string toString(){
         const size_t s = size();
