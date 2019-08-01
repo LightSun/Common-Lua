@@ -21,6 +21,7 @@ extern "C"{
 #endif
 
 #include "sstream"
+#include "lua_bridge.h"
 
 template <class T>
 class LuaRegistry{
@@ -138,14 +139,20 @@ public:
 
 class LuaBridgeCaller{
 public:
-    virtual void* call(const char* mName,  LuaMediator& holder) = 0;
+    virtual void *call(const char *cn, const char *mName ,LuaMediator &holder) = 0;
 
     //opt impl. used for user data.
     void* getCObject(){
         return nullptr;
     };
 
-    void luaError(const char* msg){
+    bool hasField(const char *className, const char *name) {
+        return false;
+    }
+    bool hasMethod(const char *className, const char *name) {
+        return false;
+    }
+    const void luaError(const char* msg){
         luaL_error(getTempLuaState(), msg);
     }
 };
@@ -177,6 +184,18 @@ public:
         delete holder;
         setTempLuaState(nullptr);
     }
+    const int hasMethod(lua_State *L){
+        const char* name = luaL_checkstring(L, -1);
+        bool result = obj->hasMethod(cn, name);
+        lua_pushboolean(L, result ? 1 : 0);
+        return 0;
+    }
+    const int hasField(lua_State *L){
+        const char* name = luaL_checkstring(L, -1);
+        bool result = obj->hasField(cn, name);
+        lua_pushboolean(L, result ? 1 : 0);
+        return 0;
+    }
     const int call(lua_State *L){
         //br.call(method, args..., size)
         setTempLuaState(L);
@@ -186,7 +205,7 @@ public:
         holder->className = cn;
 
         getParams(L, holder, count, -1);
-        const void* result = obj->call(mname, *holder);
+        const void* result = obj->call(cn, mname, *holder);
 
         const int rType = holder->resultType;
         delete holder;
@@ -219,6 +238,11 @@ public:
             case LUA_TLIGHTUSERDATA:{ // for light-userdata .you need managed self.
                 lua_pushlightuserdata(L, const_cast<void *>(result));
                 return 1;
+            }
+
+            case LUA_TTABLE:{
+
+                break;
             }
 
             default:

@@ -38,8 +38,8 @@ public final class ClassInfo {
         for (Constructor con : cons) {
             LuaMethod lm = (LuaMethod) con.getAnnotation(LuaMethod.class);
             MethodInfo info = new MethodInfo();
-            info.name = "<init>";
-            info.types = con.getParameterTypes();
+            info.setName("<init>");
+            info.setTypes(con.getParameterTypes());
 
             getSigAndFill(sb, mConstructorMap, null, lm, info);
         }
@@ -49,8 +49,8 @@ public final class ClassInfo {
             LuaMethod lm = m.getAnnotation(LuaMethod.class);
             MethodInfo info = new MethodInfo();
 
-            info.name = m.getName();
-            info.types = m.getParameterTypes();
+            info.setName(m.getName());
+            info.setTypes(m.getParameterTypes());
             getSigAndFill(sb, mMethodMap, m.getReturnType(), lm, info);
         }
     }
@@ -58,26 +58,26 @@ public final class ClassInfo {
     //for constructor. returnType = null
     private void getSigAndFill(StringBuilder sb, Map<String, MethodInfo> map, Class<?> returnType, LuaMethod lm, MethodInfo info) {
         sb.append("(");
-        for (Class<?> cla : info.types) {
+        for (Class<?> cla : info.getTypes()) {
             sb.append(typeToSig(cla));
         }
         sb.append(")");
         sb.append(returnType != null ? typeToSig(returnType) : "V");
-        info.sig = sb.toString();
+        info.setSig(sb.toString());
         sb.delete(0, sb.length());
 
         if (lm != null && lm.value().length() > 0) {
             map.put(lm.value(), info);
         } else {
-            int index = getNextMethodIndex(info.name);
+            int index = getNextMethodIndex(info.getName());
             if (index > 0) {
-                map.put(info.name + index, info);
+                map.put(info.getName() + index, info);
             } else {
-                if(map.containsKey(info.name)){
-                    mIndexMap.put(info.name, 1);
-                    map.put(info.name + 1, info);
+                if(map.containsKey(info.getName())){
+                    mIndexMap.put(info.getName(), 1);
+                    map.put(info.getName() + 1, info);
                 }else {
-                    map.put(info.name, info);
+                    map.put(info.getName(), info);
                 }
             }
         }
@@ -120,11 +120,5 @@ public final class ClassInfo {
         }
         sb.append(";");
         return sb.toString();
-    }
-    public static class MethodInfo {
-        public String name;
-        public String sig;  //"(Ljava/lang/String;Z)V"
-        public Class<?>[] types;
-       // public Object method; //method/constructor
     }
 }

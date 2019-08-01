@@ -134,7 +134,7 @@ public:
             }
         }
     }
-    void* call(const char* mName,  LuaMediator& holder){
+    void *call(const char *cn, const char *mName ,LuaMediator &holder) {
         JNIEnv *const env = getJNIEnv();
         int size = holder.count;
         //params

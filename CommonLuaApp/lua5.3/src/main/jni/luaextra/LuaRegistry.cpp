@@ -3,10 +3,13 @@
 //
 
 #include "LuaRegistry.h"
+#include "../common/map2.h"
 
 const char LuaBridge::className[] = "LuaBridge";
 const LuaRegistry<LuaBridge>::RegType LuaBridge::Register[] = {
         {"call", &LuaBridge::call},
+        {"hasField", &LuaBridge::hasField},
+        {"hasMethod", &LuaBridge::hasMethod},
         {nullptr, nullptr}
 };
 
@@ -22,31 +25,34 @@ lua_State *getTempLuaState(){
 
 void getLuaParam(lua_State* L, int id_value, LuaParam* lp){
     int type = lua_type(L, id_value);
-    lp->type = type;
     switch (type){
         case LUA_TNUMBER:{
             lua_Number* a = new lua_Number();
             *a = lua_tonumber(L, id_value);
             lp->value = a;
+            lp->type = DTYPE_NUMBER;
             break;
         }
         case LUA_TBOOLEAN:{
             int* a = new int();
             *a = lua_toboolean(L, id_value);
             lp->value = a;
+            lp->type = DTYPE_BOOLEAN;
             break;
         }
         case LUA_TSTRING:{
             const char* str = lua_tostring(L, id_value);
             lp->value = (void *) str;
+            lp->type = DTYPE_STRING;
             break;
         }
         case LUA_TNIL:{
             lp->value = nullptr;
+            lp->type = DTYPE_NULL;
             break;
         }
         case LUA_TLIGHTUSERDATA:{
-            lp->value = lua_touserdata(L, id_value);
+            luaL_error(L, "Currently, lua param not support for light-userdata.");
             break;
         }
         case LUA_TUSERDATA: {
@@ -56,9 +62,63 @@ void getLuaParam(lua_State* L, int id_value, LuaParam* lp){
             if(lbPtr != nullptr){
                 lp->className = const_cast<char *>(lbPtr->getClassname());
                 lp->value = lbPtr->getCObject();
+                lp->type = DTYPE_LB_OBJECT;
             } else{
-                //todo need convert ?
                 lp->value = data;
+                lp->type = DTYPE_OBJECT;
+            }
+            break;
+        }
+
+        case LUA_TTABLE:{
+            //TODO not support now
+            //need make the table on the top.
+            lua_pushnil(L);
+            // 现在的栈：-1 => nil; index => table
+            Map<const char*, const char*>* tab = new Map();
+            int luaCollType = -1;
+            while (lua_next(L, id_value))
+            {
+                // 现在的栈：-1 => value; -2 => key; index => table
+                // 拷贝一份 key 到栈顶，然后对它做 lua_tostring 就不会改变原始的 key 值了
+                lua_pushvalue(L, -2);
+                // 现在的栈：-1 => key; -2 => value; -3 => key; index => table
+                const char* key = lua_tostring(L, -1);
+                const char* value = lua_tostring(L, -2);
+
+                int kt = lua_type(L, -1);
+                int vt = lua_type(L, -2);
+                if( (kt == LUA_TNUMBER || kt == LUA_TBOOLEAN || kt == LUA_TSTRING) &&
+                        (vt == LUA_TNUMBER || vt == LUA_TBOOLEAN || vt == LUA_TSTRING)  ){
+                    tab->put(key, value);
+                } else if(kt == LUA_TFUNCTION && key == "getCollectionType"){ //lua defined collection. by heaven7
+                    luaCollType = static_cast<int>(lua_tointeger(L, -2));
+                }
+
+                // 弹出 value 和拷贝的 key，留下原始的 key 作为下一次 lua_next 的参数
+                lua_pop(L, 2);
+                // 现在的栈：-1 => key; index => table
+            }
+            // 现在的栈：index => table （最后 lua_next 返回 0 的时候它已经把上一次留下的 key 给弹出了）
+            // 所以栈已经恢复到进入这个函数时的状态
+            /*
+             *  m.COLLECTION_TYPE_LIST = 1
+                m.COLLECTION_TYPE_SET  = 2
+                m.COLLECTION_TYPE_MAP  = 3
+             */
+            switch (luaCollType){
+                case 1:{
+
+                    break;
+                }
+                case 2:{
+
+                    break;
+                }
+                case 3:{
+
+                    break;
+                }
             }
             break;
         }

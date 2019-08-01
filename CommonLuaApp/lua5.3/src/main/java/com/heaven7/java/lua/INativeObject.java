@@ -37,7 +37,9 @@ public interface INativeObject {
         }
         @Override
         protected void finalize() throws Throwable {
-            destroyNative();
+            if(destroyNativeOnRecycle()){
+                destroyNative();
+            }
             super.finalize();
         }
 
@@ -57,5 +59,9 @@ public interface INativeObject {
          * @param ptr the pointer of native
          */
         protected abstract void nRelease(long ptr);
+
+        protected boolean destroyNativeOnRecycle(){
+            return true;
+        }
     }
 }

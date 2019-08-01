@@ -46,16 +46,16 @@ public:
         return getAt(0);
     }
 
-    void add(T t) {
+    void add(const T& t) {
         array.push_back(t);
        // array.insert(array.end(), t);
     }
 
-    void add(int index, T t) {
+    void add(int index,const T& t) {
         array.insert(array.begin() + index, t);
     }
 
-    void addAll(List<T> &l) {
+    void addAll(const List<T> &l) {
         array.insert(array.end(), l.array.begin(), l.array.end());
     }
 
@@ -63,7 +63,18 @@ public:
         return size() == 0;
     }
 
-    bool remove(T t) {
+    bool contains(const T& t){
+        size_t size = array.size();
+        for (int i = 0; i < size; i++) {
+            //need overload ==
+            if (array[i] == t) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    bool remove(const T& t) {
         size_t size = array.size();
         for (int i = 0; i < size; i++) {
             //need overload ==
@@ -75,7 +86,7 @@ public:
         return false;
     }
 
-    const T set(int index, T newT) {
+    const T set(int index,const T& newT) {
         if (index >= size()) {
             return nullptr;
         }

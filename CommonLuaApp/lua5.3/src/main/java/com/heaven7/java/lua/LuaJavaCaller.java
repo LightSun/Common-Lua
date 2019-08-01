@@ -54,11 +54,11 @@ public final class LuaJavaCaller {
         //name can be null
         try {
             ClassInfo info = sInfos.get(className);
-            ClassInfo.MethodInfo mi = info.getConstructorInfo(name);
+            MethodInfo mi = info.getConstructorInfo(name);
             Class<?> clazz = Class.forName(className);
 
-            Object[] out = new Object[mi.types.length];
-            int state = convert(mi.types, args, out);
+            Object[] out = new Object[mi.getTypes().length];
+            int state = convert(mi.getTypes(), args, out);
             switch (state){
                 case PARAMETER_ERROR:
                     errorMsg[0] = "PARAMETER_ERROR";
@@ -69,7 +69,7 @@ public final class LuaJavaCaller {
                 default:
                     errorMsg[0] = null;
             }
-            return clazz.getConstructor(mi.types).newInstance(out);
+            return clazz.getConstructor(mi.getTypes()).newInstance(out);
         }catch (Exception e){
             errorMsg[0] = toString(e);
         }
@@ -90,11 +90,11 @@ public final class LuaJavaCaller {
         //name can be null
         try {
             ClassInfo info = sInfos.get(className);
-            ClassInfo.MethodInfo mi = info.getMethodInfo(method);
+            MethodInfo mi = info.getMethodInfo(method);
             Class<?> clazz = Class.forName(className);
 
-            Object[] out = new Object[mi.types.length];
-            int state = convert(mi.types, args, out);
+            Object[] out = new Object[mi.getTypes().length];
+            int state = convert(mi.getTypes(), args, out);
             switch (state){
                 case PARAMETER_ERROR:
                     errorMsg[0] = "PARAMETER_ERROR";
@@ -105,7 +105,7 @@ public final class LuaJavaCaller {
                 default:
                     errorMsg[0] = null;
             }
-            return clazz.getMethod(method, mi.types).invoke(owner, out);
+            return clazz.getMethod(method, mi.getTypes()).invoke(owner, out);
         }catch (Exception e){
             errorMsg[0] = toString(e);
         }
