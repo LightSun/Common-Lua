@@ -4,6 +4,16 @@
 #include <list>
 #include <assert.h>
 
+class ACB_Test{
+public:
+    ~ACB_Test(){
+        ext_getLuaPrint()("detach >>> ACB_Test", 50, 1);
+    }
+    void print(){
+        ext_getLuaPrint()("hello lua cpp.", 50, 1);
+    }
+};
+
 extern "C" {
 static int l_list_push(lua_State *L) { // Push elements from LUA
     assert(lua_gettop(L) == 2); // check that the number of args is exactly 2
@@ -27,6 +37,36 @@ static int l_list_pop(lua_State *L) {
     (*ud)->pop_front(); // remove the value from the list
     return 1; //we return 1 value in the stack
 }
+
+static int sub_print(lua_State *L){
+    ACB_Test** test = static_cast<ACB_Test **>(luaL_checkudata(L, 1, "ACB_Test"));
+    (*test)->print();
+    return 0;
+}
+
+static int sub_gc(lua_State *L){
+    ACB_Test** test = static_cast<ACB_Test **>(luaL_checkudata(L, 1, "ACB_Test"));
+    delete(*test);
+    return 0;
+}
+
+static int l_new(lua_State *L) {
+    luaB_dumpStack(L);
+    if(luaL_newmetatable(L, "ACB_Test")) {// ==0 means exists
+        lua_pushvalue(L, -1);
+        lua_setfield(L, -2, "__index"); // xx .__index = xx. and pop stack
+
+        lua_pushcfunction(L, sub_print);
+        lua_setfield(L, -2, "print");
+
+        lua_pushcfunction(L, sub_gc);
+        lua_setfield(L, -2, "__gc");
+    }
+    ACB_Test ** ud = static_cast<ACB_Test **>(lua_newuserdata(L, sizeof(ACB_Test*)));
+    *ud = new ACB_Test();
+    luaL_setmetatable(L, "ACB_Test");
+    return 1;// must return 1. to make lua yield.
+}
 }
 
 class Main {
@@ -37,14 +77,13 @@ public:
 
     void run(const char *script);
 
+    void runScript(const char *script);
     /* data */
-private:
+protected:
     lua_State *L;
     std::list<int> theList;
 
     void registerListType();
-
-    void runScript(const char *script);
 };
 
 Main::Main(lua_State *L) {
@@ -76,14 +115,16 @@ void Main::registerListType() {
     luaL_newmetatable(L, "ListMT");
 
     lua_pushvalue(L, -1);
-    luaB_dumpStack(L);
+   // luaB_dumpStack(L);//tab tab
     lua_setfield(L, -2, "__index"); // ListMT .__index = ListMT. and pop stack
-    luaB_dumpStack(L);
+   // luaB_dumpStack(L);//tab
 
     lua_pushcfunction(L, l_list_push);
     lua_setfield(L, -2, "push"); // push in lua will call l_list_push in C++
     lua_pushcfunction(L, l_list_pop);
     lua_setfield(L, -2, "pop"); // pop in lua will call l_list_pop in C++
+    lua_pushcfunction(L, l_new);
+    lua_setfield(L, -2, "new");
 }
 
 void Main::run(const char *script) {
@@ -96,7 +137,9 @@ void Main::run(const char *script) {
             lua_newuserdata(L, sizeof(std::list<int> *)));
     *(ud) = &theList;
 
+    //luaB_dumpStack(L);
     luaL_setmetatable(L, "ListMT"); // set userdata metatable
+   // luaB_dumpStack(L);
     lua_setglobal(L, "the_list"); // the_list in lua points to the new userdata
 
     runScript(script);

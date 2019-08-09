@@ -11,3 +11,6 @@ end
 for i = 1, 10 do
     the_list:push(50 + i * 100);
 end
+
+local acb = the_list:new();
+acb:print();

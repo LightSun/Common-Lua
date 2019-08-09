@@ -146,5 +146,28 @@ void setLuaBridgeCallerCreator(LBCCreator creator){
     __creator = creator;
 }
 
+extern "C"{
+    static int call(lua_State* L){
+        return 0;
+    }
+    static int hasField(lua_State* L){
+        return 0;
+    }
+    static int hasMethod(lua_State* L){
+        return 0;
+    }
+    static void luaRegister(lua_State* L, const char* name){
+        luaL_newmetatable(L, name);
+        lua_pushvalue(L, -1);
+        lua_setfield(L, -2, "__index"); //xxx.index = xxx
+
+        lua_pushcfunction(L, hasField);
+        lua_setfield(L, -2, "hasField");
+    }
+}
+
+void lua_wrapObject(lua_State* L, LuaBridgeCaller* caller, const char* name){
+
+}
 
 

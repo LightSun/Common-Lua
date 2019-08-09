@@ -174,12 +174,6 @@ public:
         //ext_print("LuaBridge is removed.", 0 , 1);
     }
 
-    LuaBridge(LuaBridgeCaller * obj, const char * cn){
-        assert(obj != nullptr);
-        this->obj = obj;
-        this->cn = cn;
-    }
-
     LuaBridge(lua_State *L){
         setTempLuaState(L);
         const lua_Integer count = lua_tointeger(L, -1);
@@ -286,4 +280,13 @@ private:
 
 //===============================================================================
 void initLuaBridge(lua_State* L);
+
+/**
+ * function which can wrap cpp object to lua.
+ * this of use LuaBridgeCaller to wrap any cpp object.
+ * @param L the lua state
+ * @param caller the bridge caller.
+ */
+// wrap base, base-array, object, object array
+void lua_wrapObject(lua_State* L, LuaBridgeCaller* caller, const char* name);
 #endif
