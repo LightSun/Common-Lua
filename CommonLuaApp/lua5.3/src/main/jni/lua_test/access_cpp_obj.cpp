@@ -39,7 +39,16 @@ static int l_list_pop(lua_State *L) {
 }
 
 static int sub_print(lua_State *L){
+    luaB_dumpStack(L);
     ACB_Test** test = static_cast<ACB_Test **>(luaL_checkudata(L, 1, "ACB_Test"));
+
+    //get field name.
+    int result = lua_getfield(L, 1, "classname");
+    const char* name = lua_tostring(L, -1);
+    lua_pop(L, -1);
+    ext_getLuaPrint()("class name is ",50, 0);
+    ext_getLuaPrint()(const_cast<char *>(name), 50, 1);
+
     (*test)->print();
     return 0;
 }
@@ -53,17 +62,27 @@ static int sub_gc(lua_State *L){
 static int l_new(lua_State *L) {
     luaB_dumpStack(L);
     if(luaL_newmetatable(L, "ACB_Test")) {// ==0 means exists
+       // luaB_dumpStack(L); // userdata tab
+
         lua_pushvalue(L, -1);
         lua_setfield(L, -2, "__index"); // xx .__index = xx. and pop stack
+        //luaB_dumpStack(L);
 
         lua_pushcfunction(L, sub_print);
         lua_setfield(L, -2, "print");
+        //luaB_dumpStack(L);
 
         lua_pushcfunction(L, sub_gc);
         lua_setfield(L, -2, "__gc");
+       // luaB_dumpStack(L);
+
+        lua_pushstring(L, "Hello Java");
+        lua_setfield(L, -2, "classname");
+       // luaB_dumpStack(L);
     }
     ACB_Test ** ud = static_cast<ACB_Test **>(lua_newuserdata(L, sizeof(ACB_Test*)));
     *ud = new ACB_Test();
+
     luaL_setmetatable(L, "ACB_Test");
     return 1;// must return 1. to make lua yield.
 }

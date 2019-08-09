@@ -74,3 +74,14 @@ void ext_closeLuaState(lua_State* ls){
 void ext_closeLuaThread(lua_State *main,lua_State* ls){
     luaE_freethread(main, ls);
 }
+const char* getFieldAsStringAndPop(lua_State* L, const char* name){
+    int result = lua_getfield(L, 1, name);
+    if(result != 0){
+        ext_print("getFieldAsStringAndPop >>> get field as string failed. name = ", 0 , 0);
+        ext_print(name, 0 , 1);
+        return NULL;
+    }
+    const char* value = luaL_checkstring(L, -1);
+    lua_pop(L, -1);
+    return value;
+}

@@ -5,6 +5,9 @@
 #include "LuaRegistry.h"
 #include "../common/map2.h"
 
+#define LUA_WRAP "Lua_dynamic_wrap"
+#define LUA_REG_CN "L_Classname"
+
 const char LuaBridge::className[] = "LuaBridge";
 const LuaRegistry<LuaBridge>::RegType LuaBridge::Register[] = {
         {"call", &LuaBridge::call},
@@ -131,6 +134,74 @@ void getLuaParam(lua_State* L, int id_value, LuaParam* lp){
     }
 }
 
+void getParams(lua_State *L, LuaMediator* holder, int count, int startIdx){
+    //br.call(method, size, args...)
+    //luaB_dumpStack(L);
+    if(count > 0){
+        for (int i = 0; i < count; ++i) { //reverse order
+            getLuaParam(L, startIdx - (i + 1), &holder->lp[count - 1 - i]);
+        }
+    }
+}
+
+int callImpl(lua_State* L, LuaBridgeCaller* caller, const char* cn){
+    //br.call(method, args..., size)
+    setTempLuaState(L);
+    const lua_Integer count = lua_tointeger(L, -1);
+    const char* mname = luaL_checkstring(L, -1 - count - 1);
+    LuaMediator* holder = new LuaMediator(count);
+    holder->className = cn;
+
+    getParams(L, holder, count, -1);
+    const void* result = caller->call(cn, mname, *holder);
+
+    const int rType = holder->resultType;
+    delete holder;
+    setTempLuaState(nullptr);
+
+    switch (rType){
+        case LUA_TNUMBER:{
+            const lua_Number* num = static_cast<const lua_Number*>(result);
+            lua_Number n = *num;
+            delete num;
+            lua_pushnumber(L, n);
+            return 1;
+        }
+        case LUA_TBOOLEAN:{
+            const int* num = static_cast<const int *>(result);
+            int n = *num;
+            delete num;
+            lua_pushboolean(L, n == 1);
+            return 1;
+        }
+        case LUA_TSTRING:{
+            const char* num = static_cast<const char*>(result);
+            lua_pushstring(L, num);
+            return 1;
+        }
+        case LUA_TNIL:{
+            return 0;
+        }
+
+        case LUA_TLIGHTUSERDATA:{ // for light-userdata .you need managed self.
+            lua_pushlightuserdata(L, const_cast<void *>(result));
+            return 1;
+        }
+
+        case LUA_TTABLE:{
+
+            break;
+        }
+
+        default:
+            std::stringstream out;
+            out << "not support result type = " << rType
+                << " for class = " << cn;
+            luaL_error(L, out.str().c_str());
+            return LUA_ERRRUN;
+    }
+}
+
 //------------------------
 LBCCreator __creator = nullptr;
 void initLuaBridge(lua_State* L){
@@ -148,26 +219,60 @@ void setLuaBridgeCallerCreator(LBCCreator creator){
 
 extern "C"{
     static int call(lua_State* L){
-        return 0;
+        LuaBridgeCaller ** ud = static_cast<LuaBridgeCaller **>(luaL_checkudata(L, 1, LUA_WRAP));
+        const char *const className = getFieldAsStringAndPop(L, LUA_REG_CN);
+        return callImpl(L, *ud, className);
     }
     static int hasField(lua_State* L){
+        setTempLuaState(L);
+        LuaBridgeCaller ** ud = static_cast<LuaBridgeCaller **>(luaL_checkudata(L, 1, LUA_WRAP));
+        const char* name = luaL_checkstring(L, -1);
+        const char *const className = getFieldAsStringAndPop(L, LUA_REG_CN);
+        bool result = (*ud)->hasField(className, name);
+        lua_pushboolean(L, result ? 1 : 0);
+        setTempLuaState(nullptr);
         return 0;
     }
     static int hasMethod(lua_State* L){
+        setTempLuaState(L);
+        LuaBridgeCaller ** ud = static_cast<LuaBridgeCaller **>(luaL_checkudata(L, 1, LUA_WRAP));
+        const char* name = luaL_checkstring(L, -1);
+        const char *const className = getFieldAsStringAndPop(L, LUA_REG_CN);
+        bool result = (*ud)->hasMethod(className, name);
+        lua_pushboolean(L, result ? 1 : 0);
+        setTempLuaState(nullptr);
         return 0;
     }
-    static void luaRegister(lua_State* L, const char* name){
-        luaL_newmetatable(L, name);
-        lua_pushvalue(L, -1);
-        lua_setfield(L, -2, "__index"); //xxx.index = xxx
-
-        lua_pushcfunction(L, hasField);
-        lua_setfield(L, -2, "hasField");
+    static int recycle(lua_State* L){
+        LuaBridgeCaller ** ud = static_cast<LuaBridgeCaller **>(luaL_checkudata(L, 1, LUA_WRAP));
+        delete(*ud);
+        return 0;
     }
 }
 
-void lua_wrapObject(lua_State* L, LuaBridgeCaller* caller, const char* name){
+void lua_wrapObject(lua_State* L, LuaBridgeCaller* caller, const char* classname){
+    if(luaL_newmetatable(L, LUA_WRAP)){
+        lua_pushvalue(L, -1);
+        lua_setfield(L, -2, "__index"); //xxx.__index = xxx
 
+        lua_pushcfunction(L, hasField);
+        lua_setfield(L, -2, "hasField");
+
+        lua_pushcfunction(L, hasMethod);
+        lua_setfield(L, -2, "hasMethod");
+
+        lua_pushcfunction(L, call);
+        lua_setfield(L, -2, "call");
+
+        lua_pushcfunction(L, recycle);
+        lua_setfield(L, -2, "__gc");
+
+        lua_pushstring(L, classname);
+        lua_setfield(L, -2, LUA_REG_CN);
+    }
+    LuaBridgeCaller** ud = static_cast<LuaBridgeCaller **>(lua_newuserdata(L, sizeof(LuaBridgeCaller*)));
+    *ud = caller;
+    luaL_setmetatable(L, LUA_WRAP);
 }
 
 

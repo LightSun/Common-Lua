@@ -15,6 +15,7 @@ extern "C"{
 #include "../lua/lauxlib.h"
 #include "../lua/luaconf.h"
 #include "lua_internal.h"
+#include "lua_extra.h"
 
 #ifdef __cplusplus
 }
@@ -162,6 +163,9 @@ public:
 typedef LuaBridgeCaller* (*LBCCreator)(const char* classname, LuaMediator& holder);
 void setLuaBridgeCallerCreator(LBCCreator creator);
 LuaBridgeCaller *Create(const char *classname, LuaMediator &holder);
+
+void getParams(lua_State *L, LuaMediator* holder, int count, int startIdx);
+int callImpl(lua_State* L, LuaBridgeCaller* caller, const char* cn);
 //=========================
 
 class LuaBridge{
@@ -199,61 +203,7 @@ public:
         return 0;
     }
     const int call(lua_State *L){
-        //br.call(method, args..., size)
-        setTempLuaState(L);
-        const lua_Integer count = lua_tointeger(L, -1);
-        const char* mname = luaL_checkstring(L, -1 - count - 1);
-        LuaMediator* holder = new LuaMediator(count);
-        holder->className = cn;
-
-        getParams(L, holder, count, -1);
-        const void* result = obj->call(cn, mname, *holder);
-
-        const int rType = holder->resultType;
-        delete holder;
-        setTempLuaState(nullptr);
-
-        switch (rType){
-            case LUA_TNUMBER:{
-                const lua_Number* num = static_cast<const lua_Number*>(result);
-                lua_Number n = *num;
-                delete num;
-                lua_pushnumber(L, n);
-                return 1;
-            }
-            case LUA_TBOOLEAN:{
-                const int* num = static_cast<const int *>(result);
-                int n = *num;
-                delete num;
-                lua_pushboolean(L, n == 1);
-                return 1;
-            }
-            case LUA_TSTRING:{
-                const char* num = static_cast<const char*>(result);
-                lua_pushstring(L, num);
-                return 1;
-            }
-            case LUA_TNIL:{
-                return 0;
-            }
-
-            case LUA_TLIGHTUSERDATA:{ // for light-userdata .you need managed self.
-                lua_pushlightuserdata(L, const_cast<void *>(result));
-                return 1;
-            }
-
-            case LUA_TTABLE:{
-
-                break;
-            }
-
-            default:
-                std::stringstream out;
-                out << "not support result type = " << rType
-                    << " for class = " << cn;
-                luaL_error(L, out.str().c_str());
-                return LUA_ERRRUN;
-        }
+        return callImpl(L, obj, cn);
     }
 
     const char* getClassname(){
@@ -266,16 +216,6 @@ public:
 private:
     LuaBridgeCaller * obj;
     const char * cn;
-
-    void getParams(lua_State *L, LuaMediator* holder, int count, int startIdx){
-        //br.call(method, size, args...)
-        //luaB_dumpStack(L);
-        if(count > 0){
-            for (int i = 0; i < count; ++i) { //reverse order
-                getLuaParam(L, startIdx - (i + 1), &holder->lp[count - 1 - i]);
-            }
-        }
-    }
 };
 
 //===============================================================================
