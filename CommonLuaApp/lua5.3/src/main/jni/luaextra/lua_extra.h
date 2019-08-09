@@ -69,9 +69,10 @@ void ext_closeLuaThread(lua_State *main,lua_State* ls);
 /**
  * get filed as string then pop it.
  * @param L the state
+ * @param idx the id of userdata
  * @param name the key
  * @return the string value
  */
-const char* getFieldAsStringAndPop(lua_State* L, const char* name);
+const char* getFieldAsString(lua_State* L, int idx, const char* name);
 
 #endif //COMMONLUAAPP_LUA_EXTRA_H

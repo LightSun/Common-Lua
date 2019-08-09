@@ -210,6 +210,7 @@ typedef unsigned long Instruction;
 ** macros that are executed whenever program enters the Lua core
 ** ('lua_lock') and leaves the core ('lua_unlock')
 */
+// let you self-define lua_lock and lua_unlock
 #if !defined(lua_lock)
 #define lua_lock(L)	((void) 0)
 #define lua_unlock(L)	((void) 0)

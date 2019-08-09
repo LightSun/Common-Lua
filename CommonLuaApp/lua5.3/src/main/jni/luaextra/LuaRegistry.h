@@ -137,6 +137,7 @@ public:
     LuaParam* lp;
     int resultType;
     const char* className;
+    const char* resultCN; //result classname
 };
 
 class LuaBridgeCaller{
@@ -157,6 +158,15 @@ public:
     const void luaError(const char* msg){
         luaL_error(getTempLuaState(), msg);
     }
+
+    void setClassname(const char *cn) {
+        this->classname = cn;
+    }
+    const char *getClassname(){
+        return this->classname;
+    }
+private:
+    const char* classname;
 };
 
 //=========================

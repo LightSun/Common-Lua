@@ -74,8 +74,8 @@ void ext_closeLuaState(lua_State* ls){
 void ext_closeLuaThread(lua_State *main,lua_State* ls){
     luaE_freethread(main, ls);
 }
-const char* getFieldAsStringAndPop(lua_State* L, const char* name){
-    int result = lua_getfield(L, 1, name);
+const char* getFieldAsString(lua_State* L, int idx, const char* name){
+    int result = lua_getfield(L, idx, name);
     if(result != 0){
         ext_print("getFieldAsStringAndPop >>> get field as string failed. name = ", 0 , 0);
         ext_print(name, 0 , 1);

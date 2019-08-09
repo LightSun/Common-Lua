@@ -9,6 +9,4 @@
 
 void testAccessCppObjInLua(lua_State* L, const char* script);
 
-void testAccessCppObjInLua2(lua_State* L,const char* script);
-
 #endif //COMMONLUAAPP_TEST_ACCESS_CPPOBJECT_H
