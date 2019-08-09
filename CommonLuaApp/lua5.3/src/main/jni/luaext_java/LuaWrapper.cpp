@@ -12,7 +12,6 @@ extern  "C" {
 #include "java_env.h"
 #include "LuaWrapper.h"
 // just for test
-#include "../luaextra/test.h"
 
 #define SEARCH_LUA_METHOD "searchLuaModule"
 #define SEARCH_C_METHOD "searchCModule"

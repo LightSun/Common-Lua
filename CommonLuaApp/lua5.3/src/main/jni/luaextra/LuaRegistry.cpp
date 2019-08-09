@@ -75,7 +75,7 @@ void getLuaParam(lua_State* L, int id_value, LuaParam* lp){
             //need make the table on the top.
             lua_pushnil(L);
             // 现在的栈：-1 => nil; index => table
-            Map<const char*, const char*>* tab = new Map();
+            Map<const char*, const char*>* tab = new Map<const char*, const char*>();
             int luaCollType = -1;
             while (lua_next(L, id_value))
             {

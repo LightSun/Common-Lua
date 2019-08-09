@@ -64,7 +64,7 @@ public:
     // true if breaked,  false otherwise.
     const bool travel(const Traveller& t){
         assert(t != nullptr);
-        for (auto &it = _map.begin(); it != _map.end() ; ++it) {
+        for (auto it = _map.begin(); it != _map.end() ; ++it) {
             if(t(this, it->first, it->second)){
                 return true;
             }

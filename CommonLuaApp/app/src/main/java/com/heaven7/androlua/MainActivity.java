@@ -89,6 +89,10 @@ public class MainActivity extends Activity {
         String script = loadLuaAssetsAsString("lua/luaregistry_test.lua");
         LuaTest.testLuaRegistry(mLuaState, script);
     }
+    public void onClickTestAccessCppObj(View view){
+        String script = loadLuaAssetsAsString("lua/access_cpp_obj.lua");
+        LuaTest.testAccessCppObjectInLua(mLuaState, script);
+    }
 
     public void onClickTestLuaScript(View view) {
         executeLuaFile();
@@ -146,7 +150,7 @@ public class MainActivity extends Activity {
         try {
             in = new InputStreamReader(getAssets().open(file));
             int state = mLuaState.LdoString(readStringWithLine(in));
-            Logger.i(TAG, "loadLua", "state = " + state);
+            Logger.i(TAG, "loadLua", "state = " + state + ", " + mLuaState.toString(-1));
         } catch (IOException e) {
             e.printStackTrace();
         } finally {

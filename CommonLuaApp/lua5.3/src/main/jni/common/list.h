@@ -6,6 +6,7 @@
 #define ANDROIDCHORDINO_LIST_H
 
 #include "vector"
+#include "sstream"
 
 using namespace std;
 

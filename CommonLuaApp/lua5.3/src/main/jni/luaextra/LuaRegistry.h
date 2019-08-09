@@ -84,6 +84,7 @@ class LuaRegistry{
             return 0;
         }
 };
+
 //=============================================================
 
 class LuaParam{
@@ -172,6 +173,13 @@ public:
         delete(obj);
         //ext_print("LuaBridge is removed.", 0 , 1);
     }
+
+    LuaBridge(LuaBridgeCaller * obj, const char * cn){
+        assert(obj != nullptr);
+        this->obj = obj;
+        this->cn = cn;
+    }
+
     LuaBridge(lua_State *L){
         setTempLuaState(L);
         const lua_Integer count = lua_tointeger(L, -1);

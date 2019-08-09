@@ -1,6 +1,6 @@
 package com.heaven7.java.lua;
 
-public class MethodInfo extends INativeObject.BaseNativeObject{
+public final class MethodInfo extends INativeObject.BaseNativeObject{
     private String name;
     private String sig;  //"(Ljava/lang/String;Z)V"
     private Class<?>[] types;

@@ -13,7 +13,7 @@
 #define MNAME_CREATE "create"
 #define MNAME_INVOKE "invoke"
 
-#define SIG_CREATE "(" STRING_NAME STRING_NAME"[" OBJECT_NAME "[" STRING_NAME ")" OBJECT_NAME
+#define SIG_CREATE "(" STRING_NAME STRING_NAME "[" OBJECT_NAME "[" STRING_NAME ")" OBJECT_NAME
 #define SIG_INVOKE "(" OBJECT_NAME STRING_NAME STRING_NAME "[" OBJECT_NAME "[" STRING_NAME ")" OBJECT_NAME
 
 static jclass __callerClass;
@@ -54,8 +54,8 @@ void initLuaJavaCaller(){
     JNIEnv *const env = getJNIEnv();
     __callerClass = env->FindClass(CALLER_CLASS);
     __objectClass = env->FindClass("java/lang/Object");
-    __mid_create = env->GetMethodID(__callerClass, MNAME_CREATE ,SIG_CREATE);
-    __mid_invoke = env->GetMethodID(__callerClass, MNAME_INVOKE ,SIG_INVOKE);
+    __mid_create = env->GetStaticMethodID(__callerClass, MNAME_CREATE ,SIG_CREATE);
+    __mid_invoke = env->GetStaticMethodID(__callerClass, MNAME_INVOKE ,SIG_INVOKE);
 }
 
 void deInitLuaJavaCaller(){

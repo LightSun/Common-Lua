@@ -18,6 +18,7 @@ include_directories(src/main/jni/cjson)
 aux_source_directory(src/main/jni/cjson SRC_CJSON)
 aux_source_directory(src/main/jni/common SRC_COMMON)
 aux_source_directory(src/main/jni/luaext_java SRC_LUA_JAVA)
+aux_source_directory(src/main/jni/lua_test SRC_LUA_TESTS)
 add_library( # Sets the name of the library.
         lua
 
@@ -66,9 +67,6 @@ add_library( # Sets the name of the library.
         src/main/jni/luaextra/lua_extra.c
         src/main/jni/luaextra/lua_internal.c
         src/main/jni/luaextra/LuaRegistry.cpp
-
-        # test
-        src/main/jni/luaextra/test.cpp
         )
 
 add_library(
@@ -88,7 +86,11 @@ add_library( # Sets the name of the library.
         # Provides a relative path to your source file(s).
         ${SRC_LUA_JAVA}
         )
-
+add_library(
+        lua_test
+        SHARED
+        ${SRC_LUA_TESTS}
+)
 
 # Searches for a specified prebuilt library and stores the path as a
 # variable. Because CMake includes system libraries in the search path by
@@ -114,7 +116,14 @@ target_link_libraries( # Specifies the target library.
         # included in the NDK.
         luajava
         lua
+        lua_test
         ${log-lib}
+        )
+target_link_libraries( # Specifies the target library.
+        # Links the target library to the log library
+        # included in the NDK.
+        lua_test
+        lua
         )
 target_link_libraries( # Specifies the target library.
         # Links the target library to the log library

@@ -4,10 +4,10 @@
 
 #include "test.h"
 extern "C"{
-#include "lua_extra.h"
+#include "../luaextra/lua_extra.h"
 }
 
-#include "LuaRegistry.h"
+#include "../luaextra/LuaRegistry.h"
 
 class Foo{
 
@@ -93,6 +93,7 @@ class LuaBridgeCallerImpl : public LuaBridgeCaller{
 public:
     LuaBridgeCallerImpl(const char *classname, LuaMediator &holder){
     }
+    LuaBridgeCallerImpl(){}
     void *call(const char *cn, const char *mName ,LuaMediator &holder) {
         if(holder.count <= 0){
             lua_Number * a = new lua_Number();
@@ -117,6 +118,23 @@ void call_testLuaRegistry(lua_State* L, char* luacontent){
     };
     setLuaBridgeCallerCreator(creator);
     initLuaBridge(L);
+
+    int code = luaL_dostring(L, luacontent);
+    const char* msg = lua_tostring(L, -1);
+    ext_getLuaPrint()(const_cast<char *>(msg), 50, 1);
+
+    char a[50];
+    sprintf(a, "call_testLuaRegistry(). result code is %d", code);
+    ext_getLuaPrint()(a, 50, 1);
+}
+void call_testLuaRegistryWrapper(lua_State* L, char* luacontent){
+    //c++ 11支持函数表达式
+    auto creator = [](const char *classname, LuaMediator &holder){
+        return (LuaBridgeCaller*)new LuaBridgeCallerImpl(classname, holder);
+    };
+    setLuaBridgeCallerCreator(creator);
+    //initLuaBridge(L);
+   //LuaRegistryWrapper<LuaBridge>::Register(L, new LuaBridge(new LuaBridgeCallerImpl(), "test.LuaBridgeCallerImpl"));
 
     int code = luaL_dostring(L, luacontent);
     const char* msg = lua_tostring(L, -1);

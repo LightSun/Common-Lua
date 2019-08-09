@@ -66,19 +66,6 @@ lua_State* ext_lua_newthread(lua_State *L){
 lua_State* ext_newLuaState(){
     lua_State* L = luaL_newstate();
     luaL_openlibs(L);
-    /*
-    * Ok, now here we go: We pass data to the lua script on the stack.
-    * That is, we first have to prepare Lua's virtual stack the way we
-    * want the script to receive it, then ask Lua to run it.
-    */
-    lua_newtable(L);    /* We will pass a table */
-
-    //<- [stack bottom] -- table, index, value [top]
-    for (int i = 1; i <= 5; i++) {
-        lua_pushnumber(L, i);   /* Push the table index */
-        lua_pushnumber(L, i*2); /* Push the cell value */
-        lua_rawset(L, -3);      /* Stores the pair in the table */
-    }
     return L;
 }
 void ext_closeLuaState(lua_State* ls){

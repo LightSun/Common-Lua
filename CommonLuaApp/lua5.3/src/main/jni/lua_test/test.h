@@ -12,13 +12,15 @@ extern "C"{
 #include "../lua/lualib.h"
 #include "../lua/lauxlib.h"
 #include "../lua/luaconf.h"
-#include "lua_internal.h"
+#include "../luaextra/lua_internal.h"
 };
 
 //调用测试的lua
 void call_testLua(lua_State* L, char* content);
 
 void call_testLuaRegistry(lua_State* L, char* content);
+
+void call_testLuaRegistryWrapper(lua_State* L, char* content);
 
 
 template <class T>
