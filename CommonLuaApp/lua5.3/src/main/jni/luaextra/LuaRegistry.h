@@ -142,7 +142,7 @@ public:
 
 class LuaBridgeCaller{
 public:
-    virtual void *call(const char *cn, const char *mName ,LuaMediator &holder) = 0;
+    virtual void *call(const char *cn, const char *mName ,LuaMediator * holder) = 0;
 
     //opt impl. used for user data.
     void* getCObject(){
@@ -170,9 +170,9 @@ private:
 };
 
 //=========================
-typedef LuaBridgeCaller* (*LBCCreator)(const char* classname, LuaMediator& holder);
+typedef LuaBridgeCaller* (*LBCCreator)(const char* classname, LuaMediator* holder);
 void setLuaBridgeCallerCreator(LBCCreator creator);
-LuaBridgeCaller *Create(const char *classname, LuaMediator &holder);
+LuaBridgeCaller *Create(const char *classname, LuaMediator* holder);
 
 void getParams(lua_State *L, LuaMediator* holder, int count, int startIdx);
 int callImpl(lua_State* L, LuaBridgeCaller* caller, const char* cn);
@@ -195,7 +195,7 @@ public:
         LuaMediator* holder = new LuaMediator(count);
         getParams(L, holder, count, -1);
 
-        obj = Create(mname, *holder);
+        obj = Create(mname, holder);
         cn = mname;
         delete holder;
         setTempLuaState(nullptr);

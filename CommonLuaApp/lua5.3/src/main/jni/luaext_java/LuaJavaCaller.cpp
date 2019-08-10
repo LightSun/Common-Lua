@@ -77,7 +77,7 @@ public:
         env->DeleteLocalRef(jclazz);
         env->DeleteLocalRef(jobj);
     }
-    LuaJavaCaller(const char *classname, LuaMediator &holder){
+    LuaJavaCaller(const char *classname, LuaMediator *holder){
         JNIEnv *const env = getJNIEnv();
         jclazz = env->FindClass(classname);
         if(jclazz == nullptr){
@@ -87,26 +87,26 @@ public:
             ext_println(msg);
             luaError(msg);
         } else{
-            if(holder.count == 0){
+            if(holder->count == 0){
                 jobj = env->AllocObject(jclazz); //default constructor
             } else{
                 bool success;
-                const char* name = getStringValue(&holder.lp[0], &success);
+                const char* name = getStringValue(&holder->lp[0], &success);
                 if(name == nullptr){
                     luaError("the first param of create object must be constructor name. like '<init>'");
                 }
-                int size = holder.count - 1;
+                int size = holder->count - 1;
                 //params
                 jobjectArray const arr = env->NewObjectArray(size, __objectClass, nullptr);
                 for (int i = 0; i < size; ++i) {
-                    const char *const str = getStringValue(&holder.lp[i + 1], &success);
+                    const char *const str = getStringValue(&holder->lp[i + 1], &success);
                     if(success){
                         jstring const jstr = str != nullptr ? env->NewStringUTF(str) : nullptr;
                         env->SetObjectArrayElement(arr, i, jstr);
                     } else{
                         //TODO support array types-- lua-table.
                         //failed means it not base types.
-                        void *const value = holder.lp[i + 1].value;
+                        void *const value = holder->lp[i + 1].value;
                         if(value != nullptr){
                             env->SetObjectArrayElement(arr, i, static_cast<jobject>(value));
                         } else{
@@ -134,21 +134,21 @@ public:
             }
         }
     }
-    void *call(const char *cn, const char *mName ,LuaMediator &holder) {
+    void *call(const char *cn, const char *mName ,LuaMediator *holder) {
         JNIEnv *const env = getJNIEnv();
-        int size = holder.count;
+        int size = holder->count;
         //params
         bool success;
         jobjectArray const arr = env->NewObjectArray(size, __objectClass, nullptr);
         for (int i = 0; i < size; ++i) {
-            const char *const str = getStringValue(&holder.lp[i], &success);
+            const char *const str = getStringValue(&holder->lp[i], &success);
             if(success){
                 jstring const jstr = str != nullptr ? env->NewStringUTF(str) : nullptr;
                 env->SetObjectArrayElement(arr, i, jstr);
             } else{
                 //TODO support array types-- lua-table.
                 //failed means it not base types.
-                void *const value = holder.lp[i].value;
+                void *const value = holder->lp[i].value;
                 if(value != nullptr){
                     env->SetObjectArrayElement(arr, i, static_cast<jobject>(value));
                 } else{
@@ -160,7 +160,7 @@ public:
         //prepare string array
         jobjectArray const msgArr = env->NewObjectArray(1, env->FindClass("java/lang/String"), nullptr);
         jvalue values[4];
-        values[0].l = env->NewStringUTF(holder.className);
+        values[0].l = env->NewStringUTF(holder->className);
         values[1].l = env->NewStringUTF(mName);
         values[2].l = arr;
         values[3].l = msgArr;

@@ -174,7 +174,7 @@ int callImpl(lua_State *L, LuaBridgeCaller *caller, const char *cn) {
     holder->className = cn;
 
     getParams(L, holder, count, -1);
-    const void *result = caller->call(cn, mname, *holder);
+    const void *result = caller->call(cn, mname, holder);
 
     const int rType = holder->resultType;
     delete holder;
@@ -242,7 +242,7 @@ void initLuaBridge(lua_State *L) {
     LuaRegistry<LuaBridge>::Register(L);
 }
 
-LuaBridgeCaller *Create(const char *classname, LuaMediator &holder) {
+LuaBridgeCaller *Create(const char *classname, LuaMediator* holder) {
     if (__creator == nullptr) {
         return nullptr;
     }
