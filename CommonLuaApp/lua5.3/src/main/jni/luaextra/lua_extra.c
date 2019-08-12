@@ -48,7 +48,7 @@ Lua_print ext_getLuaPrint(){
 }
 
 // flag == 1means end
-void ext_print(char* cs, int len, int flag){
+void ext_print(const char *cs, int len, int flag){
     if(lua_print != NULL){
         lua_print(cs, len, flag);
     }

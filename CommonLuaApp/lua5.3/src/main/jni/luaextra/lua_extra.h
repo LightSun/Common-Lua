@@ -12,6 +12,7 @@
 #include "../lua/lualib.h"
 #include "../lua/lauxlib.h"
 #include "../lua/luaconf.h"
+#include "blowfish.h"
 
 #define ext_loadLuaScript(L, S) \
         luaL_dostring(L, S)

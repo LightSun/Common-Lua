@@ -22,9 +22,36 @@ public final class LuaTest {
     public static void testAccessCppObjectInLua(LuaState state, String script){
         nTestAccessCppObjectInLua(state.getNativePointer(), script);
     }
+    public static byte[] bf_en(byte[] in){
+        byte[] arr;
+        if(in.length % 8 != 0){
+            arr = new byte[(in.length / 8 + 1) * 8];
+        }else {
+            arr = new byte[in.length];
+        }
+        nBFDo("heaven7".getBytes(), in, arr, 1);
+        return arr;
+    }
+    public static byte[] bf_de(byte[] in, int resultLen){
+        assert in.length % 8 == 0;
+        byte[] arr = new byte[in.length];
+        nBFDo("heaven7".getBytes(), in, arr, 0);
+        if(resultLen != in.length){
+            byte[] tmp = new byte[resultLen];
+            System.arraycopy(arr, 0, tmp, 0, resultLen);
+            return tmp;
+        }
+        return arr;
+    }
+    public static void bf_baseTest(){
+        nBFTest();
+    }
 
     private static native void nTestAccessCppObjectInLua(long nativePointer, String script);
     private static native void nTestBindCpp1(long nativePointer, String script);
     private static native void nTestLuaRegistry(long nativePointer, String script);
     private static native void nTestLuaRegistryWrapper(long nativePointer, String script);
+
+    private static native void nBFDo(byte[] key,byte[] data, byte[] out, int en);
+    private static native void nBFTest();
 }

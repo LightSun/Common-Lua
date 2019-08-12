@@ -24,6 +24,9 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.io.Reader;
+import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -94,10 +97,22 @@ public class MainActivity extends Activity {
         LuaTest.testAccessCppObjectInLua(mLuaState, script);
     }
 
+    public void onClickTestBlowfish(View view) {
+       // String script = loadLuaAssetsAsString("lua/LuaTest.lua");
+       // String script = "1234567890";
+        String script = "1234567890abcdefghijklmnopqrstuvwxyz!@#$%^&*()~_+. ";
+        byte[] enResult = LuaTest.bf_en(script.getBytes());
+        byte[] deResult = LuaTest.bf_de(enResult, script.length());
+        Logger.d(TAG, "onClickTestBlowfish", "======== start test blow-fish =========");
+        Logger.d(TAG, "onClickTestBlowfish", script);
+        Logger.d(TAG, "onClickTestBlowfish", Arrays.toString(enResult));
+        Logger.d(TAG, "onClickTestBlowfish", Arrays.toString(deResult));
+        Logger.d(TAG, "onClickTestBlowfish", new String(deResult, Charset.defaultCharset()));
+       // LuaTest.bf_baseTest();
+    }
     public void onClickTestLuaScript(View view) {
         executeLuaFile();
     }
-
     private void initLua() {
         mLuaState = new LuaState();
         final Map<String, Boolean> mCMap = new HashMap<>();

@@ -42,3 +42,83 @@ LUALIB_API int luaB_dumpStack(lua_State* L){
     __flushPrint();
     return 0;
 }
+
+#include <malloc.h>
+#include <stdlib.h>
+#include <unistd.h>
+LUALIB_API FILE* ext_decode(FILE* ofp){
+    int            fd, len;
+    size_t         sz;
+    FILE          *fp;
+    unsigned char *buf, *obuf;
+    char           file_temp[] = "/tmp/luajit-XXXXXX";
+
+    fp = NULL;
+    buf = NULL;
+    obuf = NULL;
+    fd = -1;
+
+    fseek(ofp, 0L, SEEK_END);
+    sz = ftell(ofp);
+
+    obuf = malloc(sz);
+    if (obuf == NULL) {
+        goto failed;
+    }
+
+    fseek(ofp, 0L, SEEK_SET);
+    if (fread(obuf, 1, sz, ofp) < sz) {
+        goto failed;
+    }
+
+    fclose(ofp);
+    ofp = NULL;
+
+   /* buf = blowfish_decrypt(obuf + FILE_HEADER_LEN,
+                           sz - FILE_HEADER_LEN,
+                           g_key,
+                           g_iv,
+                           &len);*/
+    if (buf == NULL) {
+        goto failed;
+    }
+
+    free(obuf);
+    obuf = NULL;
+
+    fd = mkstemp(file_temp);
+    if (fd < 0) {
+        goto failed;
+    }
+    unlink(file_temp);
+
+    fp = fdopen(fd, "wb+");
+    if (fp == NULL) {
+        goto failed;
+    }
+    fwrite(buf, 1, len, fp);
+    free(buf);
+    buf = NULL;
+
+    return fp;
+
+    failed:
+
+    if (fp) {
+        fclose(fp);
+    }
+
+    if (ofp) {
+        fclose(ofp);
+    }
+
+    if (obuf) {
+        free(obuf);
+    }
+
+    if (buf) {
+        free(buf);
+    }
+
+    return NULL;
+}

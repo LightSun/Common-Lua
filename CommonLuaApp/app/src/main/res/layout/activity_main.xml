@@ -61,6 +61,14 @@
             android:onClick="onClickTestAccessCppObj"
             android:text="access cpp object" />
 
+
+        <Button
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="15dp"
+            android:onClick="onClickTestBlowfish"
+            android:text="blow-fish" />
+
     </LinearLayout>
 
 </ScrollView>

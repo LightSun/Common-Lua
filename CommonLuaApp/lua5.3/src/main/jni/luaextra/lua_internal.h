@@ -11,13 +11,15 @@
 LUALIB_API char * getLuaFilename(const char* moduleName);
 LUALIB_API char * getCLibFilename(const char* moduleName);
 
+LUALIB_API FILE* ext_decode(FILE* in);
+
 /**
  * print the string . if success return 1. or else return 0.
  * @param cs
  * @param len
  * @param flag the flag of this print. if 1 means print right now. or else concat str
  */
-LUALIB_API void ext_print(char* cs, int len, int flag);
+LUALIB_API void ext_print(const char *cs, int len, int flag);
 
 //static 函数代表是内部函数。在c中
 LUALIB_API int luaB_dumpStack(lua_State* L);

@@ -700,7 +700,9 @@ static int skipcomment (LoadF *lf, int *cp) {
   else return 0;  /* no comment */
 }
 
-
+#define FILE_HEADER_LEN 5
+static  char        FILE_HEADER[FILE_HEADER_LEN];
+//load lua source.
 LUALIB_API int luaL_loadfilex (lua_State *L, const char *filename,
                                              const char *mode) {
   LoadF lf;
@@ -722,6 +724,20 @@ LUALIB_API int luaL_loadfilex (lua_State *L, const char *filename,
   if (c == LUA_SIGNATURE[0] && filename) {  /* binary file? */
     lf.f = freopen(filename, "rb", lf.f);  /* reopen in binary mode */
     if (lf.f == NULL) return errfile(L, "reopen", fnameindex);
+
+    //=====================
+    /*size_t sz;
+    char        file_header[FILE_HEADER_LEN];
+    // check file header
+    sz = fread(file_header, 1, FILE_HEADER_LEN, lf.f);
+    if (sz == FILE_HEADER_LEN) {
+      if (memcmp(file_header, FILE_HEADER, FILE_HEADER_LEN - 1) == 0) {
+        // decrypt file
+        lf.f = decrypt_file(lf.f);
+      }
+    }
+    fseek(lf.f, 0L, SEEK_SET);*/
+    //=====================
     skipcomment(&lf, &c);  /* re-read initial portion */
   }
   if (c != EOF)
@@ -730,7 +746,6 @@ LUALIB_API int luaL_loadfilex (lua_State *L, const char *filename,
   readstatus = ferror(lf.f);
   if (filename) fclose(lf.f);  /* close file (even in case of errors) */
   if (readstatus) {
-    //将编译的块当作函数入栈
     lua_settop(L, fnameindex);  /* ignore results from 'lua_load' */
     return errfile(L, "read", fnameindex);
   }
