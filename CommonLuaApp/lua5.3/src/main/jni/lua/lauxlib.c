@@ -700,8 +700,7 @@ static int skipcomment (LoadF *lf, int *cp) {
   else return 0;  /* no comment */
 }
 
-#define FILE_HEADER_LEN 5
-static  char        FILE_HEADER[FILE_HEADER_LEN];
+#include "../luaextra/lua_internal.h"
 //load lua source.
 LUALIB_API int luaL_loadfilex (lua_State *L, const char *filename,
                                              const char *mode) {
@@ -718,28 +717,41 @@ LUALIB_API int luaL_loadfilex (lua_State *L, const char *filename,
     lf.f = fopen(filename, "r");
     if (lf.f == NULL) return errfile(L, "open", fnameindex);
   }
+  int handled = 0;
   // txt 文件 or 二进制
-  if (skipcomment(&lf, &c))  /* read initial portion */
-    lf.buff[lf.n++] = '\n';  /* add line to correct line numbers */
-  if (c == LUA_SIGNATURE[0] && filename) {  /* binary file? */
-    lf.f = freopen(filename, "rb", lf.f);  /* reopen in binary mode */
-    if (lf.f == NULL) return errfile(L, "reopen", fnameindex);
-
-    //=====================
-    /*size_t sz;
-    char        file_header[FILE_HEADER_LEN];
-    // check file header
-    sz = fread(file_header, 1, FILE_HEADER_LEN, lf.f);
-    if (sz == FILE_HEADER_LEN) {
-      if (memcmp(file_header, FILE_HEADER, FILE_HEADER_LEN - 1) == 0) {
-        // decrypt file
-        lf.f = decrypt_file(lf.f);
+  if (skipcomment(&lf, &c)) { /* read initial portion */
+      lf.buff[lf.n++] = '\n';  /* add line to correct line numbers */
+  } else{
+      //--------------------- start h7 ---------------
+      if(filename){
+          lf.f = freopen(filename, "rb", lf.f);  /* reopen in binary mode */
+          if (lf.f == NULL) return errfile(L, "reopen", fnameindex);
+          size_t sz;
+          char        file_header[BF_HEADER_SIZE];
+          // check file header
+          sz = fread(file_header, 1, BF_HEADER_SIZE, lf.f);
+          if (sz == BF_HEADER_SIZE && memcmp(file_header, BF_HEADER, BF_HEADER_SIZE - 1) == 0) {
+              // de file
+              lf.f = ext_decode(lf.f, BF_HEADER_SIZE, filename);
+              if(lf.f == NULL){
+                  return errfile(L, "decode lua failed.", fnameindex);
+              }
+              fseek(lf.f, 0L, SEEK_SET);
+              skipcomment(&lf, &c);  /* re-read initial portion */
+              lf.buff[lf.n++] = '\n';  /* add line to correct line numbers */
+              handled = 1;
+          } else{
+              fseek(lf.f, 0L, SEEK_SET);
+          }
+          //--------------------- end h7 ---------------
       }
-    }
-    fseek(lf.f, 0L, SEEK_SET);*/
-    //=====================
-    skipcomment(&lf, &c);  /* re-read initial portion */
   }
+    if (handled == 0 && c == LUA_SIGNATURE[0] && filename) {  /* binary file? */
+        lf.f = freopen(filename, "rb", lf.f);  /* reopen in binary mode */
+        if (lf.f == NULL) return errfile(L, "reopen", fnameindex);
+        skipcomment(&lf, &c);  /* re-read initial portion */
+    }
+
   if (c != EOF)
     lf.buff[lf.n++] = c;  /* 'c' is the first character of the stream */
   status = lua_load(L, getF, &lf, lua_tostring(L, -1), mode);

@@ -5,13 +5,24 @@
 #ifndef COMMONLUAAPP_LUA_INTERNAL_H
 #define COMMONLUAAPP_LUA_INTERNAL_H
 
+#include "../lua/config.h"
 #include "../lua/lua.h"
 #include "stdio.h"
+#include "blowfish.h"
+#define BF_HEADER "l:u:a:nat"
+#define BF_HEADER_SIZE 9
 
 LUALIB_API char * getLuaFilename(const char* moduleName);
 LUALIB_API char * getCLibFilename(const char* moduleName);
 
-LUALIB_API FILE* ext_decode(FILE* in);
+/**
+ * get the temp file for simple file name
+ * @param name  the file name
+ * @param out  the out full path of file
+ */
+LUALIB_API void createTempFile(const char* name, char** out);
+
+LUALIB_API FILE *ext_decode(FILE *infile, int headerSize, const char *filename);
 
 /**
  * print the string . if success return 1. or else return 0.

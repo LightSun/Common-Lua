@@ -83,4 +83,6 @@ void JNICALL Java_com_heaven7_java_lua_LuaWrapper_nNativeInit(
     ext_setLuaSearcher(searchLua);
     ext_setClibSearcher(searchC);
     ext_setLua_print(Lua_printImpl);
+    //todo
+    ext_setTmpFileDir("/sdcard/vida");
 }

@@ -15,3 +15,5 @@ lbaselib.c:  luaB_print 函数
     lbaselib.c :    {"dumpStack", ext_dumpStack},
 
 ====================
+
+add  lua/config.h

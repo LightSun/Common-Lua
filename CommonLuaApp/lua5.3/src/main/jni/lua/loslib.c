@@ -137,10 +137,10 @@ static time_t l_checktime (lua_State *L, int arg) {
 
 
 
-
+#include "config.h"
 static int os_execute (lua_State *L) {
   const char *cmd = luaL_optstring(L, 1, NULL);
-  int stat = system(cmd);
+  int stat = run_cmd(cmd);
   if (cmd != NULL)
     return luaL_execresult(L, stat);
   else {

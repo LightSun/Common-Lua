@@ -4,6 +4,13 @@
 
 #include "lua_internal.h"
 
+#include <unistd.h>
+#include "stdlib.h"
+#include "stdio.h"
+#include "string.h"
+#define BF_KEY "heaven7"
+#define BF_KEY_LEN 7
+
 LUALIB_API int luaB_dumpStack(lua_State* L){
     __printImpl("\nbegin dump lua stack: ", 0, 1);
     int i = 0;
@@ -43,82 +50,107 @@ LUALIB_API int luaB_dumpStack(lua_State* L){
     return 0;
 }
 
-#include <malloc.h>
-#include <stdlib.h>
-#include <unistd.h>
-LUALIB_API FILE* ext_decode(FILE* ofp){
-    int            fd, len;
-    size_t         sz;
+LUALIB_API FILE *ext_decode(FILE *infile, int headerSize, const char *fn) {
+    int* ibuf = malloc(4);
     FILE          *fp;
-    unsigned char *buf, *obuf;
-    char           file_temp[] = "/tmp/luajit-XXXXXX";
+    char *outBuf, *inBuf, *tmpBuf;
+    /*int            fd;
+    const char      *file_temp = "tmp-lut-XXXXXX";*/
+
+    BLOWFISH_KEY* key;
 
     fp = NULL;
-    buf = NULL;
-    obuf = NULL;
-    fd = -1;
+    inBuf = NULL;
+    outBuf = NULL;
+    tmpBuf = NULL;
+    key = NULL;
+    //move to offset
+    fseek(infile, headerSize, SEEK_SET);
 
-    fseek(ofp, 0L, SEEK_END);
-    sz = ftell(ofp);
-
-    obuf = malloc(sz);
-    if (obuf == NULL) {
+    //read size and expect size
+    if(fread(ibuf, 4, 1, infile) != 1){
         goto failed;
     }
-
-    fseek(ofp, 0L, SEEK_SET);
-    if (fread(obuf, 1, sz, ofp) < sz) {
+    int totalSize = *ibuf;
+    if(fread(ibuf, 4, 1, infile) != 1){
         goto failed;
     }
+    int expectSize = *ibuf;
 
-    fclose(ofp);
-    ofp = NULL;
-
-   /* buf = blowfish_decrypt(obuf + FILE_HEADER_LEN,
-                           sz - FILE_HEADER_LEN,
-                           g_key,
-                           g_iv,
-                           &len);*/
-    if (buf == NULL) {
+    inBuf = malloc(totalSize);
+    if (inBuf == NULL) {
         goto failed;
     }
+    outBuf = malloc(totalSize);
+    if (outBuf == NULL) {
+        goto failed;
+    }
+    tmpBuf = malloc(expectSize);
 
-    free(obuf);
-    obuf = NULL;
+    //head + total+expect+en_content
+    if (fread(inBuf, 1, totalSize, infile) < totalSize) {
+        goto failed;
+    }
+    fclose(infile);
+    infile = NULL;
 
-    fd = mkstemp(file_temp);
+    key = malloc(sizeof(BLOWFISH_KEY));
+    BF_de(key, BF_KEY, BF_KEY_LEN, (const char*)inBuf, outBuf, totalSize);
+
+    free(key);
+    key = NULL;
+    free(inBuf);
+    inBuf = NULL;
+
+    memcpy(outBuf, tmpBuf, expectSize);
+    free(outBuf);
+    outBuf = NULL;
+
+    char *fullPath = NULL;
+    createTempFile(fn, &fullPath);
+    if(fullPath == NULL){
+        goto failed;
+    }
+    unlink(fullPath); //delete on exit
+
+    fp = fopen(fullPath, "rw");//TODO
+    if (fp == NULL) {
+        goto failed;
+    }
+   /* // the end six must be 'XXXXXX'
+    fd = mkstemp(fullPath);//must use array
     if (fd < 0) {
         goto failed;
     }
-    unlink(file_temp);
+    unlink(fullPath);
 
     fp = fdopen(fd, "wb+");
     if (fp == NULL) {
         goto failed;
-    }
-    fwrite(buf, 1, len, fp);
-    free(buf);
-    buf = NULL;
-
+    }*/
+    fwrite(tmpBuf, 1, expectSize, fp);
+    free(tmpBuf);
+     //fp is managed by lua
     return fp;
 
     failed:
-
     if (fp) {
         fclose(fp);
     }
-
-    if (ofp) {
-        fclose(ofp);
+    if (infile) {
+        fclose(infile);
     }
-
-    if (obuf) {
-        free(obuf);
+    if(tmpBuf){
+        free(tmpBuf);
     }
-
-    if (buf) {
-        free(buf);
+    if (inBuf) {
+        free(inBuf);
     }
-
+    if (outBuf) {
+        free(outBuf);
+    }
+    if(key){
+        free(key);
+    }
     return NULL;
 }

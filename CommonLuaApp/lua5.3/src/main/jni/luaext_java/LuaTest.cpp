@@ -39,7 +39,7 @@ jstring charToJstring(JNIEnv *env, const char *pat, int len) {
     jmethodID ctorID = (env)->GetMethodID(strClass, "<init>","([BLjava/lang/String;)V");
     jbyteArray bytes = (env)->NewByteArray(len);
     (env)->SetByteArrayRegion(bytes, 0, len, (jbyte *) pat);
-    jstring encoding = (env)->NewStringUTF( "utf-8");
+    jstring encoding = (env)->NewStringUTF("utf-8");
     return (jstring) (env)->NewObject(strClass, ctorID, bytes, encoding);
 }
 
@@ -125,4 +125,48 @@ extern "C" JNIEXPORT
 void JNICALL Java_com_heaven7_java_lua_LuaTest_nBFTest(JNIEnv *env, jclass clazz){
     ext_println("Blowfish tests: %s");
     ext_println(blowfish_test() ? "SUCCEEDED" : "FAILED");
+}
+
+#include <sstream>
+extern "C" JNIEXPORT
+void JNICALL Java_com_heaven7_java_lua_LuaTest_nBfDecodeFile(JNIEnv *env, jclass clazz, jstring str){
+    const char * file = env->GetStringUTFChars(str, nullptr);
+    FILE* f = fopen(file, "rb");
+    size_t contentOffset = BF_HEADER_SIZE + 8;
+
+    size_t len;
+    size_t readCount;
+    char* buf;
+    fseek(f, 0L, SEEK_END);
+    len = static_cast<size_t>(ftell(f));
+    ext_println("file length = ");
+    std::stringstream ss;
+    ss << len;
+    ext_println(ss.str().c_str());
+
+    size_t contentLen = len - contentOffset;
+    buf = static_cast<char *>(malloc(contentLen));
+    fseek(f, contentOffset, SEEK_SET);
+    readCount = fread(buf, 1, contentLen, f);
+    if(readCount != contentLen){
+        ext_println("content error. ");
+    }
+    free(buf);
+
+    fseek(f, 0, SEEK_SET);
+    f = ext_decode(f, BF_HEADER_SIZE, NULL);
+    if(f == nullptr){
+        ext_println("decode failed.");
+        return;
+    }
+
+    fseek(f, 0, SEEK_SET);
+    buf = static_cast<char *>(malloc(contentLen));
+    readCount = fread(buf, 1, contentLen, f);
+    if(readCount != contentLen){
+        ext_println("decode content error. ");
+    }
+
+    fclose(f);
+
 }

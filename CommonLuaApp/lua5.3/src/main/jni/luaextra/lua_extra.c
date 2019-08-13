@@ -5,9 +5,16 @@
 #include "lua_extra.h"
 #include "../lua/luaconf.h"
 
+#include "string.h"
+#define _concatFilePath(s1, s2, s3) \
+    strcpy (str,s1); \
+    strcat (str,s2);\
+    strcat (str,s3);
+
 FileSearcher luaSearcher;
 FileSearcher clibSearcher;
 Lua_print lua_print;
+char* _tmp_dir = NULL;
 
 //flag 1 to global. function. must end with   {NULL, NULL}
 LUALIB_API void lua_BindFunctions(lua_State *L, struct luaL_Reg funcs[], int global){
@@ -24,6 +31,22 @@ void ext_setLuaSearcher(FileSearcher s){
 }
 void ext_setClibSearcher(FileSearcher s){
     clibSearcher = s;
+}
+
+void ext_setTmpFileDir(const char* name){
+    _tmp_dir = (char *) name;
+}
+
+LUALIB_API void createTempFile(const char* fn, char** out){
+    //todo
+   /* if(_tmp_dir != NULL){
+        int len = (int) (strlen(_tmp_dir) + 1 + strlen(name));
+        char str[len];
+        _concatFilePath(_tmp_dir, "/", name);
+        *out = str;
+    } else{
+        *out = NULL;
+    }*/
 }
 
 //the full file name
