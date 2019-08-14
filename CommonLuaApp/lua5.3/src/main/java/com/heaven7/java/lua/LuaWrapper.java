@@ -1,10 +1,13 @@
 package com.heaven7.java.lua;
 
+import android.os.Environment;
 import android.support.annotation.Keep;
 import android.support.v4.util.ArraySet;
 import android.util.Log;
 
-import java.lang.reflect.Constructor;
+import com.heaven7.core.util.MD5Util;
+
+import java.io.File;
 import java.util.Set;
 
 /**
@@ -12,6 +15,7 @@ import java.util.Set;
  */
 public final class LuaWrapper {
 
+    private static final String SALT = "heaven7";
     private final Set<LuaSearcher> mList = new ArraySet<>();
   //  private final Map<String, LuaFunction>
     private final StringBuilder mSb = new StringBuilder();
@@ -35,6 +39,20 @@ public final class LuaWrapper {
     }
     public void unregisterLuaSearchers(){
         mList.clear();
+    }
+    @Keep
+    public String createTempFile(String fn){
+        String dir = Environment.getExternalStorageDirectory() + "/temp";
+        File file = new File(dir);
+        if(!file.exists()){
+            file.mkdirs();
+        }
+        String key = MD5Util.encode(fn + SALT);
+        File dst = new File(dir, "h7" + key);
+        if(dst.exists()){
+            dst.delete();
+        }
+        return dst.getAbsolutePath();
     }
     @Keep
     public void print(String str, boolean concat){

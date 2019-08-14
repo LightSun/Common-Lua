@@ -20,6 +20,7 @@
 typedef char* (*FileSearcher)(const char * moduleName);
 typedef void (*Lua_print)(char* cs, int len, int flag);
 
+typedef char* (*CreateTempFile)(const char * filename);
 
 // map function to lua. any like: int (*lua_CFunction) (lua_State *L);
 LUALIB_API void lua_BindFunctions(lua_State *L, luaL_Reg funcs[], int flag);
@@ -35,7 +36,7 @@ void ext_setLuaSearcher(FileSearcher s);
  * @param s the searcher
  */
 void ext_setClibSearcher(FileSearcher s);
-void ext_setTmpFileDir(const char* name);
+void ext_setCreateTempFile(CreateTempFile ctf);
 
 void ext_setLua_print(Lua_print lp);
 Lua_print ext_getLuaPrint();

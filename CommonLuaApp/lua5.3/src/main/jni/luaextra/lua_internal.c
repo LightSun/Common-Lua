@@ -111,12 +111,11 @@ LUALIB_API FILE *ext_decode(FILE *infile, int headerSize, const char *fn) {
     if(fullPath == NULL){
         goto failed;
     }
-    unlink(fullPath); //delete on exit
-
-    fp = fopen(fullPath, "rw");//TODO
+    fp = fopen(fullPath, "w+");
     if (fp == NULL) {
         goto failed;
     }
+    unlink(fullPath); //delete on exit
    /* // the end six must be 'XXXXXX'
     fd = mkstemp(fullPath);//must use array
     if (fd < 0) {

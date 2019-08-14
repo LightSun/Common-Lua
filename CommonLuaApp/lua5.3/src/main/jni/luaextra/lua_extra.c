@@ -11,10 +11,10 @@
     strcat (str,s2);\
     strcat (str,s3);
 
-FileSearcher luaSearcher;
-FileSearcher clibSearcher;
-Lua_print lua_print;
-char* _tmp_dir = NULL;
+FileSearcher luaSearcher = NULL;
+FileSearcher clibSearcher = NULL;
+Lua_print lua_print= NULL;
+CreateTempFile _ctf = NULL;
 
 //flag 1 to global. function. must end with   {NULL, NULL}
 LUALIB_API void lua_BindFunctions(lua_State *L, struct luaL_Reg funcs[], int global){
@@ -33,20 +33,16 @@ void ext_setClibSearcher(FileSearcher s){
     clibSearcher = s;
 }
 
-void ext_setTmpFileDir(const char* name){
-    _tmp_dir = (char *) name;
+void ext_setCreateTempFile(CreateTempFile ctf){
+    _ctf = ctf;
 }
 
 LUALIB_API void createTempFile(const char* fn, char** out){
-    //todo
-   /* if(_tmp_dir != NULL){
-        int len = (int) (strlen(_tmp_dir) + 1 + strlen(name));
-        char str[len];
-        _concatFilePath(_tmp_dir, "/", name);
-        *out = str;
-    } else{
+    if(_ctf == NULL){
         *out = NULL;
-    }*/
+    } else{
+        *out = _ctf(fn);
+    }
 }
 
 //the full file name

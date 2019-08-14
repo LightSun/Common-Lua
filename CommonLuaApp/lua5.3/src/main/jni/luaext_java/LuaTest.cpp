@@ -163,10 +163,6 @@ void JNICALL Java_com_heaven7_java_lua_LuaTest_nBfDecodeFile(JNIEnv *env, jclass
     fseek(f, 0, SEEK_SET);
     buf = static_cast<char *>(malloc(contentLen));
     readCount = fread(buf, 1, contentLen, f);
-    if(readCount != contentLen){
-        ext_println("decode content error. ");
-    }
-
     fclose(f);
 
 }
