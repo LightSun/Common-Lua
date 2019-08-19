@@ -67,7 +67,7 @@ void ext_closeLuaState(lua_State* ls);
  */
 void ext_closeLuaThread(lua_State *main,lua_State* ls);
 
-
+void ext_setLuaPath(lua_State* L,const char* fieldName , const char* path);
 //====================================================
 /**
  * get filed as string then pop it.

@@ -49,6 +49,7 @@ static const luaL_Reg loadedlibs[] = {
   {LUA_MATHLIBNAME, luaopen_math},
   {LUA_UTF8LIBNAME, luaopen_utf8},
   {LUA_DBLIBNAME, luaopen_debug},
+  //{"cjson", luaopen_cjson}, //after set this . 'require("cjson") can be run'
 
   //{LUA_SYSTEMNAME, luaopen_system},
 #if defined(LUA_COMPAT_BITLIB)
@@ -56,7 +57,6 @@ static const luaL_Reg loadedlibs[] = {
 #endif
   {NULL, NULL}
 };
-
 
 LUALIB_API void luaL_openlibs(lua_State *L) {
   const luaL_Reg *lib;

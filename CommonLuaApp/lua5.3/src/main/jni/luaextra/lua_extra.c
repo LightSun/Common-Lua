@@ -4,6 +4,8 @@
 #include <lapi.h>
 #include "lua_extra.h"
 #include "../lua/luaconf.h"
+#include "../lua/config.h"
+
 
 #include "string.h"
 #define _concatFilePath(s1, s2, s3) \
@@ -93,6 +95,31 @@ void ext_closeLuaState(lua_State* ls){
 void ext_closeLuaThread(lua_State *main,lua_State* ls){
     luaE_freethread(main, ls);
 }
+
+/* also can use this.
+luaL_dostring(L, "package.path = package.path .. ';?.lua'");
+luaL_dostring(L, "package.cpath = package.cpath .. ';?.dll'");
+ */
+ /**
+  * fieldName can be 'path' or "cpath"
+  * @param L
+  * @param fieldName
+  * @param path
+  * @return
+  */
+void ext_setLuaPath(lua_State* L,const char* fieldName, const char* path)
+{
+    lua_getglobal( L, "package");
+    lua_getfield( L, -1, fieldName); // get field "path" from table at top of stack (-1)
+    const char* cur_path = lua_tostring( L, -1 ); // grab path string from top of stack
+    char str[strlen(cur_path) + strlen(";") + strlen(path)];
+    _concatFilePath(cur_path, ";", path);
+    lua_pop( L, 1 ); // get rid of the string on the stack we just pushed on line 5
+    lua_pushstring(L, str); // push the new one
+    lua_setfield( L, -2, fieldName); // set the field "path" in table at -2 with value at top of stack
+    lua_pop( L, 1 ); // get rid of package table from top of stack
+}
+
 const char* getFieldAsString(lua_State* L, int idx, const char* name){
     int result = lua_getfield(L, idx, name);
     if(result != 0){
