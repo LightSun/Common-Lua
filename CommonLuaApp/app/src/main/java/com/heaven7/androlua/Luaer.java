@@ -37,6 +37,14 @@ public final class Luaer {
     private final Context context;
     private LuaState mLuaState;
 
+    static {
+        System.loadLibrary("skshaper");
+        System.loadLibrary("skottie");
+        System.loadLibrary("sksg");
+        System.loadLibrary("skia");
+        System.loadLibrary("luaui");
+    }
+
     public Luaer(Context context) {
         this.context = context;
     }

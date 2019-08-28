@@ -15,15 +15,15 @@ include_directories(src/main/cpp/cjson)
 include_directories(src/main/cpp/skia)
 
 set(LIB_DIR ${CMAKE_SOURCE_DIR}/src/main/jniLibs)
-add_library(skia SHARED IMPORTED)
 add_library(skottie SHARED IMPORTED)
 add_library(sksg SHARED IMPORTED)
 add_library(skshaper SHARED IMPORTED)
+add_library(skia SHARED IMPORTED)
 
-set_target_properties(skia PROPERTIES IMPORTED_LOCATION ${LIB_DIR}/${ANDROID_ABI}/libskia.so)
 set_target_properties(skottie PROPERTIES IMPORTED_LOCATION ${LIB_DIR}/${ANDROID_ABI}/libskottie.so)
 set_target_properties(sksg PROPERTIES IMPORTED_LOCATION ${LIB_DIR}/${ANDROID_ABI}/libsksg.so)
 set_target_properties(skshaper PROPERTIES IMPORTED_LOCATION ${LIB_DIR}/${ANDROID_ABI}/libskshaper.so)
+set_target_properties(skia PROPERTIES IMPORTED_LOCATION ${LIB_DIR}/${ANDROID_ABI}/libskia.so)
 
 #aux_source_directory(src/main/jni/lua SRC_LUA)
 #aux_source_directory(src/main/jni/luaextra SRC_LUA_EXTRA)
@@ -133,6 +133,9 @@ target_link_libraries(
         luaui
         lua
         skia
+        skshaper
+        sksg
+        skottie
 )
 target_link_libraries( # Specifies the target library.
         # Links the target library to the log library
