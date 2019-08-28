@@ -1,0 +1,19 @@
+
+
+lua原始修改点
+
+
+== add lua_internal.h ========
+============= 1 ===================
+lbaselib.c:  luaB_print 函数
+    loadlib.c
+    //============= self ==========
+      if(filename == NULL){
+        filename = getLuaFilename(name);
+      }
+    //============ end self =======
+    lbaselib.c :    {"dumpStack", ext_dumpStack},
+
+====================
+
+add  lua/config.h

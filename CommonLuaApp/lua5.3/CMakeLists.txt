@@ -10,15 +10,27 @@ cmake_minimum_required(VERSION 3.4.1)
 # You can define multiple libraries, and CMake builds them for you.
 # Gradle automatically packages shared libraries with your APK.
 
-include_directories(src/main/jni/lua)
-include_directories(src/main/jni/cjson)
+include_directories(src/main/cpp/lua)
+include_directories(src/main/cpp/cjson)
+include_directories(src/main/cpp/include)
+
+set(LIB_DIR ${CMAKE_SOURCE_DIR}/src/main/jniLibs)
+add_library(skia SHARED IMPORTED)
+add_library(skottie SHARED IMPORTED)
+add_library(sksg SHARED IMPORTED)
+add_library(skshaper SHARED IMPORTED)
+
+set_target_properties(skia PROPERTIES IMPORTED_LOCATION ${LIB_DIR}/${ANDROID_ABI}/libskia.so)
+set_target_properties(skottie PROPERTIES IMPORTED_LOCATION ${LIB_DIR}/${ANDROID_ABI}/libskottie.so)
+set_target_properties(sksg PROPERTIES IMPORTED_LOCATION ${LIB_DIR}/${ANDROID_ABI}/libsksg.so)
+set_target_properties(skshaper PROPERTIES IMPORTED_LOCATION ${LIB_DIR}/${ANDROID_ABI}/libskshaper.so)
 
 #aux_source_directory(src/main/jni/lua SRC_LUA)
 #aux_source_directory(src/main/jni/luaextra SRC_LUA_EXTRA)
-aux_source_directory(src/main/jni/cjson SRC_CJSON)
-aux_source_directory(src/main/jni/common SRC_COMMON)
-aux_source_directory(src/main/jni/luaext_java SRC_LUA_JAVA)
-aux_source_directory(src/main/jni/lua_test SRC_LUA_TESTS)
+aux_source_directory(src/main/cpp/cjson SRC_CJSON)
+aux_source_directory(src/main/cpp/common SRC_COMMON)
+aux_source_directory(src/main/cpp/luaext_java SRC_LUA_JAVA)
+aux_source_directory(src/main/cpp/lua_test SRC_LUA_TESTS)
 add_library( # Sets the name of the library.
         lua
 
@@ -28,46 +40,46 @@ add_library( # Sets the name of the library.
 
         # Provides a relative path to your source file(s).
         ${SRC_COMMON}
-        src/main/jni/lua/lapi.c
-        src/main/jni/lua/lauxlib.c
-        src/main/jni/lua/lbaselib.c
-        src/main/jni/lua/lbitlib.c
-        src/main/jni/lua/lcode.c
-        src/main/jni/lua/lcorolib.c
-        src/main/jni/lua/lctype.c
-        src/main/jni/lua/ldblib.c
-        src/main/jni/lua/ldebug.c
-        src/main/jni/lua/ldo.c
-        src/main/jni/lua/ldump.c
-        src/main/jni/lua/lfunc.c
-        src/main/jni/lua/lgc.c
-        src/main/jni/lua/linit.c
+        src/main/cpp/lua/lapi.c
+        src/main/cpp/lua/lauxlib.c
+        src/main/cpp/lua/lbaselib.c
+        src/main/cpp/lua/lbitlib.c
+        src/main/cpp/lua/lcode.c
+        src/main/cpp/lua/lcorolib.c
+        src/main/cpp/lua/lctype.c
+        src/main/cpp/lua/ldblib.c
+        src/main/cpp/lua/ldebug.c
+        src/main/cpp/lua/ldo.c
+        src/main/cpp/lua/ldump.c
+        src/main/cpp/lua/lfunc.c
+        src/main/cpp/lua/lgc.c
+        src/main/cpp/lua/linit.c
 
-        src/main/jni/lua/liolib.c
-        src/main/jni/lua/llex.c
-        src/main/jni/lua/lmathlib.c
-        src/main/jni/lua/lmem.c
-        src/main/jni/lua/loadlib.c
-        src/main/jni/lua/lobject.c
-        src/main/jni/lua/lopcodes.c
-        src/main/jni/lua/loslib.c
-        src/main/jni/lua/lparser.c
+        src/main/cpp/lua/liolib.c
+        src/main/cpp/lua/llex.c
+        src/main/cpp/lua/lmathlib.c
+        src/main/cpp/lua/lmem.c
+        src/main/cpp/lua/loadlib.c
+        src/main/cpp/lua/lobject.c
+        src/main/cpp/lua/lopcodes.c
+        src/main/cpp/lua/loslib.c
+        src/main/cpp/lua/lparser.c
 
-        src/main/jni/lua/lstate.c
-        src/main/jni/lua/lstring.c
-        src/main/jni/lua/lstrlib.c
-        src/main/jni/lua/ltable.c
-        src/main/jni/lua/ltablib.c
-        src/main/jni/lua/ltm.c
-        src/main/jni/lua/lundump.c
-        src/main/jni/lua/lutf8lib.c
-        src/main/jni/lua/lvm.c
-        src/main/jni/lua/lzio.c
+        src/main/cpp/lua/lstate.c
+        src/main/cpp/lua/lstring.c
+        src/main/cpp/lua/lstrlib.c
+        src/main/cpp/lua/ltable.c
+        src/main/cpp/lua/ltablib.c
+        src/main/cpp/lua/ltm.c
+        src/main/cpp/lua/lundump.c
+        src/main/cpp/lua/lutf8lib.c
+        src/main/cpp/lua/lvm.c
+        src/main/cpp/lua/lzio.c
 
-        src/main/jni/luaextra/lua_extra.c
-        src/main/jni/luaextra/lua_internal.c
-        src/main/jni/luaextra/LuaRegistry.cpp
-        src/main/jni/luaextra/blowfish.c
+        src/main/cpp/luaextra/lua_extra.c
+        src/main/cpp/luaextra/lua_internal.c
+        src/main/cpp/luaextra/LuaRegistry.cpp
+        src/main/cpp/luaextra/blowfish.c
         )
 
 add_library(

@@ -13,11 +13,12 @@ android {
 
         externalNativeBuild {
             cmake {
-                cppFlags "-std=c++11 -fexceptions -O0"
+                cppFlags "-std=c++14 -fexceptions -O0"
             }
         }
         ndk {
             stl "gnustl_shared"
+            abiFilters "arm64-v8a"
         }
     }
 
@@ -36,12 +37,12 @@ android {
         }
     }
 
-    sourceSets {
+    /*sourceSets {
         main {
             jni.srcDirs = [] //屏蔽gradle的jni生成过程
             jniLibs.srcDirs = ['src/main/jniLibs']
         }
-    }
+    }*/
 
     externalNativeBuild {
         cmake {
