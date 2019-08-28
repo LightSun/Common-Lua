@@ -49,7 +49,6 @@ public final class LuaTest {
     public static void bfDecodeFile(String file) {
         nBfDecodeFile(file);
     }
-
     private static native void nTestAccessCppObjectInLua(long nativePointer, String script);
     private static native void nTestBindCpp1(long nativePointer, String script);
     private static native void nTestLuaRegistry(long nativePointer, String script);
@@ -58,5 +57,4 @@ public final class LuaTest {
     private static native void nBFDo(byte[] key,byte[] data, byte[] out, int en);
     private static native void nBFTest();
     private static native void nBfDecodeFile(String file);
-
 }

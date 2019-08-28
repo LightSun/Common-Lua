@@ -100,7 +100,10 @@ public class MainActivity extends Activity {
         String file = Environment.getExternalStorageDirectory() + "/vida/lua.txt";
         LuaTest.bfDecodeFile(file);
     }
-
+    public void onClickTestSk1(View view){
+        String script = mLuaer.loadLuaAssetsAsString("lua/skia_t1.lua");
+        mLuaer.getLuaState().LdoString(script);
+    }
     public void onClickTestLuaScript(View view) {
         executeLuaFile();
     }

@@ -12,7 +12,7 @@ cmake_minimum_required(VERSION 3.4.1)
 
 include_directories(src/main/cpp/lua)
 include_directories(src/main/cpp/cjson)
-include_directories(src/main/cpp/include)
+include_directories(src/main/cpp/skia)
 
 set(LIB_DIR ${CMAKE_SOURCE_DIR}/src/main/jniLibs)
 add_library(skia SHARED IMPORTED)
@@ -31,6 +31,8 @@ aux_source_directory(src/main/cpp/cjson SRC_CJSON)
 aux_source_directory(src/main/cpp/common SRC_COMMON)
 aux_source_directory(src/main/cpp/luaext_java SRC_LUA_JAVA)
 aux_source_directory(src/main/cpp/lua_test SRC_LUA_TESTS)
+aux_source_directory(src/main/cpp/luaui SRC_LUA_UI)
+
 add_library( # Sets the name of the library.
         lua
 
@@ -81,7 +83,11 @@ add_library( # Sets the name of the library.
         src/main/cpp/luaextra/LuaRegistry.cpp
         src/main/cpp/luaextra/blowfish.c
         )
-
+add_library(
+        luaui
+        SHARED
+        ${SRC_LUA_UI}
+)
 add_library(
         cjson
 
@@ -123,7 +129,11 @@ find_library( # Sets the name of the path variable.
         # you want CMake to locate.
         log)
 
-
+target_link_libraries(
+        luaui
+        lua
+        skia
+)
 target_link_libraries( # Specifies the target library.
         # Links the target library to the log library
         # included in the NDK.
