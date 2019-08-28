@@ -12,18 +12,8 @@ cmake_minimum_required(VERSION 3.4.1)
 
 include_directories(src/main/cpp/lua)
 include_directories(src/main/cpp/cjson)
-include_directories(src/main/cpp/include)
 
-set(LIB_DIR ${CMAKE_SOURCE_DIR}/src/main/jniLibs)
-add_library(skia SHARED IMPORTED)
-add_library(skottie SHARED IMPORTED)
-add_library(sksg SHARED IMPORTED)
-add_library(skshaper SHARED IMPORTED)
-
-set_target_properties(skia PROPERTIES IMPORTED_LOCATION ${LIB_DIR}/${ANDROID_ABI}/libskia.so)
-set_target_properties(skottie PROPERTIES IMPORTED_LOCATION ${LIB_DIR}/${ANDROID_ABI}/libskottie.so)
-set_target_properties(sksg PROPERTIES IMPORTED_LOCATION ${LIB_DIR}/${ANDROID_ABI}/libsksg.so)
-set_target_properties(skshaper PROPERTIES IMPORTED_LOCATION ${LIB_DIR}/${ANDROID_ABI}/libskshaper.so)
+#set(LIB_DIR ${CMAKE_SOURCE_DIR}/src/main/jniLibs)
 
 #aux_source_directory(src/main/jni/lua SRC_LUA)
 #aux_source_directory(src/main/jni/luaextra SRC_LUA_EXTRA)
