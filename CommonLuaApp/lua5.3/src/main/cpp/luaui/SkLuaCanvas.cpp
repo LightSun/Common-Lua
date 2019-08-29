@@ -5,12 +5,9 @@
  * found in the LICENSE file.
  */
 
-//#include "include/utils/SkLuaCanvas.h"
-#include "include/core/SkTypes.h"
 #include "SkLuaCanvas.h"
 
 #include "include/private/SkTo.h"
-//#include "include/utils/SkLua.h"
 #include "SkLua.h"
 #include "src/core/SkStringUtils.h"
 
@@ -21,7 +18,7 @@ extern "C" {
 
 class AutoCallLua : public SkLua {
 public:
-    AutoCallLua(lua_State* L, const char func[], const char verb[]) : INHERITED(L) {
+    AutoCallLua(lua_State* L, const char func[], const char verb[]) : SUPER(L) {
         lua_getglobal(L, func);
         if (!lua_isfunction(L, -1)) {
             int t = lua_type(L, -1);
@@ -43,7 +40,7 @@ public:
     void pushEncodedText(SkTextEncoding, const void*, size_t);
 
 private:
-    typedef SkLua INHERITED;
+    typedef SkLua SUPER;
 };
 
 #define AUTO_LUA(verb)  AutoCallLua lua(fL, fFunc.c_str(), verb)
@@ -77,16 +74,17 @@ void SkLuaCanvas::pushThis() {
 ///////////////////////////////////////////////////////////////////////////////
 
 SkLuaCanvas::SkLuaCanvas(int width, int height, lua_State* L, const char func[])
-    : INHERITED(width, height)
+    : SkCanvas(width, height)
     , fL(L)
     , fFunc(func) {
 }
 
-SkLuaCanvas::~SkLuaCanvas() {}
+SkLuaCanvas::~SkLuaCanvas() {
+}
 
 void SkLuaCanvas::willSave() {
     AUTO_LUA("save");
-    this->INHERITED::willSave();
+    SkCanvas::willSave();
 }
 
 SkCanvas::SaveLayerStrategy SkLuaCanvas::getSaveLayerStrategy(const SaveLayerRec& rec) {
@@ -98,7 +96,7 @@ SkCanvas::SaveLayerStrategy SkLuaCanvas::getSaveLayerStrategy(const SaveLayerRec
         lua.pushPaint(*rec.fPaint, "paint");
     }
 
-    (void)this->INHERITED::getSaveLayerStrategy(rec);
+    (void)SkCanvas::getSaveLayerStrategy(rec);
     // No need for a layer.
     return kNoLayer_SaveLayerStrategy;
 }
@@ -110,7 +108,7 @@ bool SkLuaCanvas::onDoSaveBehind(const SkRect*) {
 
 void SkLuaCanvas::willRestore() {
     AUTO_LUA("restore");
-    this->INHERITED::willRestore();
+    SkCanvas::willRestore();
 }
 
 void SkLuaCanvas::didConcat(const SkMatrix& matrix) {
@@ -136,37 +134,37 @@ void SkLuaCanvas::didConcat(const SkMatrix& matrix) {
         }
     }
 
-    this->INHERITED::didConcat(matrix);
+    SkCanvas::didConcat(matrix);
 }
 
 void SkLuaCanvas::didSetMatrix(const SkMatrix& matrix) {
-    this->INHERITED::didSetMatrix(matrix);
+    SkCanvas::didSetMatrix(matrix);
 }
 
 void SkLuaCanvas::onClipRect(const SkRect& r, SkClipOp op, ClipEdgeStyle edgeStyle) {
     AUTO_LUA("clipRect");
     lua.pushRect(r, "rect");
     lua.pushBool(kSoft_ClipEdgeStyle == edgeStyle, "aa");
-    this->INHERITED::onClipRect(r, op, edgeStyle);
+    SkCanvas::onClipRect(r, op, edgeStyle);
 }
 
 void SkLuaCanvas::onClipRRect(const SkRRect& rrect, SkClipOp op, ClipEdgeStyle edgeStyle) {
     AUTO_LUA("clipRRect");
     lua.pushRRect(rrect, "rrect");
     lua.pushBool(kSoft_ClipEdgeStyle == edgeStyle, "aa");
-    this->INHERITED::onClipRRect(rrect, op, edgeStyle);
+    SkCanvas::onClipRRect(rrect, op, edgeStyle);
 }
 
 void SkLuaCanvas::onClipPath(const SkPath& path, SkClipOp op, ClipEdgeStyle edgeStyle) {
     AUTO_LUA("clipPath");
     lua.pushPath(path, "path");
     lua.pushBool(kSoft_ClipEdgeStyle == edgeStyle, "aa");
-    this->INHERITED::onClipPath(path, op, edgeStyle);
+    SkCanvas::onClipPath(path, op, edgeStyle);
 }
 
 void SkLuaCanvas::onClipRegion(const SkRegion& deviceRgn, SkClipOp op) {
     AUTO_LUA("clipRegion");
-    this->INHERITED::onClipRegion(deviceRgn, op);
+    SkCanvas::onClipRegion(deviceRgn, op);
 }
 
 void SkLuaCanvas::onDrawPaint(const SkPaint& paint) {
@@ -275,13 +273,13 @@ void SkLuaCanvas::onDrawPicture(const SkPicture* picture, const SkMatrix* matrix
                                 const SkPaint* paint) {
     AUTO_LUA("drawPicture");
     // call through so we can see the nested picture ops
-    this->INHERITED::onDrawPicture(picture, matrix, paint);
+    SkCanvas::onDrawPicture(picture, matrix, paint);
 }
 
 void SkLuaCanvas::onDrawDrawable(SkDrawable* drawable, const SkMatrix* matrix) {
     AUTO_LUA("drawDrawable");
     // call through so we can see the nested ops
-    this->INHERITED::onDrawDrawable(drawable, matrix);
+    SkCanvas::onDrawDrawable(drawable, matrix);
 }
 
 void SkLuaCanvas::onDrawVerticesObject(const SkVertices*, const SkVertices::Bone[], int,

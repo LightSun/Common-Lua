@@ -216,7 +216,7 @@ public:
     /** Draws saved layers, if any.
         Frees up resources used by SkCanvas.
     */
-    virtual ~SkCanvas();
+    virtual ~SkCanvas() = 0;
 
     /** Returns SkImageInfo for SkCanvas. If SkCanvas is not associated with raster surface or
         GPU surface, returned SkColorType is set to kUnknown_SkColorType.
@@ -246,7 +246,7 @@ public:
 
         @return  integral width and height of base layer
     */
-    virtual SkISize getBaseLayerSize() const;
+    virtual SkISize getBaseLayerSize() const = 0;
 
     /** Creates SkSurface matching info and props, and associates it with SkCanvas.
         Returns nullptr if no match found.
@@ -264,7 +264,7 @@ public:
 
         @return  GPU context, if available; nullptr otherwise
     */
-    virtual GrContext* getGrContext();
+    virtual GrContext* getGrContext() = 0;
 
     /** Returns the pixel base address, SkImageInfo, rowBytes, and origin if the pixels
         can be read directly. The returned address is only valid
@@ -1859,7 +1859,12 @@ public:
      * This API only draws solid color, filled rectangles so it does not accept a full SkPaint.
      */
     void experimental_DrawEdgeAAQuad(const SkRect& rect, const SkPoint clip[4], QuadAAFlags aaFlags,
-                                     SkColor color, SkBlendMode mode);
+                                     const SkColor4f& color, SkBlendMode mode);
+    void experimental_DrawEdgeAAQuad(const SkRect& rect, const SkPoint clip[4], QuadAAFlags aaFlags,
+                                     SkColor color, SkBlendMode mode) {
+        this->experimental_DrawEdgeAAQuad(rect, clip, aaFlags, SkColor4f::FromColor(color), mode);
+    }
+
     /**
      * This is an bulk variant of experimental_DrawEdgeAAQuad() that renders 'cnt' textured quads.
      * For each entry, 'fDstRect' is rendered with its clip (determined by entry's 'fHasClip' and
@@ -2346,14 +2351,14 @@ public:
 
         @return  true if clip is empty
     */
-    virtual bool isClipEmpty() const;
+    virtual bool isClipEmpty() const = 0;
 
     /** Returns true if clip is SkRect and not empty.
         Returns false if the clip is empty, or if it is not SkRect.
 
         @return  true if clip is SkRect and not empty
     */
-    virtual bool isClipRect() const;
+    virtual bool isClipRect() const = 0;
 
     /** Returns SkMatrix.
         This does not account for translation by SkBaseDevice or SkSurface.
@@ -2365,7 +2370,7 @@ public:
     ///////////////////////////////////////////////////////////////////////////
 
     // don't call
-    virtual GrRenderTargetContext* internal_private_accessTopLayerRenderTargetContext();
+    virtual GrRenderTargetContext* internal_private_accessTopLayerRenderTargetContext() = 0;
     SkIRect internal_private_getTopLayerBounds() const { return getTopLayerBounds(); }
 
     // TEMP helpers until we switch virtual over to const& for src-rect
@@ -2387,14 +2392,14 @@ public:
 
 protected:
     // default impl defers to getDevice()->newSurface(info)
-    virtual sk_sp<SkSurface> onNewSurface(const SkImageInfo& info, const SkSurfaceProps& props);
+    virtual sk_sp<SkSurface> onNewSurface(const SkImageInfo& info, const SkSurfaceProps& props) = 0;
 
     // default impl defers to its device
-    virtual bool onPeekPixels(SkPixmap* pixmap);
-    virtual bool onAccessTopLayerPixels(SkPixmap* pixmap);
-    virtual SkImageInfo onImageInfo() const;
-    virtual bool onGetProps(SkSurfaceProps* props) const;
-    virtual void onFlush();
+    virtual bool onPeekPixels(SkPixmap* pixmap) = 0;
+    virtual bool onAccessTopLayerPixels(SkPixmap* pixmap) = 0;
+    virtual SkImageInfo onImageInfo() const = 0;
+    virtual bool onGetProps(SkSurfaceProps* props) const = 0;
+    virtual void onFlush() = 0;
 
     // Subclass save/restore notifiers.
     // Overriders should call the corresponding INHERITED method up the inheritance chain.
@@ -2410,36 +2415,36 @@ protected:
         return kFullLayer_SaveLayerStrategy;
     }
     // returns true if we should actually perform the saveBehind, or false if we should just save.
-    virtual bool onDoSaveBehind(const SkRect*) { return true; }
-    virtual void willRestore() {}
-    virtual void didRestore() {}
+    virtual bool onDoSaveBehind(const SkRect*){ return true; }
+    virtual void willRestore(){}
+    virtual void didRestore(){}
     virtual void didConcat(const SkMatrix& ) {}
     virtual void didSetMatrix(const SkMatrix& ) {}
-    virtual void didTranslate(SkScalar dx, SkScalar dy) {
+    void didTranslate(SkScalar dx, SkScalar dy) {
         this->didConcat(SkMatrix::MakeTrans(dx, dy));
     }
 
     // NOTE: If you are adding a new onDraw virtual to SkCanvas, PLEASE add an override to
     // SkCanvasVirtualEnforcer (in SkCanvasVirtualEnforcer.h). This ensures that subclasses using
     // that mechanism  will be required to implement the new function.
-    virtual void onDrawPaint(const SkPaint& paint);
-    virtual void onDrawBehind(const SkPaint& paint);
-    virtual void onDrawRect(const SkRect& rect, const SkPaint& paint);
-    virtual void onDrawRRect(const SkRRect& rrect, const SkPaint& paint);
-    virtual void onDrawDRRect(const SkRRect& outer, const SkRRect& inner, const SkPaint& paint);
-    virtual void onDrawOval(const SkRect& rect, const SkPaint& paint);
+    virtual void onDrawPaint(const SkPaint& paint) = 0;
+    virtual void onDrawBehind(const SkPaint& paint) = 0;
+    virtual void onDrawRect(const SkRect& rect, const SkPaint& paint) = 0;
+    virtual void onDrawRRect(const SkRRect& rrect, const SkPaint& paint) = 0;
+    virtual void onDrawDRRect(const SkRRect& outer, const SkRRect& inner, const SkPaint& paint) = 0;
+    virtual void onDrawOval(const SkRect& rect, const SkPaint& paint) = 0;
     virtual void onDrawArc(const SkRect& rect, SkScalar startAngle, SkScalar sweepAngle,
-                           bool useCenter, const SkPaint& paint);
-    virtual void onDrawPath(const SkPath& path, const SkPaint& paint);
-    virtual void onDrawRegion(const SkRegion& region, const SkPaint& paint);
+                           bool useCenter, const SkPaint& paint) = 0;
+    virtual void onDrawPath(const SkPath& path, const SkPaint& paint) = 0;
+    virtual void onDrawRegion(const SkRegion& region, const SkPaint& paint) = 0;
 
     virtual void onDrawTextBlob(const SkTextBlob* blob, SkScalar x, SkScalar y,
-                                const SkPaint& paint);
+                                const SkPaint& paint) = 0;
 
     virtual void onDrawPatch(const SkPoint cubics[12], const SkColor colors[4],
-                           const SkPoint texCoords[4], SkBlendMode mode, const SkPaint& paint);
+                           const SkPoint texCoords[4], SkBlendMode mode, const SkPaint& paint) = 0;
     virtual void onDrawPoints(PointMode mode, size_t count, const SkPoint pts[],
-                              const SkPaint& paint);
+                              const SkPaint& paint) = 0;
 
     // TODO: Remove old signature
     virtual void onDrawVerticesObject(const SkVertices* vertices, SkBlendMode mode,
@@ -2447,60 +2452,60 @@ protected:
         this->onDrawVerticesObject(vertices, nullptr, 0, mode, paint);
     }
     virtual void onDrawVerticesObject(const SkVertices* vertices, const SkVertices::Bone bones[],
-                                      int boneCount, SkBlendMode mode, const SkPaint& paint);
+                                      int boneCount, SkBlendMode mode, const SkPaint& paint) = 0;
 
-    virtual void onDrawImage(const SkImage* image, SkScalar dx, SkScalar dy, const SkPaint* paint);
+    virtual void onDrawImage(const SkImage* image, SkScalar dx, SkScalar dy, const SkPaint* paint)  = 0;
     virtual void onDrawImageRect(const SkImage* image, const SkRect* src, const SkRect& dst,
-                                 const SkPaint* paint, SrcRectConstraint constraint);
+                                 const SkPaint* paint, SrcRectConstraint constraint)  = 0;
     virtual void onDrawImageNine(const SkImage* image, const SkIRect& center, const SkRect& dst,
-                                 const SkPaint* paint);
+                                 const SkPaint* paint)  = 0;
     virtual void onDrawImageLattice(const SkImage* image, const Lattice& lattice, const SkRect& dst,
-                                    const SkPaint* paint);
+                                    const SkPaint* paint)  = 0;
 
     virtual void onDrawBitmap(const SkBitmap& bitmap, SkScalar dx, SkScalar dy,
-                              const SkPaint* paint);
+                              const SkPaint* paint)  = 0;
     virtual void onDrawBitmapRect(const SkBitmap& bitmap, const SkRect* src, const SkRect& dst,
-                                  const SkPaint* paint, SrcRectConstraint constraint);
+                                  const SkPaint* paint, SrcRectConstraint constraint)  = 0;
     virtual void onDrawBitmapNine(const SkBitmap& bitmap, const SkIRect& center, const SkRect& dst,
-                                  const SkPaint* paint);
+                                  const SkPaint* paint)  = 0;
     virtual void onDrawBitmapLattice(const SkBitmap& bitmap, const Lattice& lattice,
-                                     const SkRect& dst, const SkPaint* paint);
+                                     const SkRect& dst, const SkPaint* paint)  = 0;
 
     virtual void onDrawAtlas(const SkImage* atlas, const SkRSXform xform[], const SkRect rect[],
                              const SkColor colors[], int count, SkBlendMode mode,
-                             const SkRect* cull, const SkPaint* paint);
+                             const SkRect* cull, const SkPaint* paint)  = 0;
 
-    virtual void onDrawAnnotation(const SkRect& rect, const char key[], SkData* value);
-    virtual void onDrawShadowRec(const SkPath&, const SkDrawShadowRec&);
+    virtual void onDrawAnnotation(const SkRect& rect, const char key[], SkData* value){};
+    virtual void onDrawShadowRec(const SkPath&, const SkDrawShadowRec&)  = 0;
 
-    virtual void onDrawDrawable(SkDrawable* drawable, const SkMatrix* matrix);
+    virtual void onDrawDrawable(SkDrawable* drawable, const SkMatrix* matrix)  = 0;
     virtual void onDrawPicture(const SkPicture* picture, const SkMatrix* matrix,
-                               const SkPaint* paint);
+                               const SkPaint* paint)  = 0;
 
     virtual void onDrawEdgeAAQuad(const SkRect& rect, const SkPoint clip[4], QuadAAFlags aaFlags,
-                                  SkColor color, SkBlendMode mode);
+                                  const SkColor4f& color, SkBlendMode mode)  = 0;
     virtual void onDrawEdgeAAImageSet(const ImageSetEntry imageSet[], int count,
                                       const SkPoint dstClips[], const SkMatrix preViewMatrices[],
-                                      const SkPaint* paint, SrcRectConstraint constraint);
+                                      const SkPaint* paint, SrcRectConstraint constraint)  = 0;
 
     enum ClipEdgeStyle {
         kHard_ClipEdgeStyle,
         kSoft_ClipEdgeStyle
     };
 
-    virtual void onClipRect(const SkRect& rect, SkClipOp op, ClipEdgeStyle edgeStyle);
-    virtual void onClipRRect(const SkRRect& rrect, SkClipOp op, ClipEdgeStyle edgeStyle);
-    virtual void onClipPath(const SkPath& path, SkClipOp op, ClipEdgeStyle edgeStyle);
-    virtual void onClipRegion(const SkRegion& deviceRgn, SkClipOp op);
+    virtual void onClipRect(const SkRect& rect, SkClipOp op, ClipEdgeStyle edgeStyle)  = 0;
+    virtual void onClipRRect(const SkRRect& rrect, SkClipOp op, ClipEdgeStyle edgeStyle)  = 0;
+    virtual void onClipPath(const SkPath& path, SkClipOp op, ClipEdgeStyle edgeStyle)  = 0;
+    virtual void onClipRegion(const SkRegion& deviceRgn, SkClipOp op) = 0 ;
 
-    virtual void onDiscard();
+    virtual void onDiscard()  = 0;
 
     // Clip rectangle bounds. Called internally by saveLayer.
     // returns false if the entire rectangle is entirely clipped out
     // If non-NULL, The imageFilter parameter will be used to expand the clip
     // and offscreen bounds for any margin required by the filter DAG.
-    bool clipRectBounds(const SkRect* bounds, SaveLayerFlags flags, SkIRect* intersection,
-                        const SkImageFilter* imageFilter = nullptr);
+    virtual bool clipRectBounds(const SkRect* bounds, SaveLayerFlags flags, SkIRect* intersection,
+                        const SkImageFilter* imageFilter = nullptr)  = 0;
 
     SkBaseDevice* getTopDevice() const;
 

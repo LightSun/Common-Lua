@@ -87,6 +87,8 @@ add_library(
         luaui
         SHARED
         ${SRC_LUA_UI}
+        src/main/cpp/skia/src/core/SkStringUtils.cpp
+        src/main/cpp/skia/src/utils/SkUTF.cpp
 )
 add_library(
         cjson
@@ -134,8 +136,8 @@ target_link_libraries(
         lua
         skia
         skshaper
-        sksg
         skottie
+        sksg
 )
 target_link_libraries( # Specifies the target library.
         # Links the target library to the log library

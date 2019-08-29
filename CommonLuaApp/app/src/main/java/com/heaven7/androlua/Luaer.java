@@ -116,7 +116,6 @@ public final class Luaer {
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
-
                 Logger.d(TAG, "run", "lua script copy done");
             }
         });

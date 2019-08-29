@@ -64,9 +64,7 @@ private:
     lua_State*  fL;
     SkString    fFunc;
 
-    void sendverb(const char verb[]);
-
-    typedef SkCanvas INHERITED;
+    //void sendverb(const char verb[]);
 };
 
 #endif

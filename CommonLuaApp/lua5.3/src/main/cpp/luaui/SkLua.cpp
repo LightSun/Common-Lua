@@ -5,7 +5,6 @@
  * found in the LICENSE file.
  */
 
-//#include "include/utils/SkLua.h"
 #include "SkLua.h"
 
 #if SK_SUPPORT_GPU
@@ -1867,7 +1866,7 @@ static int lsk_newRRect(lua_State* L) {
 }
 
 // Sk.newTextBlob(text, rect, paint)
-static int lsk_newTextBlob(lua_State* L) {
+/*static int lsk_newTextBlob(lua_State* L) {
     const char* text = lua_tolstring(L, 1, nullptr);
     SkRect bounds;
     lua2rect(L, 2, &bounds);
@@ -1887,7 +1886,7 @@ static int lsk_newTextBlob(lua_State* L) {
     push_ref<SkTextBlob>(L, builder.makeBlob());
     SkLua(L).pushScalar(builder.endPoint().fY);
     return 2;
-}
+}*/
 
 static int lsk_newTypeface(lua_State* L) {
     const char* name = nullptr;
@@ -1976,7 +1975,7 @@ static void register_Sk(lua_State* L) {
     setfield_function(L, "newPictureRecorder", lsk_newPictureRecorder);
     setfield_function(L, "newRRect", lsk_newRRect);
     setfield_function(L, "newRasterSurface", lsk_newRasterSurface);
-    setfield_function(L, "newTextBlob", lsk_newTextBlob);
+   // setfield_function(L, "newTextBlob", lsk_newTextBlob);
     setfield_function(L, "newTypeface", lsk_newTypeface);
     setfield_function(L, "newFontStyle", lsk_newFontStyle);
     lua_pop(L, 1);  // pop off the Sk table
