@@ -89,6 +89,7 @@ add_library(
         ${SRC_LUA_UI}
         src/main/cpp/skia/src/core/SkStringUtils.cpp
         src/main/cpp/skia/src/utils/SkUTF.cpp
+        src/main/cpp/skia/modules/skshaper/include/SkShaper.cpp
 )
 add_library(
         cjson
@@ -134,10 +135,10 @@ find_library( # Sets the name of the path variable.
 target_link_libraries(
         luaui
         lua
-        skia
-        skshaper
-        skottie
         sksg
+        skottie
+        skshaper
+        skia
 )
 target_link_libraries( # Specifies the target library.
         # Links the target library to the log library

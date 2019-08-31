@@ -38,11 +38,11 @@ public final class Luaer {
     private LuaState mLuaState;
 
     static {
-        System.loadLibrary("skshaper");
-        System.loadLibrary("skottie");
         System.loadLibrary("sksg");
+        System.loadLibrary("skottie");
+        System.loadLibrary("skshaper");
         System.loadLibrary("skia");
-        System.loadLibrary("luaui");
+        //System.loadLibrary("luaui");
     }
 
     public Luaer(Context context) {
@@ -99,27 +99,33 @@ public final class Luaer {
             @Override
             public void run() {
                 AssetsFileCopyUtils.copyAll(getApplicationContext(), "lua", LUA_PARENT_DIR);
-                File dst = new File(getFilesDir(), "libcjson.so");
-                System.out.println("libcjson: path is " + dst.getPath());
-                if(dst.exists()){
-                    System.out.println("libcjson load ok(already copied).");
-                    return;
-                }
-                //lua load libcjson .the c json can't be load on sdcard.
-                try {
-                    InputStream in = getAssets().open("clua/libcjson.so");
-                    OutputStream out = new FileOutputStream(dst);
-                    IOUtils.copyLarge(in, out);
-                    IOUtils.closeQuietly(in);
-                    IOUtils.closeQuietly(out);
-                    System.out.println("libcjson load ok.");
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
+                copyNativeLibs("libcjson");
+                copyNativeLibs("libluaui");
                 Logger.d(TAG, "run", "lua script copy done");
             }
         });
     }
+
+    private void copyNativeLibs(String libname) {//like libcjson
+        File dst = new File(getFilesDir(), libname + ".so");
+        System.out.println(libname + ":  path is " + dst.getPath());
+        if(dst.exists()){
+            System.out.println("libcjson load ok(already copied).");
+            return;
+        }
+        //lua load libcjson .the c json can't be load on sdcard.
+        try {
+            InputStream in = getAssets().open("clua/"+libname+".so");
+            OutputStream out = new FileOutputStream(dst);
+            IOUtils.copyLarge(in, out);
+            IOUtils.closeQuietly(in);
+            IOUtils.closeQuietly(out);
+            System.out.println(libname + " load ok.");
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
     public static byte[] intToBytes(int val){
        /* ByteBuffer buffer = ByteBuffer.allocateDirect(4)
                 .order(ByteOrder.LITTLE_ENDIAN);
