@@ -38,10 +38,10 @@ public final class Luaer {
     private LuaState mLuaState;
 
     static {
-        System.loadLibrary("sksg");
+       /* System.loadLibrary("sksg");
         System.loadLibrary("skottie");
         System.loadLibrary("skshaper");
-        System.loadLibrary("skia");
+        System.loadLibrary("skia");*/
         //System.loadLibrary("luaui");
     }
 
@@ -79,6 +79,7 @@ public final class Luaer {
     public void initEnv(){
         final Map<String, Boolean> mCMap = new HashMap<>();
         mCMap.put("cjson", true);
+        mCMap.put("luaui", true);
         LuaWrapper.getDefault().registerLuaSearcher(new LuaSearcher() {
             @Override
             public String getLuaFilepath(String module) {
@@ -92,7 +93,7 @@ public final class Luaer {
             public String getClibFilepath(String module) {
                 Logger.d(TAG, "getClibFilepath", "module = " + module);
                 //return LUA_DIR + "/lib" + module + ".so";
-                return new File(getFilesDir(), "libcjson.so").getPath();
+                return new File(getFilesDir(), "lib"+ module + ".so").getPath();
             }
         });
         Schedulers.io().newWorker().schedule(new Runnable() {
@@ -101,6 +102,9 @@ public final class Luaer {
                 AssetsFileCopyUtils.copyAll(getApplicationContext(), "lua", LUA_PARENT_DIR);
                 copyNativeLibs("libcjson");
                 copyNativeLibs("libluaui");
+                copyNativeLibs("libskottie");
+                copyNativeLibs("libsksg");
+                copyNativeLibs("libskshaper");
                 Logger.d(TAG, "run", "lua script copy done");
             }
         });
@@ -110,7 +114,7 @@ public final class Luaer {
         File dst = new File(getFilesDir(), libname + ".so");
         System.out.println(libname + ":  path is " + dst.getPath());
         if(dst.exists()){
-            System.out.println("libcjson load ok(already copied).");
+            System.out.println(libname + " load ok(already copied).");
             return;
         }
         //lua load libcjson .the c json can't be load on sdcard.

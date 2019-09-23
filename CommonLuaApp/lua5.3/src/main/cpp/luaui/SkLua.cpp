@@ -2012,8 +2012,13 @@ void SkLua::Load(lua_State* L) {
     REG_CLASS(L, SkFontStyle);
 }
 
-extern "C" int luaopen_skia(lua_State* L);
+/*extern "C" int luaopen_skia(lua_State* L);
 extern "C" int luaopen_skia(lua_State* L) {
+    SkLua::Load(L);
+    return 0;
+}*/
+extern "C" int luaopen_luaui(lua_State* L);
+extern "C" int luaopen_luaui(lua_State* L) {
     SkLua::Load(L);
     return 0;
 }
