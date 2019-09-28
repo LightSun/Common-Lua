@@ -101,7 +101,8 @@ public class MainActivity extends Activity {
         LuaTest.bfDecodeFile(file);
     }
     public void onClickTestSk1(View view){
-        String script = mLuaer.loadLuaAssetsAsString("lua/skia_t1.lua");
+        //String script = mLuaer.loadLuaAssetsAsString("lua/skia_t1.lua");
+        String script = mLuaer.loadLuaAssetsAsString("lua/skia_ui1.lua");
         mLuaer.getLuaState().LdoString(script);
         String result = mLuaer.getLuaState().toString(-1);
         Logger.d(TAG, "onClickTestSk1", result);

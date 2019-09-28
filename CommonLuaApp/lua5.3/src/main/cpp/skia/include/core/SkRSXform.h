@@ -10,7 +10,6 @@
 
 #include "include/core/SkPoint.h"
 #include "include/core/SkSize.h"
-#include "include/core/SkScalar.h"
 
 /**
  *  A compressed form of a rotation+scale matrix.

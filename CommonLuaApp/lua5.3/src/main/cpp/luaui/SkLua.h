@@ -13,7 +13,9 @@
 #include "include/core/SkScalar.h"
 #include "include/core/SkString.h"
 
-struct lua_State;
+extern "C"{
+    struct lua_State;
+};
 
 class SkCanvas;
 class SkMatrix;

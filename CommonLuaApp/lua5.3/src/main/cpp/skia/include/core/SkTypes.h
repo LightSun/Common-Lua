@@ -18,6 +18,7 @@
 #include "include/core/SkPostConfig.h"
 #include <stddef.h>
 #include <stdint.h>
+#include <include/c/sk_types.h>
 // IWYU pragma: end_exports
 
 /** \file SkTypes.h

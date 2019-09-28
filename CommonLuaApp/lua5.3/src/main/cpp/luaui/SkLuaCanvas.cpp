@@ -5,6 +5,8 @@
  * found in the LICENSE file.
  */
 
+//#include "include/utils/SkLuaCanvas.h"
+//#include "include/utils/SkLua.h"
 #include "SkLuaCanvas.h"
 
 #include "include/private/SkTo.h"
@@ -18,7 +20,7 @@ extern "C" {
 
 class AutoCallLua : public SkLua {
 public:
-    AutoCallLua(lua_State* L, const char func[], const char verb[]) : SUPER(L) {
+    AutoCallLua(lua_State* L, const char func[], const char verb[]) : SkLua(L) {
         lua_getglobal(L, func);
         if (!lua_isfunction(L, -1)) {
             int t = lua_type(L, -1);
@@ -40,14 +42,13 @@ public:
     void pushEncodedText(SkTextEncoding, const void*, size_t);
 
 private:
-    typedef SkLua SUPER;
+   // typedef SkLua INHERITED;
 };
 
 #define AUTO_LUA(verb)  AutoCallLua lua(fL, fFunc.c_str(), verb)
 
 
 ///////////////////////////////////////////////////////////////////////////////
-
 void AutoCallLua::pushEncodedText(SkTextEncoding enc, const void* text, size_t length) {
     switch (enc) {
         case SkTextEncoding::kUTF8:
@@ -79,8 +80,7 @@ SkLuaCanvas::SkLuaCanvas(int width, int height, lua_State* L, const char func[])
     , fFunc(func) {
 }
 
-SkLuaCanvas::~SkLuaCanvas() {
-}
+SkLuaCanvas::~SkLuaCanvas() {}
 
 void SkLuaCanvas::willSave() {
     AUTO_LUA("save");

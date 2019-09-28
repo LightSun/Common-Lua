@@ -1,0 +1,17 @@
+in SkTypes.h :
+     add "#include <include/c/sk_types.h>"
+
+SkLuaCanvas :
+  annotate  "// typedef SkLua INHERITED; "
+  change this->INHERITED to SkCanvas
+
+SkCanvas:
+    处理关于virtual函数。要么=0 要么有impl
+
+    changed:
+     void experimental_DrawEdgeAAQuad(const SkRect& rect, const SkPoint clip[4], QuadAAFlags aaFlags,
+                                         SkColor4f color, SkBlendMode mode);
+        void experimental_DrawEdgeAAQuad(const SkRect& rect, const SkPoint clip[4], QuadAAFlags aaFlags,
+                                         SkColor color, SkBlendMode mode) {
+            this->experimental_DrawEdgeAAQuad(rect, clip, aaFlags, SkColor4f::FromColor(color), mode);
+        }

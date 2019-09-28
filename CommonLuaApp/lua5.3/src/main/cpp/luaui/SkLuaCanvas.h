@@ -12,7 +12,9 @@
 #include "include/core/SkString.h"
 #include "include/core/SkVertices.h"
 
-struct lua_State;
+extern "C"{
+    struct lua_State;
+};
 
 class SkLuaCanvas : public SkCanvas {
 public:

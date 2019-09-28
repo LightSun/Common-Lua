@@ -5,6 +5,7 @@
  * found in the LICENSE file.
  */
 
+//#include "include/utils/SkLua.h"
 #include "SkLua.h"
 
 #if SK_SUPPORT_GPU
@@ -36,9 +37,9 @@
 #include <new>
 
 extern "C" {
-    #include "lua.h"
-    #include "lualib.h"
-    #include "lauxlib.h"
+#include "lua.h"
+#include "lualib.h"
+#include "lauxlib.h"
 }
 
 struct DocHolder {
@@ -651,33 +652,33 @@ static int lcanvas_gc(lua_State* L) {
 }
 
 const struct luaL_Reg gSkCanvas_Methods[] = {
-    { "clear", lcanvas_clear },
-    { "drawColor", lcanvas_drawColor },
-    { "drawPaint", lcanvas_drawPaint },
-    { "drawRect", lcanvas_drawRect },
-    { "drawOval", lcanvas_drawOval },
-    { "drawCircle", lcanvas_drawCircle },
-    { "drawImage", lcanvas_drawImage },
-    { "drawImageRect", lcanvas_drawImageRect },
-    { "drawPatch", lcanvas_drawPatch },
-    { "drawPath", lcanvas_drawPath },
-    { "drawPicture", lcanvas_drawPicture },
-    { "drawText", lcanvas_drawText },
-    { "drawTextBlob", lcanvas_drawTextBlob },
-    { "getSaveCount", lcanvas_getSaveCount },
-    { "getTotalMatrix", lcanvas_getTotalMatrix },
-    { "save", lcanvas_save },
-    { "saveLayer", lcanvas_saveLayer },
-    { "restore", lcanvas_restore },
-    { "scale", lcanvas_scale },
-    { "translate", lcanvas_translate },
-    { "rotate", lcanvas_rotate },
-    { "concat", lcanvas_concat },
+        { "clear", lcanvas_clear },
+        { "drawColor", lcanvas_drawColor },
+        { "drawPaint", lcanvas_drawPaint },
+        { "drawRect", lcanvas_drawRect },
+        { "drawOval", lcanvas_drawOval },
+        { "drawCircle", lcanvas_drawCircle },
+        { "drawImage", lcanvas_drawImage },
+        { "drawImageRect", lcanvas_drawImageRect },
+        { "drawPatch", lcanvas_drawPatch },
+        { "drawPath", lcanvas_drawPath },
+        { "drawPicture", lcanvas_drawPicture },
+        { "drawText", lcanvas_drawText },
+        { "drawTextBlob", lcanvas_drawTextBlob },
+        { "getSaveCount", lcanvas_getSaveCount },
+        { "getTotalMatrix", lcanvas_getTotalMatrix },
+        { "save", lcanvas_save },
+        { "saveLayer", lcanvas_saveLayer },
+        { "restore", lcanvas_restore },
+        { "scale", lcanvas_scale },
+        { "translate", lcanvas_translate },
+        { "rotate", lcanvas_rotate },
+        { "concat", lcanvas_concat },
 
-    { "newSurface", lcanvas_newSurface },
+        { "newSurface", lcanvas_newSurface },
 
-    { "__gc", lcanvas_gc },
-    { nullptr, nullptr }
+        { "__gc", lcanvas_gc },
+        { nullptr, nullptr }
 };
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -706,11 +707,11 @@ static int ldocument_gc(lua_State* L) {
 }
 
 static const struct luaL_Reg gDocHolder_Methods[] = {
-    { "beginPage", ldocument_beginPage },
-    { "endPage", ldocument_endPage },
-    { "close", ldocument_close },
-    { "__gc", ldocument_gc },
-    { nullptr, nullptr }
+        { "beginPage", ldocument_beginPage },
+        { "endPage", ldocument_endPage },
+        { "close", ldocument_close },
+        { "__gc", ldocument_gc },
+        { nullptr, nullptr }
 };
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -899,34 +900,34 @@ static int lpaint_gc(lua_State* L) {
 }
 
 static const struct luaL_Reg gSkPaint_Methods[] = {
-    { "isAntiAlias", lpaint_isAntiAlias },
-    { "setAntiAlias", lpaint_setAntiAlias },
-    { "isDither", lpaint_isDither },
-    { "setDither", lpaint_setDither },
-    { "getFilterQuality", lpaint_getFilterQuality },
-    { "setFilterQuality", lpaint_setFilterQuality },
-    { "getAlpha", lpaint_getAlpha },
-    { "setAlpha", lpaint_setAlpha },
-    { "getColor", lpaint_getColor },
-    { "setColor", lpaint_setColor },
-    { "getStroke", lpaint_getStroke },
-    { "setStroke", lpaint_setStroke },
-    { "getStrokeCap", lpaint_getStrokeCap },
-    { "getStrokeJoin", lpaint_getStrokeJoin },
-    { "getStrokeWidth", lpaint_getStrokeWidth },
-    { "setStrokeWidth", lpaint_setStrokeWidth },
-    { "getStrokeMiter", lpaint_getStrokeMiter },
-    { "getEffects", lpaint_getEffects },
-    { "getColorFilter", lpaint_getColorFilter },
-    { "setColorFilter", lpaint_setColorFilter },
-    { "getImageFilter", lpaint_getImageFilter },
-    { "setImageFilter", lpaint_setImageFilter },
-    { "getShader", lpaint_getShader },
-    { "setShader", lpaint_setShader },
-    { "getPathEffect", lpaint_getPathEffect },
-    { "getFillPath", lpaint_getFillPath },
-    { "__gc", lpaint_gc },
-    { nullptr, nullptr }
+        { "isAntiAlias", lpaint_isAntiAlias },
+        { "setAntiAlias", lpaint_setAntiAlias },
+        { "isDither", lpaint_isDither },
+        { "setDither", lpaint_setDither },
+        { "getFilterQuality", lpaint_getFilterQuality },
+        { "setFilterQuality", lpaint_setFilterQuality },
+        { "getAlpha", lpaint_getAlpha },
+        { "setAlpha", lpaint_setAlpha },
+        { "getColor", lpaint_getColor },
+        { "setColor", lpaint_setColor },
+        { "getStroke", lpaint_getStroke },
+        { "setStroke", lpaint_setStroke },
+        { "getStrokeCap", lpaint_getStrokeCap },
+        { "getStrokeJoin", lpaint_getStrokeJoin },
+        { "getStrokeWidth", lpaint_getStrokeWidth },
+        { "setStrokeWidth", lpaint_setStrokeWidth },
+        { "getStrokeMiter", lpaint_getStrokeMiter },
+        { "getEffects", lpaint_getEffects },
+        { "getColorFilter", lpaint_getColorFilter },
+        { "setColorFilter", lpaint_setColorFilter },
+        { "getImageFilter", lpaint_getImageFilter },
+        { "setImageFilter", lpaint_setImageFilter },
+        { "getShader", lpaint_getShader },
+        { "setShader", lpaint_setShader },
+        { "getPathEffect", lpaint_getPathEffect },
+        { "getFillPath", lpaint_getFillPath },
+        { "__gc", lpaint_gc },
+        { nullptr, nullptr }
 };
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -1002,18 +1003,18 @@ static int lfont_gc(lua_State* L) {
 }
 
 static const struct luaL_Reg gSkFont_Methods[] = {
-    { "getSize", lfont_getSize },
-    { "setSize", lfont_setSize },
-    { "getScaleX", lfont_getScaleX },
-    { "getSkewX", lfont_getSkewX },
-    { "getTypeface", lfont_getTypeface },
-    { "setTypeface", lfont_setTypeface },
-    { "getHinting", lfont_getHinting },
-    { "getFontID", lfont_getFontID },
-    { "measureText", lfont_measureText },
-    { "getMetrics", lfont_getMetrics },
-    { "__gc", lfont_gc },
-    { nullptr, nullptr }
+        { "getSize", lfont_getSize },
+        { "setSize", lfont_setSize },
+        { "getScaleX", lfont_getScaleX },
+        { "getSkewX", lfont_getSkewX },
+        { "getTypeface", lfont_getTypeface },
+        { "setTypeface", lfont_setTypeface },
+        { "getHinting", lfont_getHinting },
+        { "getFontID", lfont_getFontID },
+        { "measureText", lfont_measureText },
+        { "getMetrics", lfont_getMetrics },
+        { "__gc", lfont_gc },
+        { nullptr, nullptr }
 };
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -1026,7 +1027,7 @@ static const char* mode2string(SkTileMode mode) {
 
 static const char* gradtype2string(SkShader::GradientType t) {
     static const char* gNames[] = {
-        "none", "color", "linear", "radial", "radial2", "sweep", "conical"
+            "none", "color", "linear", "radial", "radial2", "sweep", "conical"
     };
     SkASSERT((unsigned)t < SK_ARRAY_COUNT(gNames));
     return gNames[t];
@@ -1092,11 +1093,11 @@ static int lshader_gc(lua_State* L) {
 }
 
 static const struct luaL_Reg gSkShader_Methods[] = {
-    { "isOpaque",       lshader_isOpaque },
-    { "isAImage",       lshader_isAImage },
-    { "asAGradient",    lshader_asAGradient },
-    { "__gc",           lshader_gc },
-    { nullptr, nullptr }
+        { "isOpaque",       lshader_isOpaque },
+        { "isAImage",       lshader_isAImage },
+        { "asAGradient",    lshader_asAGradient },
+        { "__gc",           lshader_gc },
+        { nullptr, nullptr }
 };
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -1123,9 +1124,9 @@ static int lpatheffect_gc(lua_State* L) {
 }
 
 static const struct luaL_Reg gSkPathEffect_Methods[] = {
-    { "asADash",        lpatheffect_asADash },
-    { "__gc",           lpatheffect_gc },
-    { nullptr, nullptr }
+        { "asADash",        lpatheffect_asADash },
+        { "__gc",           lpatheffect_gc },
+        { nullptr, nullptr }
 };
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -1136,8 +1137,8 @@ static int lpcolorfilter_gc(lua_State* L) {
 }
 
 static const struct luaL_Reg gSkColorFilter_Methods[] = {
-    { "__gc",       lpcolorfilter_gc },
-    { nullptr, nullptr }
+        { "__gc",       lpcolorfilter_gc },
+        { nullptr, nullptr }
 };
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -1148,8 +1149,8 @@ static int lpimagefilter_gc(lua_State* L) {
 }
 
 static const struct luaL_Reg gSkImageFilter_Methods[] = {
-    { "__gc",       lpimagefilter_gc },
-    { nullptr, nullptr }
+        { "__gc",       lpimagefilter_gc },
+        { nullptr, nullptr }
 };
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -1211,10 +1212,10 @@ static int lmatrix_setRectToRect(lua_State* L) {
             const char* fName;
             SkMatrix::ScaleToFit fScaleToFit;
         } rec[] = {
-            { "fill",   SkMatrix::kFill_ScaleToFit },
-            { "start",  SkMatrix::kStart_ScaleToFit },
-            { "center", SkMatrix::kCenter_ScaleToFit },
-            { "end",    SkMatrix::kEnd_ScaleToFit },
+                { "fill",   SkMatrix::kFill_ScaleToFit },
+                { "start",  SkMatrix::kStart_ScaleToFit },
+                { "center", SkMatrix::kCenter_ScaleToFit },
+                { "end",    SkMatrix::kEnd_ScaleToFit },
         };
 
         for (size_t i = 0; i < SK_ARRAY_COUNT(rec); ++i) {
@@ -1230,15 +1231,15 @@ static int lmatrix_setRectToRect(lua_State* L) {
 }
 
 static const struct luaL_Reg gSkMatrix_Methods[] = {
-    { "getType", lmatrix_getType },
-    { "getScaleX", lmatrix_getScaleX },
-    { "getScaleY", lmatrix_getScaleY },
-    { "getTranslateX", lmatrix_getTranslateX },
-    { "getTranslateY", lmatrix_getTranslateY },
-    { "setRectToRect", lmatrix_setRectToRect },
-    { "invert", lmatrix_invert },
-    { "mapXY", lmatrix_mapXY },
-    { nullptr, nullptr }
+        { "getType", lmatrix_getType },
+        { "getScaleX", lmatrix_getScaleX },
+        { "getScaleY", lmatrix_getScaleY },
+        { "getTranslateX", lmatrix_getTranslateX },
+        { "getTranslateY", lmatrix_getTranslateY },
+        { "setRectToRect", lmatrix_setRectToRect },
+        { "invert", lmatrix_invert },
+        { "mapXY", lmatrix_mapXY },
+        { nullptr, nullptr }
 };
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -1334,7 +1335,7 @@ static int lpath_isRect(lua_State* L) {
 
 static const char* dir2string(SkPath::Direction dir) {
     static const char* gStr[] = {
-        "unknown", "cw", "ccw"
+            "unknown", "cw", "ccw"
     };
     SkASSERT((unsigned)dir < SK_ARRAY_COUNT(gStr));
     return gStr[dir];
@@ -1440,23 +1441,23 @@ static int lpath_gc(lua_State* L) {
 }
 
 static const struct luaL_Reg gSkPath_Methods[] = {
-    { "getBounds", lpath_getBounds },
-    { "getFillType", lpath_getFillType },
-    { "getSegmentTypes", lpath_getSegmentTypes },
-    { "getVerbs", lpath_getVerbs },
-    { "isConvex", lpath_isConvex },
-    { "isEmpty", lpath_isEmpty },
-    { "isRect", lpath_isRect },
-    { "isNestedFillRects", lpath_isNestedFillRects },
-    { "countPoints", lpath_countPoints },
-    { "reset", lpath_reset },
-    { "moveTo", lpath_moveTo },
-    { "lineTo", lpath_lineTo },
-    { "quadTo", lpath_quadTo },
-    { "cubicTo", lpath_cubicTo },
-    { "close", lpath_close },
-    { "__gc", lpath_gc },
-    { nullptr, nullptr }
+        { "getBounds", lpath_getBounds },
+        { "getFillType", lpath_getFillType },
+        { "getSegmentTypes", lpath_getSegmentTypes },
+        { "getVerbs", lpath_getVerbs },
+        { "isConvex", lpath_isConvex },
+        { "isEmpty", lpath_isEmpty },
+        { "isRect", lpath_isRect },
+        { "isNestedFillRects", lpath_isNestedFillRects },
+        { "countPoints", lpath_countPoints },
+        { "reset", lpath_reset },
+        { "moveTo", lpath_moveTo },
+        { "lineTo", lpath_lineTo },
+        { "quadTo", lpath_quadTo },
+        { "cubicTo", lpath_cubicTo },
+        { "close", lpath_close },
+        { "__gc", lpath_gc },
+        { nullptr, nullptr }
 };
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -1504,11 +1505,11 @@ static int lrrect_gc(lua_State* L) {
 }
 
 static const struct luaL_Reg gSkRRect_Methods[] = {
-    { "rect", lrrect_rect },
-    { "type", lrrect_type },
-    { "radii", lrrect_radii },
-    { "__gc", lrrect_gc },
-    { nullptr, nullptr }
+        { "rect", lrrect_rect },
+        { "type", lrrect_type },
+        { "radii", lrrect_radii },
+        { "__gc", lrrect_gc },
+        { nullptr, nullptr }
 };
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -1536,11 +1537,11 @@ static int limage_gc(lua_State* L) {
 }
 
 static const struct luaL_Reg gSkImage_Methods[] = {
-    { "width", limage_width },
-    { "height", limage_height },
-    { "newShader", limage_newShader },
-    { "__gc", limage_gc },
-    { nullptr, nullptr }
+        { "width", limage_width },
+        { "height", limage_height },
+        { "newShader", limage_newShader },
+        { "__gc", limage_gc },
+        { nullptr, nullptr }
 };
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -1599,13 +1600,13 @@ static int lsurface_gc(lua_State* L) {
 }
 
 static const struct luaL_Reg gSkSurface_Methods[] = {
-    { "width", lsurface_width },
-    { "height", lsurface_height },
-    { "getCanvas", lsurface_getCanvas },
-    { "newImageSnapshot", lsurface_newImageSnapshot },
-    { "newSurface", lsurface_newSurface },
-    { "__gc", lsurface_gc },
-    { nullptr, nullptr }
+        { "width", lsurface_width },
+        { "height", lsurface_height },
+        { "getCanvas", lsurface_getCanvas },
+        { "newImageSnapshot", lsurface_newImageSnapshot },
+        { "newSurface", lsurface_newSurface },
+        { "__gc", lsurface_gc },
+        { nullptr, nullptr }
 };
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -1654,11 +1655,11 @@ static int lpicturerecorder_gc(lua_State* L) {
 }
 
 static const struct luaL_Reg gSkPictureRecorder_Methods[] = {
-    { "beginRecording", lpicturerecorder_beginRecording },
-    { "getCanvas", lpicturerecorder_getCanvas },
-    { "endRecording", lpicturerecorder_endRecording },
-    { "__gc", lpicturerecorder_gc },
-    { nullptr, nullptr }
+        { "beginRecording", lpicturerecorder_beginRecording },
+        { "getCanvas", lpicturerecorder_getCanvas },
+        { "endRecording", lpicturerecorder_endRecording },
+        { "__gc", lpicturerecorder_gc },
+        { nullptr, nullptr }
 };
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -1679,10 +1680,10 @@ static int lpicture_gc(lua_State* L) {
 }
 
 static const struct luaL_Reg gSkPicture_Methods[] = {
-    { "width", lpicture_width },
-    { "height", lpicture_height },
-    { "__gc", lpicture_gc },
-    { nullptr, nullptr }
+        { "width", lpicture_width },
+        { "height", lpicture_height },
+        { "__gc", lpicture_gc },
+        { nullptr, nullptr }
 };
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -1698,9 +1699,9 @@ static int ltextblob_gc(lua_State* L) {
 }
 
 static const struct luaL_Reg gSkTextBlob_Methods[] = {
-    { "bounds", ltextblob_bounds },
-    { "__gc", ltextblob_gc },
-    { nullptr, nullptr }
+        { "bounds", ltextblob_bounds },
+        { "__gc", ltextblob_gc },
+        { nullptr, nullptr }
 };
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -1723,10 +1724,10 @@ static int ltypeface_gc(lua_State* L) {
 }
 
 static const struct luaL_Reg gSkTypeface_Methods[] = {
-    { "getFamilyName", ltypeface_getFamilyName },
-    { "getStyle", ltypeface_getStyle },
-    { "__gc", ltypeface_gc },
-    { nullptr, nullptr }
+        { "getFamilyName", ltypeface_getFamilyName },
+        { "getStyle", ltypeface_getStyle },
+        { "__gc", ltypeface_gc },
+        { nullptr, nullptr }
 };
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -1752,11 +1753,11 @@ static int lfontstyle_gc(lua_State* L) {
 }
 
 static const struct luaL_Reg gSkFontStyle_Methods[] = {
-    { "weight", lfontstyle_weight },
-    { "width", lfontstyle_width },
-    { "slant", lfontstyle_slant },
-    { "__gc", lfontstyle_gc },
-    { nullptr, nullptr }
+        { "weight", lfontstyle_weight },
+        { "width", lfontstyle_width },
+        { "slant", lfontstyle_slant },
+        { "__gc", lfontstyle_gc },
+        { nullptr, nullptr }
 };
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -1866,7 +1867,7 @@ static int lsk_newRRect(lua_State* L) {
 }
 
 // Sk.newTextBlob(text, rect, paint)
-/*static int lsk_newTextBlob(lua_State* L) {
+static int lsk_newTextBlob(lua_State* L) {
     const char* text = lua_tolstring(L, 1, nullptr);
     SkRect bounds;
     lua2rect(L, 2, &bounds);
@@ -1886,7 +1887,7 @@ static int lsk_newRRect(lua_State* L) {
     push_ref<SkTextBlob>(L, builder.makeBlob());
     SkLua(L).pushScalar(builder.endPoint().fY);
     return 2;
-}*/
+}
 
 static int lsk_newTypeface(lua_State* L) {
     const char* name = nullptr;
@@ -1975,7 +1976,7 @@ static void register_Sk(lua_State* L) {
     setfield_function(L, "newPictureRecorder", lsk_newPictureRecorder);
     setfield_function(L, "newRRect", lsk_newRRect);
     setfield_function(L, "newRasterSurface", lsk_newRasterSurface);
-   // setfield_function(L, "newTextBlob", lsk_newTextBlob);
+    setfield_function(L, "newTextBlob", lsk_newTextBlob);
     setfield_function(L, "newTypeface", lsk_newTypeface);
     setfield_function(L, "newFontStyle", lsk_newFontStyle);
     lua_pop(L, 1);  // pop off the Sk table
