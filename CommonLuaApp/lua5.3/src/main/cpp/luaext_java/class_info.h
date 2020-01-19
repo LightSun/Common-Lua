@@ -18,16 +18,16 @@ namespace LUA_JAVA {
     public:
         std::string name;//method name
         std::string sig;
-        List<jclass> types;
+        List<jclass> paramTypes;
 
         MethodInfo() {}
 
         ~MethodInfo() {
             JNIEnv *const pEnv = getJNIEnv();
-            for (int i = 0, size = types.size(); i < size; ++i) {
-                pEnv->DeleteLocalRef(types.getAt(i));
+            for (int i = 0, size = paramTypes.size(); i < size; ++i) {
+                pEnv->DeleteLocalRef(paramTypes.getAt(i));
             }
-            types.clear();
+            paramTypes.clear();
         }
 
         const string &getName() const {
@@ -44,11 +44,11 @@ namespace LUA_JAVA {
             MethodInfo::sig = sig;
         }
 
-        const List<jclass> &getTypes() const {
-            return types;
+        const List<jclass> &getParameterTypes() const {
+            return paramTypes;
         }
-        void setTypes(const List<jclass> &types) {
-            MethodInfo::types = types;
+        void setParameterTypes(const List<jclass> &types) {
+            MethodInfo::paramTypes = types;
         }
     };
 
@@ -73,8 +73,6 @@ namespace LUA_JAVA {
                     delete (value);
                     return false;
                 };
-                mConstructorMap.travel(tr);
-                mMethodMap.travel(tr);
             }
             mConstructorMap.clear();
             mMethodMap.clear();

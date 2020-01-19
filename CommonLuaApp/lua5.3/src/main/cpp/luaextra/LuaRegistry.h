@@ -24,6 +24,36 @@ extern "C"{
 #include "sstream"
 #include "lua_bridge.h"
 
+class LuaParam;
+class LuaBridgeCaller;
+class LuaMediator;
+
+typedef LuaBridgeCaller* (*LBCCreator)(const char* classname, LuaMediator* holder);
+
+void setTempLuaState(lua_State * L);
+lua_State *getTempLuaState();
+void getLuaParam(lua_State* L, int id_value, LuaParam* lp);
+
+//=========================
+void setLuaBridgeCallerCreator(LBCCreator creator);
+LuaBridgeCaller *CreateLBC(const char *classname, LuaMediator* holder);
+
+void getParams(lua_State *L, LuaMediator* holder, int count, int startIdx);
+int callImpl(lua_State* L, LuaBridgeCaller* caller, const char* cn);
+//=========================
+
+//===============================================================================
+void initLuaBridge(lua_State* L);
+/**
+ * function which can wrap cpp object to lua.
+ * this of use LuaBridgeCaller to wrap any cpp object.
+ * @param L the lua state
+ * @param caller the bridge caller.
+ * @param classname  the class name.
+ */
+// wrap base, base-array, object, object array
+void lua_wrapObject(lua_State* L, LuaBridgeCaller* caller, const char* classname);
+
 template <class T>
 class LuaRegistry{
         public:
@@ -114,9 +144,6 @@ public:
     void* value;
     const char* className;
 };
-void getLuaParam(lua_State* L, int id_value, LuaParam* lp);
-void setTempLuaState(lua_State * L);
-lua_State *getTempLuaState();
 
 class LuaMediator{
 public:
@@ -169,15 +196,6 @@ private:
     const char* classname;
 };
 
-//=========================
-typedef LuaBridgeCaller* (*LBCCreator)(const char* classname, LuaMediator* holder);
-void setLuaBridgeCallerCreator(LBCCreator creator);
-LuaBridgeCaller *Create(const char *classname, LuaMediator* holder);
-
-void getParams(lua_State *L, LuaMediator* holder, int count, int startIdx);
-int callImpl(lua_State* L, LuaBridgeCaller* caller, const char* cn);
-//=========================
-
 class LuaBridge{
 public:
     static const char className[];
@@ -195,7 +213,7 @@ public:
         LuaMediator* holder = new LuaMediator(count);
         getParams(L, holder, count, -1);
 
-        obj = Create(mname, holder);
+        obj = CreateLBC(mname, holder);
         cn = mname;
         delete holder;
         setTempLuaState(nullptr);
@@ -228,15 +246,4 @@ private:
     const char * cn;
 };
 
-//===============================================================================
-void initLuaBridge(lua_State* L);
-
-/**
- * function which can wrap cpp object to lua.
- * this of use LuaBridgeCaller to wrap any cpp object.
- * @param L the lua state
- * @param caller the bridge caller.
- */
-// wrap base, base-array, object, object array
-void lua_wrapObject(lua_State* L, LuaBridgeCaller* caller, const char* name);
 #endif

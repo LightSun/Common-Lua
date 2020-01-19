@@ -139,6 +139,7 @@ public final class Luaer {
             dos.write(bytes1);
             dos.write(bytes2);
             dos.write(enResult);
+            dos.flush();
             Logger.i(TAG, "writeToFile", "write total len = " + (9 + 8 + enResult.length)); //73 - 17
             Logger.i(TAG, "writeToFile", "rawLength = " + rawLength);
         } catch (Exception e) {

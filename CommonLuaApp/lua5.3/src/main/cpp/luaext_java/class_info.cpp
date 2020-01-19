@@ -4,7 +4,7 @@
 
 #include "class_info.h"
 
-Map<std::string, LUA_JAVA::ClassInfo*> _classMap;
+Map<std::string, LUA_JAVA::ClassInfo*> _classMap; /* NOLINT */
 ClassInfoInitializer _cii = nullptr;
 
 namespace LUA_JAVA {
