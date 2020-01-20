@@ -157,10 +157,11 @@ void getLuaParam(lua_State *L, int id_value, LuaParam *lp) {
 }
 
 void getParams(lua_State *L, LuaMediator *holder, int count, int startIdx) {
-    //br.call(method, size, args...)
+    //br.call(method, args..., size)
     //luaB_dumpStack(L);
     if (count > 0) {
         for (int i = 0; i < count; ++i) { //reverse order
+            //getLuaParam(L, startIdx - (i + 1), &holder->lp[i]);
             getLuaParam(L, startIdx - (i + 1), &holder->lp[count - 1 - i]);
         }
     }
@@ -177,35 +178,35 @@ int callImpl(lua_State *L, LuaBridgeCaller *caller, const char *cn) {
     getParams(L, holder, count, -1);
     const void *result = caller->call(cn, mname, holder);
 
-    const int rType = holder->resultType;
+    const int rType = holder->resultType; //must be DTYPE_XX
     delete holder;
     setTempLuaState(nullptr);
 
     switch (rType) {
-        case LUA_TNUMBER: {
+        case DTYPE_NUMBER: {
             const lua_Number *num = static_cast<const lua_Number *>(result);
             lua_Number n = *num;
             delete num;
             lua_pushnumber(L, n);
-            return LUA_OK;
+            return LUA_YIELD; //有返回值的需要用yield
         }
-        case LUA_TBOOLEAN: {
+        case DTYPE_BOOLEAN: {
             const int *num = static_cast<const int *>(result);
             int n = *num;
             delete num;
             lua_pushboolean(L, n == 1);
-            return LUA_OK;
+            return LUA_YIELD;
         }
-        case LUA_TSTRING: {
+        case DTYPE_STRING: {
             const char *num = static_cast<const char *>(result);
             lua_pushstring(L, num);
-            return LUA_OK;
+            return LUA_YIELD;
         }
-        case LUA_TNIL: {
-            return LUA_OK;
+        case DTYPE_NULL: {
+            return LUA_YIELD;
         }
 
-        case LUA_TUSERDATA:{
+        case DTYPE_LBD_OBJECT:{
             if(holder->resultCN == nullptr){
                 luaL_error(L, "for user data. result classname must not be null.");
                 return LUA_ERRRUN;
@@ -219,13 +220,9 @@ int callImpl(lua_State *L, LuaBridgeCaller *caller, const char *cn) {
             return LUA_YIELD; //must
         }
 
-        case LUA_TTHREAD:
-        case LUA_TFUNCTION:
-        case LUA_TTABLE:
-        case LUA_TLIGHTUSERDATA: { // for light-userdata .you need managed self.
-            luaL_error(L, "Currently, lua param not support for any of 'light-userdata/function/table/thread'.");
-            return LUA_ERRRUN;
-        }
+        case DTYPE_LB_OBJECT:
+        case DTYPE_OBJECT:
+            //TODO
 
         default:
             std::stringstream out;

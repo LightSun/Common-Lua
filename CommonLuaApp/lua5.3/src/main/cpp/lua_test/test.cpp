@@ -98,7 +98,7 @@ public:
         if(holder->count <= 0){
             lua_Number * a = new lua_Number();
             *a = 10086;
-            holder->resultType = LUA_TNUMBER;
+            holder->resultType = DTYPE_NUMBER;
             return a;
         } else{
             LuaParam* param = &holder->lp[0];
