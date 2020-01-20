@@ -31,6 +31,7 @@
     lp->type = DTYPE_BOOLEAN;
 #endif
 
+// in: LuaBridge -> out -> lp
 #define  RECEIVE_USERDATA(id_value)  \
     void *data = lua_touserdata(L, id_value); \
     /** unpack for LuaBridge. only class can be dynamic cast.*/ \

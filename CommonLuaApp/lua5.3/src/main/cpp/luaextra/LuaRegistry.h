@@ -27,6 +27,8 @@ extern "C"{
 class LuaParam;
 class LuaBridgeCaller;
 class LuaMediator;
+template <class T> class LuaRegistry;
+class LuaBridge;
 
 typedef LuaBridgeCaller* (*LBCCreator)(const char* classname, LuaMediator* holder);
 
@@ -206,7 +208,7 @@ public:
         //ext_print("LuaBridge is removed.", 0 , 1);
     }
 
-    LuaBridge(lua_State *L){
+    LuaBridge(lua_State *L){ //cname, ...params, count
         setTempLuaState(L);
         const lua_Integer count = lua_tointeger(L, -1);
         const char* mname = luaL_checkstring(L, -1 - count - 1);

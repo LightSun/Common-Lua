@@ -159,7 +159,7 @@ void Main::run(const char *script) {
     //luaB_dumpStack(L);
     luaL_setmetatable(L, "ListMT"); // set userdata metatable
    // luaB_dumpStack(L);
-    lua_setglobal(L, "the_list"); // the_list in lua points to the new userdata
+    lua_setglobal(L, "the_list"); // the_list in lua points to the new userdata. lua can direct access it
 
     runScript(script);
 
