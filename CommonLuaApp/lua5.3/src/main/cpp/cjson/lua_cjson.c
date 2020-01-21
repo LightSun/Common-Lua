@@ -370,16 +370,17 @@ static int json_destroy_config(lua_State *l)
 
 static void json_create_config(lua_State *l)
 {
+    //{tab }
     json_config_t *cfg;
     int i;
 
-    cfg = lua_newuserdata(l, sizeof(*cfg));
+    cfg = lua_newuserdata(l, sizeof(*cfg)); //{tab, ud}
 
     /* Create GC method to clean up strbuf */
     lua_newtable(l);
-    lua_pushcfunction(l, json_destroy_config);
-    lua_setfield(l, -2, "__gc");
-    lua_setmetatable(l, -2);
+    lua_pushcfunction(l, json_destroy_config);   //{tab1, ud, tab2, func}
+    lua_setfield(l, -2, "__gc");                 //{tab1, ud, tab2}
+    lua_setmetatable(l, -2);                     //{tab1, ud}
 
     cfg->encode_sparse_convert = DEFAULT_SPARSE_CONVERT;
     cfg->encode_sparse_ratio = DEFAULT_SPARSE_RATIO;
@@ -1337,7 +1338,6 @@ static int json_protect_conversion(lua_State *l)
      * errors are memory related */
     return luaL_error(l, "Memory allocation error in CJSON protected call");
 }
-
 /* Return cjson module table */
 static int lua_cjson_new(lua_State *l)
 {
@@ -1362,19 +1362,20 @@ static int lua_cjson_new(lua_State *l)
     lua_newtable(l);
 
     /* Register functions with config data as upvalue */
-    json_create_config(l);
-    luaL_setfuncs(l, reg, 1);
+    json_create_config(l);    // [tab, ud}
+    luaL_setfuncs(l, reg, 1); // {tab }
 
     /* Set cjson.null */
     lua_pushlightuserdata(l, NULL);
-    lua_setfield(l, -2, "null");
+    lua_setfield(l, -2, "null");// {tab }
 
     /* Set module name / version fields */
     lua_pushliteral(l, CJSON_MODNAME);
-    lua_setfield(l, -2, "_NAME");
+    lua_setfield(l, -2, "_NAME"); // {tab }
     lua_pushliteral(l, CJSON_VERSION);
-    lua_setfield(l, -2, "_VERSION");
+    lua_setfield(l, -2, "_VERSION"); // {tab }
 
+    //luaB_dumpStack(l);
     return 1;
 }
 

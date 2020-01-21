@@ -12,7 +12,7 @@
 typedef struct Registration{
     char* clazz;
     JNINativeMethod* methods;
-    int len;
+    int len; //method count
 }Registration;
 
 Registration createRegistration(char* clazz, JNINativeMethod methods[], int len);

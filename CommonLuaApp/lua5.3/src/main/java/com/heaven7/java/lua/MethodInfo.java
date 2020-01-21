@@ -22,6 +22,10 @@ public final class MethodInfo extends INativeObject.BaseNativeObject{
         this.sig = sig;
     }
 
+    public int getParameterCount(){
+        return types != null ? types.length : 0;
+    }
+
     public Class<?>[] getTypes() {
         return types;
     }

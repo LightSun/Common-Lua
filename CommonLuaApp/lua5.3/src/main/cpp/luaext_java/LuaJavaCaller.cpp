@@ -34,7 +34,7 @@ const char * getStringValue(LuaParam* lp, bool* state){
         case LUA_TBOOLEAN: {
             int *a = static_cast<int *>(lp->value);
             std::stringstream out;
-            out << *a;
+            out << (*a == 1);
             return out.str().c_str();
         }
         case LUA_TSTRING: {
@@ -97,14 +97,13 @@ public:
                 }
                 int size = holder->count - 1;
                 //params
-                jobjectArray const arr = env->NewObjectArray(size, __objectClass, nullptr);
+                const jobjectArray const arr = env->NewObjectArray(size, __objectClass, nullptr);
                 for (int i = 0; i < size; ++i) {
                     const char *const str = getStringValue(&holder->lp[i + 1], &success);
                     if(success){
                         jstring const jstr = str != nullptr ? env->NewStringUTF(str) : nullptr;
                         env->SetObjectArrayElement(arr, i, jstr);
                     } else{
-                        //TODO support array types-- lua-table.
                         //failed means it not base types.
                         void *const value = holder->lp[i + 1].value;
                         if(value != nullptr){
@@ -114,12 +113,12 @@ public:
                         }
                     }
                 }
-                
+                // static Object create(String className, String name, Object[] args, String[] errorMsg)
                 //prepare string array
                 jobjectArray const msgArr = env->NewObjectArray(1, env->FindClass("java/lang/String"), nullptr);
                 jvalue values[4];
                 values[0].l = env->NewStringUTF(classname);
-                values[1].l = env->NewStringUTF(name);
+                values[1].l = name != nullptr ? env->NewStringUTF(name) : nullptr;
                 values[2].l = arr;
                 values[3].l = msgArr;
                 //create
@@ -129,8 +128,9 @@ public:
                    const jchar *const chs = env->GetStringChars(msg, nullptr);
                    luaError(reinterpret_cast<const char *>(chs));
                 } else{
-                    jobj = result;
+                   jobj = result;
                 }
+                //TODO release
             }
         }
     }

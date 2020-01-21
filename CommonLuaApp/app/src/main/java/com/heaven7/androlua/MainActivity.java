@@ -68,7 +68,7 @@ public class MainActivity extends Activity {
     public void onClickTestLuaExtend(View view){
         mLuaer.loadLuaAssets("lua/extend2.lua");
     }
-    public void onClickTestBindCpp(View view){
+    public void onClickTestBindCpp(View view){ //LuaWrapper
         String script = mLuaer.loadLuaAssetsAsString("lua/LuaTest.lua");
         LuaTest.testBindCpp1(mLuaer.getLuaState(), script);
     }

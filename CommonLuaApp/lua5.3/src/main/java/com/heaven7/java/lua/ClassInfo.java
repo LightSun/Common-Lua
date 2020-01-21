@@ -1,8 +1,14 @@
 package com.heaven7.java.lua;
 
+import java.lang.annotation.Annotation;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -11,12 +17,17 @@ import java.util.Map;
 public final class ClassInfo {
 
     private static final Map<Class<?>, String> sBases = new HashMap<>();
+    private static final Comparator<MethodInfo> COM_MethodInfo = new Comparator<MethodInfo>() {
+        @Override
+        public int compare(MethodInfo o1, MethodInfo o2) {
+            return Integer.compare(o2.getParameterCount(), o2.getParameterCount());
+        }
+    };
 
     //private final String mClassName;
     //lua_method_name, info
-    private final Map<String, MethodInfo> mMethodMap = new HashMap<>();
-    private final Map<String, MethodInfo> mConstructorMap = new HashMap<>();
-    private final Map<String, Integer> mIndexMap = new HashMap<>();
+    private final Map<String, List<MethodInfo>> mMethodMap = new HashMap<>();
+    private final Map<String, List<MethodInfo>> mConstructorMap = new HashMap<>();
 
     static {
         sBases.put(boolean.class, "Z");
@@ -36,27 +47,41 @@ public final class ClassInfo {
         //constructors
         Constructor[] cons = clazz.getConstructors();
         for (Constructor con : cons) {
+            Annotation anno = con.getAnnotation(LuaIgnore.class);
+            if(anno != null){
+                continue;
+            }
             LuaMethod lm = (LuaMethod) con.getAnnotation(LuaMethod.class);
+            String luaMethodName = lm != null ? lm.value() : "<init>";
+
             MethodInfo info = new MethodInfo();
             info.setName("<init>");
             info.setTypes(con.getParameterTypes());
 
-            getSigAndFill(sb, mConstructorMap, null, lm, info);
+            getSigAndFill(sb, mConstructorMap, null, luaMethodName, info);
         }
         //methods
         Method[] methods = clazz.getMethods();
         for (Method m : methods) {
             LuaMethod lm = m.getAnnotation(LuaMethod.class);
-            MethodInfo info = new MethodInfo();
+            String luaMethodName = lm != null ? lm.value() : m.getName();
 
+            MethodInfo info = new MethodInfo();
             info.setName(m.getName());
             info.setTypes(m.getParameterTypes());
-            getSigAndFill(sb, mMethodMap, m.getReturnType(), lm, info);
+            getSigAndFill(sb, mMethodMap, m.getReturnType(), luaMethodName, info);
+        }
+        //sort param count. desc
+        for (List<MethodInfo> list : mMethodMap.values()){
+            Collections.sort(list, COM_MethodInfo);
+        }
+        for (List<MethodInfo> list : mConstructorMap.values()){
+            Collections.sort(list, COM_MethodInfo);
         }
     }
 
     //for constructor. returnType = null
-    private void getSigAndFill(StringBuilder sb, Map<String, MethodInfo> map, Class<?> returnType, LuaMethod lm, MethodInfo info) {
+    private static void getSigAndFill(StringBuilder sb, Map<String, List<MethodInfo>> map, Class<?> returnType, String methodName, MethodInfo info) {
         sb.append("(");
         for (Class<?> cla : info.getTypes()) {
             sb.append(typeToSig(cla));
@@ -66,37 +91,44 @@ public final class ClassInfo {
         info.setSig(sb.toString());
         sb.delete(0, sb.length());
 
-        if (lm != null && lm.value().length() > 0) {
-            map.put(lm.value(), info);
-        } else {
-            int index = getNextMethodIndex(info.getName());
-            if (index > 0) {
-                map.put(info.getName() + index, info);
-            } else {
-                if(map.containsKey(info.getName())){
-                    mIndexMap.put(info.getName(), 1);
-                    map.put(info.getName() + 1, info);
-                }else {
-                    map.put(info.getName(), info);
-                }
+        List<MethodInfo> methodInfos = map.get(methodName);
+        if(methodInfos == null){
+            methodInfos = new ArrayList<>();
+            map.put(methodName, methodInfos);
+        }
+        methodInfos.add(info);
+    }
+    //desc
+    public List<MethodInfo> getMethodInfoes(String name, int expectParamCount){
+        List<MethodInfo> infos = mMethodMap.get(name);
+        if(infos == null){
+            return null;
+        }
+        List<MethodInfo> list = new ArrayList<>();
+        for (MethodInfo mi : infos){
+            if(mi.getParameterCount() >= expectParamCount){
+                list.add(mi);
+            }else {
+                break;
             }
         }
+        return list;
     }
-
-    public MethodInfo getMethodInfo(String name){
-        return mMethodMap.get(name);
-    }
-    public MethodInfo getConstructorInfo(String name){
-        return mConstructorMap.get(name);
-    }
-
-    private int getNextMethodIndex(String expectName) {
-        Integer index = mIndexMap.get(expectName);
-        if(index == null){
-            return 0;
+    //desc
+    public List<MethodInfo> getConstructorInfoes(String name, int expectParamCount){
+        List<MethodInfo> infos = mConstructorMap.get(name);
+        if(infos == null){
+            return null;
         }
-        mIndexMap.put(expectName, index + 1);
-        return index + 1;
+        List<MethodInfo> list = new ArrayList<>();
+        for (MethodInfo mi : infos){
+            if(mi.getParameterCount() >= expectParamCount){
+                list.add(mi);
+            }else {
+                break;
+            }
+        }
+        return list;
     }
     private static String typeToSig(Class<?> type) {
         if(type.isArray()){

@@ -32,8 +32,12 @@ local function func(key, val)
     print(tostring(key), tostring(val))
 end
 
+dumpStack()
 local ff = FooWrapper(3)
+dumpStack()
+print("type ff = ", type(ff)) -- table
 local v = ff:add(1, 4)        -- v = 5
+dumpStack()
 
 travelTable(ff, func)
 print("after add v = ",v);

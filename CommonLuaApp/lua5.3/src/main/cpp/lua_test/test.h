@@ -56,25 +56,25 @@ public:
 
         // 3. 新建一个userdata用来持有c++对象
         T** a = (T** )lua_newuserdata(L, sizeof(T*)); //函数按照指定的大小分配一块内存，将对应的userdata放到栈内，并返回内存块的地址
-        *a = obj;
+        *a = obj; //{tab, ud}
 
         /**
          *  3 table userdata : 第一个3 代表的是栈的索引stk[3]. table在这里是lua_newtable.   userdata是lua_newuserdata 创建的.
          */
-        luaB_dumpStack(L);
+       // luaB_dumpStack(L);
 
         // 4. 设置lua userdata的元表. 将之前Register函数注册的元表取出来 ,然后放入到新对象中。
-        luaL_getmetatable(L, T::className);
-        luaB_dumpStack(L);
+        luaL_getmetatable(L, T::className); //{tab, ud, tab2}
+       // luaB_dumpStack(L);
         lua_setmetatable(L, -2); // 等价于lua内 setmetatable(userdata, meta).将栈顶的 meta设置给 -2位置的table. 并出栈
 
-        luaB_dumpStack(L);
+       // luaB_dumpStack(L); //{tab, ud}
 
         // 5. tt[0] = userdata
         lua_pushnumber(L, 0);
         lua_insert(L, -2); //move 栈顶 '0'(lua_pushnumber) 到 -2的位置 (-1 是栈顶)
-        luaB_dumpStack(L);
-        lua_settable(L, -3);
+       // luaB_dumpStack(L); //{tab, 0, ud}
+        lua_settable(L, -3);//{tab}
 
         // 6. 向table中注入c++函数 tt[1]
         for (int i = 0; T::Register[i].name; ++i){

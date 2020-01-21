@@ -2,7 +2,9 @@
 local cjson = require "cjson"
 
 -- 创建实例
+-- dumpStack()
 local cjson2 = cjson.new()
+print(type(cjson2)) -- table
 
 -- 布尔类型
 local lua_bool = true

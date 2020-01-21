@@ -1,23 +1,23 @@
 package com.heaven7.java.lua;
 
-import java.util.List;
+public final class TableObject {
 
-public final class CppObject {
+    /** the table index. often is negative. -1 means top */
+    private final int index;
 
-    /** the cpp object wrapper */
-    private Object object;
-    private LuaState luaState;  //obj.aa()
-    private List<CppObjectMember> members;
-
-    public Object findFieldAndGet(String name){
-
+    public TableObject(int index) {
+        this.index = index;
+    }
+    public long getIndex() {
+        return index;
+    }
+    public Object call(LuaState luaState, String name, Object...params){
+        //luaState.pushCppObject(pointer);
+        /*
+         * 1, push table(cpp-object) .set global '__spec_name__'
+         * 2, evaluate script. '$__spec_name__.name=a' /  'local c = $__spec_name__.name' / 'local r = $__spec_name__.name(...params)'
+         */
         return null;
-    }
-    public void findFieldAndSet(String name, Object value){
-
-    }
-    public Object findMethodAndInvoke(String name, Object...values){
-       return null;
     }
 }
 

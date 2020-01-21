@@ -93,7 +93,8 @@ void getLuaParam(lua_State *L, int id_value, LuaParam *lp) {
             break;
         }
         case LUA_TUSERDATA: {
-            RECEIVE_USERDATA(id_value);
+            luaL_error(L, "Currently, lua param not support for 'userdata'.");
+            //RECEIVE_USERDATA(id_value);
             break;
         }
         case LUA_TLIGHTUSERDATA: {
@@ -109,7 +110,9 @@ void getLuaParam(lua_State *L, int id_value, LuaParam *lp) {
             break;
         }
         case LUA_TTABLE: {
-            luaL_error(L, "Currently, lua param not support for 'table'.");
+            //luaL_error(L, "Currently, lua param not support for 'table'.");
+
+
             //TODO latter will support
             //need make the table on the top.
            /* lua_pushnil(L);
@@ -206,6 +209,8 @@ int callImpl(lua_State *L, LuaBridgeCaller *caller, const char *cn) {
             return LUA_YIELD;
         }
 
+
+
         case DTYPE_LBD_OBJECT:{
             if(holder->resultCN == nullptr){
                 luaL_error(L, "for user data. result classname must not be null.");
@@ -219,7 +224,7 @@ int callImpl(lua_State *L, LuaBridgeCaller *caller, const char *cn) {
             lua_wrapObject(L, lbc, holder->resultCN);
             return LUA_YIELD; //must
         }
-
+        case DTYPE_TABLE:
         case DTYPE_LB_OBJECT:
         case DTYPE_OBJECT:
             //TODO

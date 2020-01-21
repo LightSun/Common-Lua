@@ -5,6 +5,7 @@ import android.support.annotation.Keep;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -12,8 +13,6 @@ import java.util.Map;
  */
 public final class LuaJavaCaller {
 
-    public static final int PARAMETER_ERROR = 1;
-    public static final int INVOKE_ERROR    = 2;
     private static final HashMap<String, ClassInfo> sInfos = new HashMap<>();
     private static final Map<Class<?>, TypeHandler> sConverters = new HashMap<>();
 
@@ -29,8 +28,11 @@ public final class LuaJavaCaller {
     }
 
     public static void registerJavaClass(Class<?> clazz){
-        ClassInfo info = new ClassInfo(clazz);
-        sInfos.put(clazz.getName(), info);
+        ClassInfo info = sInfos.get(clazz.getName());
+        if(info == null){
+            info = new ClassInfo(clazz);
+            sInfos.put(clazz.getName(), info);
+        }
     }
     public static void registerJavaClasss(Class<?>...clazzs){
         for (Class<?> clazz : clazzs){
@@ -44,7 +46,7 @@ public final class LuaJavaCaller {
     /**
      * create object .this is called from lua.
      * @param className the class name
-     * @param name the name
+     * @param name the name .can be null.
      * @param args the args
      * @param errorMsg the error msg
      * @return the object.
@@ -52,24 +54,30 @@ public final class LuaJavaCaller {
     @Keep
     public static Object create(String className, String name, Object[] args, String[] errorMsg){
         //name can be null
+        if(name == null){
+            name = "<init>";
+        }
         try {
             ClassInfo info = sInfos.get(className);
-            MethodInfo mi = info.getConstructorInfo(name);
             Class<?> clazz = Class.forName(className);
-
-            Object[] out = new Object[mi.getTypes().length];
-            int state = convert(mi.getTypes(), args, out);
-            switch (state){
-                case PARAMETER_ERROR:
-                    errorMsg[0] = "PARAMETER_ERROR";
-                    return null;
-                case INVOKE_ERROR:
-                    errorMsg[0] = "INVOKE_ERROR";
-                    return null;
-                default:
-                    errorMsg[0] = null;
+            if(args == null || args.length == 0){
+                return clazz.newInstance();
             }
-            return clazz.getConstructor(mi.getTypes()).newInstance(out);
+            List<MethodInfo> list = info.getConstructorInfoes(name, args.length);
+            //desc -> aesc
+            for (int size = list.size(), i = size -1 ; i >= 0 ; i--){
+                MethodInfo mi = list.get(i);
+                Object[] out = new Object[mi.getParameterCount()];
+                convert(mi.getTypes(), args, out);
+                try {
+                    return clazz.getConstructor(mi.getTypes()).newInstance(out);
+                }catch (Exception e){
+                    if(i == 0){
+                        //last. still error.
+                        errorMsg[0] = "can't find correct constructor(" + name + ") for class(" + className + ").";
+                    }
+                }
+            }
         }catch (Exception e){
             errorMsg[0] = toString(e);
         }
@@ -90,22 +98,25 @@ public final class LuaJavaCaller {
         //name can be null
         try {
             ClassInfo info = sInfos.get(className);
-            MethodInfo mi = info.getMethodInfo(method);
             Class<?> clazz = Class.forName(className);
-
-            Object[] out = new Object[mi.getTypes().length];
-            int state = convert(mi.getTypes(), args, out);
-            switch (state){
-                case PARAMETER_ERROR:
-                    errorMsg[0] = "PARAMETER_ERROR";
-                    return null;
-                case INVOKE_ERROR:
-                    errorMsg[0] = "INVOKE_ERROR";
-                    return null;
-                default:
-                    errorMsg[0] = null;
+            if(args == null || args.length == 0){
+                return clazz.newInstance();
             }
-            return clazz.getMethod(method, mi.getTypes()).invoke(owner, out);
+            List<MethodInfo> list = info.getMethodInfoes(method, args.length);
+            //desc -> aesc
+            for (int size = list.size(), i = size -1 ; i >= 0 ; i--){
+                MethodInfo mi = list.get(i);
+                Object[] out = new Object[mi.getParameterCount()];
+                convert(mi.getTypes(), args, out);
+                try {
+                    return clazz.getMethod(mi.getName(), mi.getTypes()).invoke(owner, out);
+                }catch (Exception e){
+                    if(i == 0){
+                        //last. still error.
+                        errorMsg[0] = "can't find correct method(" + method + ") for class(" + className + ").";
+                    }
+                }
+            }
         }catch (Exception e){
             errorMsg[0] = toString(e);
         }
@@ -118,38 +129,29 @@ public final class LuaJavaCaller {
         return sw.toString();
     }
 
-    private static int convert(Class<?>[] types, Object[] src, Object[] out){
-        if(src.length > types.length){
-            return PARAMETER_ERROR;
+    private static boolean convert(Class<?>[] types, Object[] args, Object[] out){
+        for (int size = args.length, i = 0; i < size ; i ++){
+            Class<?> type = types[i];
+            TypeHandler converter = sConverters.get(type);
+            if(converter != null){
+                out[i] = converter.convert(args[i].toString());
+            }else {
+                //change nothing
+                out[i] = args[i];
+            }
         }
-        try {
-            for (int size = src.length , i = 0 ; i < size ; i ++){
-                Class<?> type = types[i];
-                TypeHandler converter = sConverters.get(type);
+        //补全
+        if(args.length < types.length){
+            for (int i = args.length, end = types.length; i < end ; i ++){
+                TypeHandler converter = sConverters.get(types[i]);
                 if(converter != null){
-                    out[i] = converter.convert(src[i].toString());
+                    out[i] = converter.defaultValue();
                 }else {
-                    //change nothing
-                    out[i] = src[i];
+                    out[i] = null;
                 }
             }
-            //补全
-            if(src.length < types.length){
-                int start = src.length;
-                int end = types.length;
-                for (int i = start; i < end ; i ++){
-                    TypeHandler converter = sConverters.get(types[i]);
-                    if(converter != null){
-                        out[i] = converter.defaultValue();
-                    }else {
-                        out[i] = null;
-                    }
-                }
-            }
-        }catch (Exception e){
-            return INVOKE_ERROR;
         }
-        return 0;
+        return true;
     }
 
     private interface TypeHandler{
