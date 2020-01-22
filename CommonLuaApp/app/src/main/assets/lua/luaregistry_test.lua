@@ -1,5 +1,5 @@
 --
---  ::int/byte/short/long float/double/boolean/
+--int/byte/short/long float/double/boolean/
 
 local a = {'a', 'b', 'c'}
 

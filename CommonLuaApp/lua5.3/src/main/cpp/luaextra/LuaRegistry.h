@@ -204,7 +204,9 @@ public:
     static const LuaRegistry<LuaBridge>::RegType Register[];
 
     ~LuaBridge(){
-        delete(obj);
+        if(obj != nullptr){
+            delete(obj);
+        }
         //ext_print("LuaBridge is removed.", 0 , 1);
     }
 

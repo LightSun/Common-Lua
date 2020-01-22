@@ -60,9 +60,9 @@ static int sub_gc(lua_State *L){
 }
 
 static int l_new(lua_State *L) {
-    luaB_dumpStack(L);
+    luaB_dumpStack(L); // userdata
     if(luaL_newmetatable(L, "ACB_Test")) {// ==0 means exists
-       // luaB_dumpStack(L); // userdata tab
+        luaB_dumpStack(L); // userdata tab
 
         lua_pushvalue(L, -1);
         lua_setfield(L, -2, "__index"); // xx .__index = xx. and pop stack

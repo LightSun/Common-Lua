@@ -12,12 +12,26 @@ public final class TableObject {
         return index;
     }
     public Object call(LuaState luaState, String name, Object...params){
-        //luaState.pushCppObject(pointer);
-        /*
-         * 1, push table(cpp-object) .set global '__spec_name__'
-         * 2, evaluate script. '$__spec_name__.name=a' /  'local c = $__spec_name__.name' / 'local r = $__spec_name__.name(...params)'
-         */
+        int top = luaState.getTop();
+        //result=xx.$name(params)
+        //1, get func
+        //luaState.pushTable(index);
+        luaState.pushString(name);
+        luaState.getTable(index);
+        //2, push params
+
+        //3, lua_pcall
+
+        //4, restore lua stack
         return null;
+    }
+    public Object getField(LuaState luaState, String name){
+        int top = luaState.getTop();
+
+        return null;
+    }
+    public void setField(LuaState luaState, String name, Object val){
+        int top = luaState.getTop();
     }
 }
 
@@ -33,22 +47,22 @@ typedef int8_t   jbyte;            /* signed 8 bits
         typedef float    jfloat;   /* 32-bit IEEE 754
         typedef double   jdouble;  /* 64-bit IEEE 754
 
-       lua ---------------- java
-#define DTYPE_NULL 1   --  null
-#define DTYPE_NUMBER 2 -- byte, short, int, long, float, double
-#define DTYPE_STRING 3 -- string
-#define DTYPE_BOOLEAN 4 -- boolean
-
 char* -- string
-
 
 #define LUA_TNIL		0         ----   null
 #define LUA_TBOOLEAN		1     ----   boolean
-#define LUA_TLIGHTUSERDATA	2     ----
+#define LUA_TLIGHTUSERDATA	2     ----  -----------
 #define LUA_TNUMBER		3         ----  byte, short, int, long, float, double
 #define LUA_TSTRING		4         ----  string
-#define LUA_TTABLE		5         ----  list, set , map.. etc.
-#define LUA_TFUNCTION		6     ----
-#define LUA_TUSERDATA		7     ----  LuaBridge
-#define LUA_TTHREAD		8         ----- no support.
+#define LUA_TTABLE		5         ----  list, set, map.. etc.
+#define LUA_TFUNCTION		6     ----  ----------------
+#define LUA_TUSERDATA		7     ----  meta-table
+#define LUA_TTHREAD		8         ----- -----------
+
+java                   lua
+primitive-array       ->  table
+list, set, map        ->  table
+object                ->  wrap-table
+
+
 * */

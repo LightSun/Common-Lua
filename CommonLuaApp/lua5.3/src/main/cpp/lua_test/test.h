@@ -52,6 +52,7 @@ public:
         // 1. 构造c++对象
         T* obj = new T(L);
         // 2. 新建一个表 tt = {}
+
         lua_newtable(L);
 
         // 3. 新建一个userdata用来持有c++对象

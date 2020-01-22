@@ -2,6 +2,7 @@
 // Created by Administrator on 2019/7/27.
 //
 
+#include <jni.h>
 #include "LuaRegistry.h"
 #include "../common/map2.h"
 
@@ -92,11 +93,6 @@ void getLuaParam(lua_State *L, int id_value, LuaParam *lp) {
             lp->type = DTYPE_NULL;
             break;
         }
-        case LUA_TUSERDATA: {
-            luaL_error(L, "Currently, lua param not support for 'userdata'.");
-            //RECEIVE_USERDATA(id_value);
-            break;
-        }
         case LUA_TLIGHTUSERDATA: {
             luaL_error(L, "Currently, lua param not support for 'light-userdata'.");
             break;
@@ -109,9 +105,15 @@ void getLuaParam(lua_State *L, int id_value, LuaParam *lp) {
             luaL_error(L, "Currently, lua param not support for 'thread'.");
             break;
         }
+        case LUA_TUSERDATA: {
+            luaL_error(L, "Currently, lua param not support for 'userdata'.");
+            //RECEIVE_USERDATA(id_value);
+            break;
+        }
         case LUA_TTABLE: {
             //luaL_error(L, "Currently, lua param not support for 'table'.");
-
+            //c++对象包装成lua可访问的对象时，有可能是userdata,也可能是table(cjson)
+            //java如何动态访问lua table的成员 .?? TableObject
 
             //TODO latter will support
             //need make the table on the top.
@@ -209,8 +211,6 @@ int callImpl(lua_State *L, LuaBridgeCaller *caller, const char *cn) {
             return LUA_YIELD;
         }
 
-
-
         case DTYPE_LBD_OBJECT:{
             if(holder->resultCN == nullptr){
                 luaL_error(L, "for user data. result classname must not be null.");
@@ -224,10 +224,12 @@ int callImpl(lua_State *L, LuaBridgeCaller *caller, const char *cn) {
             lua_wrapObject(L, lbc, holder->resultCN);
             return LUA_YIELD; //must
         }
-        case DTYPE_TABLE:
-        case DTYPE_LB_OBJECT:
-        case DTYPE_OBJECT:
+        case DTYPE_OBJECT: //userdata. -- metatable
             //TODO
+        case DTYPE_TABLE:
+
+
+        case DTYPE_LB_OBJECT:
 
         default:
             std::stringstream out;

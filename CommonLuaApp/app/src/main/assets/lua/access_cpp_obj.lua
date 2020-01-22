@@ -13,4 +13,5 @@ for i = 1, 10 do
 end
 
 local acb = the_list:new();
+print("Access_cpp_object:", type(acb))
 acb:print();

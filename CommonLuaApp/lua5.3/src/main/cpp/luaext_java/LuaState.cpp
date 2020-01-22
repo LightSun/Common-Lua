@@ -358,8 +358,9 @@ JNINativeMethod lua_state_methods[] = {
         {"_toString",       "(JI)" SIG_JSTRING,               (void *) lua_tostring_},
         {"_pcall",          "(JIII)I",                        (void *) lua_pcall_},
         {"_call",           "(JII)V",                         (void *) lua_call_},
+        {"_getTop",           "(J)I",                        (void *) lua_gettop_},
 };
 
 Registration getLuaStateRegistration() {
-    return createRegistration(CN_LUA_STATE, lua_state_methods, 7);
+    return createRegistration(CN_LUA_STATE, lua_state_methods, sizeof(lua_state_methods)/ sizeof(lua_state_methods[0]));
 }

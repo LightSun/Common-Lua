@@ -43,6 +43,15 @@ public final class LuaState extends INativeObject.BaseNativeObject{
     public void call(int nArgs, int nResults) {
         _call(getNativePointer(), nArgs, nResults);
     }
+    public int getTop() {
+        return _getTop(getNativePointer());
+    }
+    public void getTable(int index) {
+
+    }
+   //TODO private static synchronized native int _getTable(long ptr, int index);
+    private static synchronized native int _getTop(long ptr);
+
     private static synchronized native int _evaluateScript(long ptr, String script);
     private static synchronized native int _getGlobal(long ptr, String var);
     private static synchronized native String _pushString(long ptr, String var);
