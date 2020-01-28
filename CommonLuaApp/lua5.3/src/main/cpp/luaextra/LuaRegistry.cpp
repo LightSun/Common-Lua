@@ -35,20 +35,20 @@ void getLuaParam(lua_State *L, int id_value, LuaParam *lp) {
         case LUA_TNUMBER: {
             auto *a = new lua_Number();
             *a = lua_tonumber(L, id_value);
-            lp->value = newLua2JavaValue(DTYPE_NUMBER, (jlong) a);
+            lp->value = newLua2JavaValue(DTYPE_NUMBER, reinterpret_cast<long long int>(a));
             lp->type = DTYPE_LUA2JAVA_VALUE;
             break;
         }
         case LUA_TBOOLEAN: {
             auto *a = new int();
             *a = lua_toboolean(L, id_value);
-            lp->value = newLua2JavaValue(DTYPE_BOOLEAN, (jlong) a);
+            lp->value = newLua2JavaValue(DTYPE_BOOLEAN, reinterpret_cast<long long int>(a));
             lp->type = DTYPE_LUA2JAVA_VALUE;
             break;
         }
         case LUA_TSTRING: {
             const char *str = lua_tostring(L, id_value);
-            lp->value = newLua2JavaValue(DTYPE_STRING, (jlong) str);
+            lp->value = newLua2JavaValue(DTYPE_STRING, reinterpret_cast<long long int> (str));
             lp->type = DTYPE_LUA2JAVA_VALUE;
             break;
         }

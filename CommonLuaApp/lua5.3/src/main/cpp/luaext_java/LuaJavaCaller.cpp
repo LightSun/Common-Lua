@@ -58,6 +58,25 @@ static const char * getString(LuaParam* lp, bool* state){
     return nullptr;
 }
 
+void* newLua2JavaValue0(int type, long long ptrOrIndex){
+    JNIEnv *const env = getJNIEnv();
+    return env->CallStaticObjectMethod(__lua2JavaClass, __mid_create_lua2java, type, ptrOrIndex);
+}
+
+int getType_Lua2Java(jobject obj){
+    JNIEnv *const env = getJNIEnv();
+    return env->CallIntMethod(obj, __mid_getType_lua2java);
+}
+jlong getValuePtr_Lua2Java(jobject obj){
+    JNIEnv *const env = getJNIEnv();
+    return env->CallLongMethod(obj, __mid_getValuePtr_lua2java);
+}
+void releaseJavaObject0(void * obj){
+    auto jobj = static_cast<jobject>(obj);
+    JNIEnv *const env = getJNIEnv();
+    env->DeleteLocalRef(jobj);
+}
+
 void initLuaJavaCaller(){
     JNIEnv *const env = getJNIEnv();
     __callerClass = env->FindClass(CALLER_CLASS);
@@ -69,6 +88,9 @@ void initLuaJavaCaller(){
     __mid_create_lua2java = env->GetStaticMethodID(__lua2JavaClass, "of", SIG_NEW_LUA2JAVA);
     __mid_getType_lua2java = env->GetMethodID(__lua2JavaClass, "getType", "()I");
     __mid_getValuePtr_lua2java = env->GetMethodID(__lua2JavaClass, "getValuePtr", "()J");
+
+    setLua2JavaValue_Creator(&newLua2JavaValue0);
+    setJava_Object_Releaser(&releaseJavaObject0);
 }
 
 void deInitLuaJavaCaller(){
@@ -87,24 +109,7 @@ void deInitLuaJavaCaller(){
     __lua2JavaClass = nullptr;
 }
 
-void* newLua2JavaValue(int type, long long ptrOrIndex){
-    JNIEnv *const env = getJNIEnv();
-    return env->CallStaticObjectMethod(__lua2JavaClass, __mid_create_lua2java, type, ptrOrIndex);
-}
 
-int getType_Lua2Java(jobject obj){
-    JNIEnv *const env = getJNIEnv();
-    return env->CallIntMethod(obj, __mid_getType_lua2java);
-}
-jlong getValuePtr_Lua2Java(jobject obj){
-    JNIEnv *const env = getJNIEnv();
-    return env->CallLongMethod(obj, __mid_getValuePtr_lua2java);
-}
-void releaseJavaObject(void * obj){
-    auto jobj = static_cast<jobject>(obj);
-    JNIEnv *const env = getJNIEnv();
-    env->DeleteLocalRef(jobj);
-}
 
 class LuaJavaCaller: public LuaBridgeCaller{
     jobject jobj;
@@ -152,8 +157,8 @@ public:
                 jobject const result = env->CallStaticObjectMethodA(__callerClass, __mid_create, values);
                 jstring const msg = static_cast<jstring const>(env->GetObjectArrayElement(msgArr, 0));
                 if(msg != nullptr){
-                   const jchar *const chs = env->GetStringChars(msg, nullptr);
-                   luaError(reinterpret_cast<const char *>(chs));
+                   const char * chs = env->GetStringUTFChars(msg, nullptr);
+                   luaError(chs);
                 } else{
                    jobj = result;
                 }
@@ -174,17 +179,18 @@ public:
 
         //prepare string array
         jobjectArray const msgArr = env->NewObjectArray(1, env->FindClass("java/lang/String"), nullptr);
-        jvalue values[4];
-        values[0].l = env->NewStringUTF(holder->className);
-        values[1].l = env->NewStringUTF(mName);
-        values[2].l = arr;
-        values[3].l = msgArr;
+        jvalue values[5];
+        values[0].l = jobj;
+        values[1].l = env->NewStringUTF(holder->className);
+        values[2].l = env->NewStringUTF(mName);
+        values[3].l = arr;
+        values[4].l = msgArr;
         //create
         jobject const result = env->CallStaticObjectMethodA(__callerClass, __mid_invoke, values);
         jstring const msg = static_cast<jstring const>(env->GetObjectArrayElement(msgArr, 0));
         if(msg != nullptr){
-            const jchar *const chs = env->GetStringChars(msg, nullptr);
-            luaError(reinterpret_cast<const char *>(chs));
+            const char * chs = env->GetStringUTFChars(msg, nullptr);
+            luaError(chs);
             return nullptr;
         } else{
             //TODO need convert java object to lua.

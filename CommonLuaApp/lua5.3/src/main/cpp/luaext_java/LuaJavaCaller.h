@@ -9,8 +9,6 @@
 void initLuaJavaCaller();
 void deInitLuaJavaCaller();
 
-void* newLua2JavaValue(int type, long long ptr);
-
 int getType_Lua2Java(jobject obj);
 jlong getValuePtr_Lua2Java(jobject obj);
 

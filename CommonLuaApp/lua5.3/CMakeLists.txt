@@ -69,6 +69,7 @@ add_library( # Sets the name of the library.
         src/main/cpp/luaextra/lua_extra.c
         src/main/cpp/luaextra/lua_internal.c
         src/main/cpp/luaextra/LuaRegistry.cpp
+        src/main/cpp/luaextra/lua_bridge.cpp
         src/main/cpp/luaextra/blowfish.c
         )
 

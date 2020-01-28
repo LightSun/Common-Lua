@@ -22,10 +22,16 @@
 /**
  * create lua2java value object
  * @param type the value type
- * @param ptrOrIndex  the pointer or stack index
+ * @param ptrOrIndex the pointer or stack index
  * @return  the java object
  */
-extern void* newLua2JavaValue(int type, long long ptrOrIndex);
-extern void releaseJavaObject(void *obj);
+typedef void* (*Lua2JavaValue_Creator)(int type, long long ptrOrIndex);
+typedef void (*Java_Object_Releaser)(void *obj);
+
+void setLua2JavaValue_Creator(Lua2JavaValue_Creator creator);
+void setJava_Object_Releaser(Java_Object_Releaser releaser);
+
+void* newLua2JavaValue(int type, long long ptrOrIndex);
+void releaseJavaObject(void * obj);
 
 #endif //COMMONLUAAPP_LUA_BRIDGE_H

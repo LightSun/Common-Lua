@@ -24,6 +24,7 @@ extern "C"{
 #include "sstream"
 #include "lua_bridge.h"
 
+
 class LuaParam;
 class LuaBridgeCaller;
 class LuaMediator;
