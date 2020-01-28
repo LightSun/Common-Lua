@@ -22,7 +22,7 @@ Registration createRegistration(char *clazz, JNINativeMethod methods[], int len)
 }
 
 int registerMethods(JNIEnv *env, Registration n) {
-    LOGD("Registration: len = %d", n.len);
+    LOGD("Registration: class = %s, len = %d", n.clazz, n.len);
     jclass clazz = env->FindClass(n.clazz);
     if (clazz == nullptr) {
         LOGW("can't find class %s", n.clazz);
@@ -46,6 +46,7 @@ JNIEXPORT jint JNI_OnLoad(JavaVM *vm, void *reserved) {
     }
     // __JNI_OnLoad(env);
     registerMethods(env, getLuaStateRegistration());
+    registerMethods(env, getLua2JavaRegistration());
     g_jvm = vm;
     initLuaJavaCaller();
     return JNI_VERSION_1_4;

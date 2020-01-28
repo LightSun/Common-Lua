@@ -1,5 +1,5 @@
 //
-// Created by Administrator on 2019/7/29.
+// Created by heaven7 on 2019/7/29.
 //
 #include "java_env.h"
 #include "../luaextra/LuaRegistry.h"
@@ -7,47 +7,55 @@
 #include "sstream"
 #include "class_info.h"
 
+extern "C"{
+#include "../lua/lua.h"
+}
+
 #define STRING_NAME "Ljava/lang/String;"
 #define OBJECT_NAME "Ljava/lang/Object;"
 #define CALLER_CLASS "com/heaven7/java/lua/LuaJavaCaller"
+#define LUA2JAVA_CLASS "com/heaven7/java/lua/Lua2JavaValue"
 #define MNAME_CREATE "create"
 #define MNAME_INVOKE "invoke"
 
 #define SIG_CREATE "(" STRING_NAME STRING_NAME "[" OBJECT_NAME "[" STRING_NAME ")" OBJECT_NAME
 #define SIG_INVOKE "(" OBJECT_NAME STRING_NAME STRING_NAME "[" OBJECT_NAME "[" STRING_NAME ")" OBJECT_NAME
 
+#define SIG_NEW_LUA2JAVA "(IJ)" "L" LUA2JAVA_CLASS ";"
+
 static jclass __callerClass;
 static jclass __objectClass;
 static jmethodID __mid_create;
 static jmethodID __mid_invoke;
 
-const char * getStringValue(LuaParam* lp, bool* state){
+static jmethodID  __mid_create_lua2java;
+static jmethodID __mid_getType_lua2java;
+static jmethodID __mid_getValuePtr_lua2java;
+static jclass __lua2JavaClass;
+
+jstring getStringValue(JNIEnv *env, jclass clazz, long ptr);
+
+static const char * getString(LuaParam* lp, bool* state){
     int type = lp->type;
-    *state = true;
+    *state = false;
     switch (type) {
-        case LUA_TNUMBER: {
-            lua_Number *a = static_cast<lua_Number *>(lp->value);
-            std::stringstream out;
-            out << *a;
-            return out.str().c_str();
-        }
-        case LUA_TBOOLEAN: {
-            int *a = static_cast<int *>(lp->value);
-            std::stringstream out;
-            out << (*a == 1);
-            return out.str().c_str();
-        }
-        case LUA_TSTRING: {
+        case DTYPE_LUA2JAVA_VALUE: {
+            jobject obj = static_cast<jobject>(lp->value);
+            auto i = getType_Lua2Java(obj);
+            if(i == DTYPE_STRING){
+                auto ptr = getValuePtr_Lua2Java(obj);
+                auto pEnv = getJNIEnv();
+                auto str = getStringValue(pEnv, nullptr, ptr);
+                *state = true;
+                return pEnv->GetStringUTFChars(str, 0);
+            }
+        }break;
+
+        case DTYPE_STRING: {
             return static_cast<const char *>(lp->value);
         }
-        case LUA_TNIL: {
-            return nullptr;
-        }
-
-        default:
-            *state = false;
-            return nullptr;
     }
+    return nullptr;
 }
 
 void initLuaJavaCaller(){
@@ -56,19 +64,49 @@ void initLuaJavaCaller(){
     __objectClass = env->FindClass("java/lang/Object");
     __mid_create = env->GetStaticMethodID(__callerClass, MNAME_CREATE ,SIG_CREATE);
     __mid_invoke = env->GetStaticMethodID(__callerClass, MNAME_INVOKE ,SIG_INVOKE);
+
+    __lua2JavaClass = env->FindClass(LUA2JAVA_CLASS);
+    __mid_create_lua2java = env->GetStaticMethodID(__lua2JavaClass, "of", SIG_NEW_LUA2JAVA);
+    __mid_getType_lua2java = env->GetMethodID(__lua2JavaClass, "getType", "()I");
+    __mid_getValuePtr_lua2java = env->GetMethodID(__lua2JavaClass, "getValuePtr", "()J");
 }
 
 void deInitLuaJavaCaller(){
     JNIEnv *const env = getJNIEnv();
     env->DeleteLocalRef(__callerClass);
     env->DeleteLocalRef(__objectClass);
+    env->DeleteLocalRef(__lua2JavaClass);
     __callerClass = nullptr;
+    __objectClass = nullptr;
     __mid_create = nullptr;
     __mid_invoke = nullptr;
+
+    __mid_create_lua2java = nullptr;
+    __mid_getType_lua2java = nullptr;
+    __mid_getValuePtr_lua2java = nullptr;
+    __lua2JavaClass = nullptr;
+}
+
+void* newLua2JavaValue(int type, long long ptrOrIndex){
+    JNIEnv *const env = getJNIEnv();
+    return env->CallStaticObjectMethod(__lua2JavaClass, __mid_create_lua2java, type, ptrOrIndex);
+}
+
+int getType_Lua2Java(jobject obj){
+    JNIEnv *const env = getJNIEnv();
+    return env->CallIntMethod(obj, __mid_getType_lua2java);
+}
+jlong getValuePtr_Lua2Java(jobject obj){
+    JNIEnv *const env = getJNIEnv();
+    return env->CallLongMethod(obj, __mid_getValuePtr_lua2java);
+}
+void releaseJavaObject(void * obj){
+    auto jobj = static_cast<jobject>(obj);
+    JNIEnv *const env = getJNIEnv();
+    env->DeleteLocalRef(jobj);
 }
 
 class LuaJavaCaller: public LuaBridgeCaller{
-
     jobject jobj;
     jclass jclazz;
 public:
@@ -91,27 +129,16 @@ public:
                 jobj = env->AllocObject(jclazz); //default constructor
             } else{
                 bool success;
-                const char* name = getStringValue(&holder->lp[0], &success);
+                const char* name = getString(&holder->lp[0], &success);
                 if(name == nullptr){
-                    luaError("the first param of create object must be constructor name. like '<init>'");
-                }
+                   luaError("the first param of create object must be constructor name. like '<init>'");
+                } 
                 int size = holder->count - 1;
                 //params
                 const jobjectArray const arr = env->NewObjectArray(size, __objectClass, nullptr);
                 for (int i = 0; i < size; ++i) {
-                    const char *const str = getStringValue(&holder->lp[i + 1], &success);
-                    if(success){
-                        jstring const jstr = str != nullptr ? env->NewStringUTF(str) : nullptr;
-                        env->SetObjectArrayElement(arr, i, jstr);
-                    } else{
-                        //failed means it not base types.
-                        void *const value = holder->lp[i + 1].value;
-                        if(value != nullptr){
-                            env->SetObjectArrayElement(arr, i, static_cast<jobject>(value));
-                        } else{
-                            env->SetObjectArrayElement(arr, i, nullptr);
-                        }
-                    }
+                    auto param = static_cast<jobject>(holder->lp[i + 1].value);
+                    env->SetObjectArrayElement(arr, i, param);
                 }
                 // static Object create(String className, String name, Object[] args, String[] errorMsg)
                 //prepare string array
@@ -141,20 +168,8 @@ public:
         bool success;
         jobjectArray const arr = env->NewObjectArray(size, __objectClass, nullptr);
         for (int i = 0; i < size; ++i) {
-            const char *const str = getStringValue(&holder->lp[i], &success);
-            if(success){
-                jstring const jstr = str != nullptr ? env->NewStringUTF(str) : nullptr;
-                env->SetObjectArrayElement(arr, i, jstr);
-            } else{
-                //TODO support array types-- lua-table.
-                //failed means it not base types.
-                void *const value = holder->lp[i].value;
-                if(value != nullptr){
-                    env->SetObjectArrayElement(arr, i, static_cast<jobject>(value));
-                } else{
-                    env->SetObjectArrayElement(arr, i, nullptr);
-                }
-            }
+            auto param = static_cast<jobject>(holder->lp[i].value);
+            env->SetObjectArrayElement(arr, i, param);
         }
 
         //prepare string array
@@ -181,3 +196,38 @@ public:
        // holder.resultType = LUA_TNUMBER;
     }
 };
+
+//--------------- lua2java ---------------
+jstring getStringValue(JNIEnv *env, jclass clazz, long ptr){
+    const char* ch = reinterpret_cast<const char *>(ptr);
+    return env->NewStringUTF(ch);
+}
+jboolean getBooleanValue(JNIEnv *env, jclass clazz, long ptr){
+    int* ch = reinterpret_cast<int *>(ptr);
+    return static_cast<jboolean>(*ch == 1);
+}
+
+jdouble getDoubleValue(JNIEnv *env, jclass clazz, long ptr){
+    auto* ch = reinterpret_cast<lua_Number *>(ptr);
+    return *ch;
+}
+void releaseBoolean(JNIEnv *env, jclass clazz, long ptr){
+    auto* ch = reinterpret_cast<int *>(ptr);
+    delete ch;
+}
+void releaseNumber(JNIEnv *env, jclass clazz, long ptr){
+    auto* ch = reinterpret_cast<lua_Number *>(ptr);
+    delete ch;
+}
+
+JNINativeMethod lua2java_methods[] = {
+        {"getString_", "(J)" SIG_JSTRING,            (void *) getStringValue},
+        {"getBoolean_", "(J)Z",            (void *) getBooleanValue},
+        {"getNumber_", "(J)D",            (void *) getDoubleValue},
+        {"releaseNumber_", "(J)V",            (void *) releaseNumber},
+        {"releaseBoolean_", "(J)V",            (void *) releaseBoolean}
+};
+
+Registration getLua2JavaRegistration(){
+    return createRegistration(LUA2JAVA_CLASS, lua2java_methods, sizeof(lua2java_methods)/ sizeof(lua2java_methods[0]));
+}

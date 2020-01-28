@@ -134,7 +134,11 @@ public final class LuaJavaCaller {
             Class<?> type = types[i];
             TypeHandler converter = sConverters.get(type);
             if(converter != null){
-                out[i] = converter.convert(args[i].toString());
+                if(args[i] instanceof Lua2JavaValue){
+                    out[i] = converter.convert((Lua2JavaValue)args[i]);
+                }else {
+                    out[i] = converter.convert(args[i].toString());
+                }
             }else {
                 //change nothing
                 out[i] = args[i];
@@ -156,12 +160,17 @@ public final class LuaJavaCaller {
 
     private interface TypeHandler{
         Object convert(String arg);
+        Object convert(Lua2JavaValue arg);
         Object defaultValue();
     }
     private static class IntConvertor implements TypeHandler {
         @Override
         public Object convert(String arg) {
             return Float.valueOf(arg).intValue();
+        }
+        @Override
+        public Object convert(Lua2JavaValue arg) {
+            return arg.toIntValue();
         }
         @Override
         public Object defaultValue() {
@@ -177,11 +186,19 @@ public final class LuaJavaCaller {
         public Object defaultValue() {
             return 0f;
         }
+        @Override
+        public Object convert(Lua2JavaValue arg) {
+            return arg.toFloatValue();
+        }
     }
     private static class ShortConvertor extends IntConvertor  {
         @Override
         public Object convert(String arg) {
             return Float.valueOf(arg).shortValue();
+        }
+        @Override
+        public Object convert(Lua2JavaValue arg) {
+            return arg.toShortValue();
         }
     }
     private static class ByteConvertor extends IntConvertor {
@@ -189,11 +206,19 @@ public final class LuaJavaCaller {
         public Object convert(String arg) {
             return Float.valueOf(arg).byteValue();
         }
+        @Override
+        public Object convert(Lua2JavaValue arg) {
+            return arg.toByteValue();
+        }
     }
     private static class LongConvertor extends IntConvertor  {
         @Override
         public Object convert(String arg) {
             return Double.valueOf(arg).longValue();
+        }
+        @Override
+        public Object convert(Lua2JavaValue arg) {
+            return arg.toLongValue();
         }
     }
     private static class DoubleConvertor implements TypeHandler {
@@ -205,6 +230,10 @@ public final class LuaJavaCaller {
         public Object defaultValue() {
             return 0d;
         }
+        @Override
+        public Object convert(Lua2JavaValue arg) {
+            return arg.toDoubleValue();
+        }
     }
     private static class CharConvertor implements TypeHandler {
         @Override
@@ -215,6 +244,10 @@ public final class LuaJavaCaller {
         public Object defaultValue() {
             throw new RuntimeException("char type must be initialize.");
         }
+        @Override
+        public Object convert(Lua2JavaValue arg) {
+            return arg.toCharValue();
+        }
     }
     private static class BooleanConvertor implements TypeHandler {
         @Override
@@ -224,6 +257,10 @@ public final class LuaJavaCaller {
         @Override
         public Object defaultValue() {
             return false;
+        }
+        @Override
+        public Object convert(Lua2JavaValue arg) {
+            return arg.toBooleanValue();
         }
     }
 

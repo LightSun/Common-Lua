@@ -128,14 +128,21 @@ public:
     ~LuaParam(){
         if(value != nullptr){
             switch (type){
-                case LUA_TNUMBER:{
+                case DTYPE_NUMBER:{
                     lua_Number* a = (lua_Number *) value;
                     delete a;
-                }
-                case LUA_TBOOLEAN:{
+                } break;
+
+                case DTYPE_BOOLEAN:{
                     int * a = (int *)value;
                     delete a;
+                } break;
+
+                case DTYPE_LUA2JAVA_VALUE:{
+                    releaseJavaObject(value);
                 }
+                    break;
+
                 /*  case LUA_TSTRING:
                   case LUA_TNIL:  */
             }

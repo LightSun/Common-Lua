@@ -5,13 +5,17 @@ public final class TableObject {
     /** the table index. often is negative. -1 means top */
     private final int index;
 
-    public TableObject(int index) {
+    public static TableObject from(int stackIndex){
+        return new TableObject(stackIndex);
+    }
+    private TableObject(int index) {
         this.index = index;
     }
     public long getIndex() {
         return index;
     }
     public Object call(LuaState luaState, String name, Object...params){
+        //TODO
         int top = luaState.getTop();
         //result=xx.$name(params)
         //1, get func

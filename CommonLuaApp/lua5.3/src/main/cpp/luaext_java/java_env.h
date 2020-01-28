@@ -19,6 +19,8 @@ Registration createRegistration(char* clazz, JNINativeMethod methods[], int len)
 
 Registration getLuaStateRegistration();
 
+Registration getLua2JavaRegistration();
+
 int registerMethods(JNIEnv* env,Registration n);
 
 JNIEnv *getJNIEnv();

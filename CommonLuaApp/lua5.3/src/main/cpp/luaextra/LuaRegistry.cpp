@@ -9,50 +9,6 @@
 #define LUA_WRAP "Lua_dynamic_wrap"
 
 //----------------- help memory ---------
-#define RECEIVE_STRING(id_value)\
-    const char *str = lua_tostring(L, id_value); \
-    lp->value = (void *) str;\
-    lp->type = DTYPE_STRING;
-
-#if defined(LUA_BRIDGE_STRING)
-#define RECEIVE_NUM(id_value) \
-    RECEIVE_STRING(id_value)
-#define RECEIVE_BOOLEAN(id_value)\
-    RECEIVE_STRING(id_value)
-#else
-#define RECEIVE_NUM(id_value) \
-    auto *a = new lua_Number();\
-    *a = lua_tonumber(L, id_value);\
-    lp->value = a;\
-    lp->type = DTYPE_NUMBER;
-#define RECEIVE_BOOLEAN(id_value)\
-    auto *a = new int();\
-    *a = lua_toboolean(L, id_value);\
-    lp->value = a;\
-    lp->type = DTYPE_BOOLEAN;
-#endif
-
-// in: LuaBridge -> out -> lp
-#define  RECEIVE_USERDATA(id_value)  \
-    void *data = lua_touserdata(L, id_value); \
-    /** unpack for LuaBridge. only class can be dynamic cast.*/ \
-    LuaBridge *lbPtr = static_cast<LuaBridge *>(data);\
-    if (lbPtr != nullptr) { \
-        lp->className - lbPtr->getClassname(); \
-        lp->value = lbPtr->getCObject();\
-        lp->type = DTYPE_LB_OBJECT;\
-    } else {\
-        LuaBridgeCaller *ptr = static_cast<LuaBridgeCaller *>(data);\
-        if (ptr != nullptr) {\
-            lp->className = ptr->getClassname();\
-            lp->value = ptr->getCObject();\
-            lp->type = DTYPE_LBD_OBJECT;\
-        } else{\
-            lp->value = data;\
-            lp->type = DTYPE_OBJECT;\
-        }\
-    }
-
 
 const char LuaBridge::className[] = "LuaBridge";
 const LuaRegistry<LuaBridge>::RegType LuaBridge::Register[] = {
@@ -77,20 +33,28 @@ void getLuaParam(lua_State *L, int id_value, LuaParam *lp) {
     int type = lua_type(L, id_value);
     switch (type) {
         case LUA_TNUMBER: {
-            RECEIVE_NUM(id_value);
+            auto *a = new lua_Number();
+            *a = lua_tonumber(L, id_value);
+            lp->value = newLua2JavaValue(DTYPE_NUMBER, (jlong) a);
+            lp->type = DTYPE_LUA2JAVA_VALUE;
             break;
         }
         case LUA_TBOOLEAN: {
-            RECEIVE_BOOLEAN(id_value);
+            auto *a = new int();
+            *a = lua_toboolean(L, id_value);
+            lp->value = newLua2JavaValue(DTYPE_BOOLEAN, (jlong) a);
+            lp->type = DTYPE_LUA2JAVA_VALUE;
             break;
         }
         case LUA_TSTRING: {
-            RECEIVE_STRING(id_value);
+            const char *str = lua_tostring(L, id_value);
+            lp->value = newLua2JavaValue(DTYPE_STRING, (jlong) str);
+            lp->type = DTYPE_LUA2JAVA_VALUE;
             break;
         }
         case LUA_TNIL: {
-            lp->value = nullptr;
-            lp->type = DTYPE_NULL;
+            lp->value = newLua2JavaValue(DTYPE_NULL, 0);;
+            lp->type = DTYPE_LUA2JAVA_VALUE;
             break;
         }
         case LUA_TLIGHTUSERDATA: {
@@ -108,12 +72,14 @@ void getLuaParam(lua_State *L, int id_value, LuaParam *lp) {
         case LUA_TUSERDATA: {
             luaL_error(L, "Currently, lua param not support for 'userdata'.");
             //RECEIVE_USERDATA(id_value);
+            lp->value = newLua2JavaValue(DTYPE_TABLE, id_value);;
+            lp->type = DTYPE_LUA2JAVA_VALUE;
             break;
         }
         case LUA_TTABLE: {
-            //luaL_error(L, "Currently, lua param not support for 'table'.");
+            lp->value = newLua2JavaValue(DTYPE_TABLE, id_value);;
+            lp->type = DTYPE_LUA2JAVA_VALUE;
             //c++对象包装成lua可访问的对象时，有可能是userdata,也可能是table(cjson)
-            //java如何动态访问lua table的成员 .?? TableObject
 
             //TODO latter will support
             //need make the table on the top.
@@ -179,8 +145,9 @@ int callImpl(lua_State *L, LuaBridgeCaller *caller, const char *cn) {
     const char *mname = luaL_checkstring(L, -1 - count - 1);
     LuaMediator *holder = new LuaMediator(count);
     holder->className = cn;
-
+    //lua -> java
     getParams(L, holder, count, -1);
+    //java - lua
     const void *result = caller->call(cn, mname, holder);
 
     const int rType = holder->resultType; //must be DTYPE_XX
@@ -193,7 +160,7 @@ int callImpl(lua_State *L, LuaBridgeCaller *caller, const char *cn) {
             lua_Number n = *num;
             delete num;
             lua_pushnumber(L, n);
-            return LUA_YIELD; //有返回值的需要用yield
+            return LUA_YIELD; //if have return . must use yield.
         }
         case DTYPE_BOOLEAN: {
             const int *num = static_cast<const int *>(result);
@@ -224,7 +191,7 @@ int callImpl(lua_State *L, LuaBridgeCaller *caller, const char *cn) {
             lua_wrapObject(L, lbc, holder->resultCN);
             return LUA_YIELD; //must
         }
-        case DTYPE_OBJECT: //userdata. -- metatable
+        //case DTYPE_OBJECT: //userdata. -- metatable
             //TODO
         case DTYPE_TABLE:
 

@@ -2,8 +2,8 @@
 // Created by Administrator on 2019/7/23.
 //
 
-#include "jni.h"
-#include "../lua_test/tests_all.h"
+#include <jni.h>
+#include "tests_all.h"
 
 extern "C" JNIEXPORT
 void JNICALL Java_com_heaven7_java_lua_LuaTest_nTestBindCpp1(JNIEnv *env, jclass clazz, long ptr, jstring script){
