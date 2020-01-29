@@ -31,15 +31,13 @@ class LuaMediator;
 template <class T> class LuaRegistry;
 class LuaBridge;
 
-typedef LuaBridgeCaller* (*LBCCreator)(const char* classname, LuaMediator* holder);
+typedef LuaBridgeCaller* (*LBCCreator)(lua_State *L, const char* classname, LuaMediator* holder);
 
-void setTempLuaState(lua_State * L);
-lua_State *getTempLuaState();
 void getLuaParam(lua_State* L, int id_value, LuaParam* lp);
 
 //=========================
 void setLuaBridgeCallerCreator(LBCCreator creator);
-LuaBridgeCaller *CreateLBC(const char *classname, LuaMediator* holder);
+LuaBridgeCaller *CreateLBC(lua_State *L, const char *classname, LuaMediator* holder);
 
 void getParams(lua_State *L, LuaMediator* holder, int count, int startIdx);
 int callImpl(lua_State* L, LuaBridgeCaller* caller, const char* cn);
@@ -179,7 +177,7 @@ public:
 
 class LuaBridgeCaller{
 public:
-    virtual void *call(const char *cn, const char *mName ,LuaMediator * holder) = 0;
+    virtual void *call(lua_State* L, const char *cn, const char *mName ,LuaMediator * holder) = 0;
 
     //opt impl. used for user data.
     void* getCObject(){
@@ -192,10 +190,6 @@ public:
     bool hasMethod(const char *className, const char *name) {
         return false;
     }
-    const void luaError(const char* msg){
-        luaL_error(getTempLuaState(), msg);
-    }
-
     void setClassname(const char *cn) {
         this->classname = cn;
     }
@@ -219,16 +213,14 @@ public:
     }
 
     LuaBridge(lua_State *L){ //cname, ...params, count
-        setTempLuaState(L);
         const lua_Integer count = lua_tointeger(L, -1);
         const char* mname = luaL_checkstring(L, -1 - count - 1);
         LuaMediator* holder = new LuaMediator(count);
         getParams(L, holder, count, -1);
 
-        obj = CreateLBC(mname, holder);
+        obj = CreateLBC(L, mname, holder);
         cn = mname;
         delete holder;
-        setTempLuaState(nullptr);
     }
     const int hasMethod(lua_State *L){
         const char* name = luaL_checkstring(L, -1);

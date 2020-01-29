@@ -1,6 +1,6 @@
 package com.heaven7.java.lua;
 
-public final class MethodInfo extends INativeObject.BaseNativeObject{
+public final class MethodInfo{
     private String name;
     private String sig;  //"(Ljava/lang/String;Z)V"
     private Class<?>[] types;
@@ -32,15 +32,5 @@ public final class MethodInfo extends INativeObject.BaseNativeObject{
 
     public void setTypes(Class<?>[] types) {
         this.types = types;
-    }
-
-    @Override
-    protected native long nCreate();
-
-    @Override
-    protected native void nRelease(long ptr);
-    @Override
-    protected boolean destroyNativeOnRecycle() {
-        return false;
     }
 }

@@ -19,10 +19,17 @@ public interface INativeObject {
     abstract class BaseNativeObject implements INativeObject{
 
         private long ptr;
+        private final boolean createNative;
 
-        public BaseNativeObject() {
-            onPreCreate();
-            this.ptr = nCreate();
+        public BaseNativeObject(long ptr) {
+            if(ptr == 0){
+                onPreCreate();
+                this.ptr = nCreate();
+                createNative = true;
+            }else {
+                this.ptr = ptr;
+                createNative = false;
+            }
         }
         @Override
         public long getNativePointer() {
@@ -61,7 +68,7 @@ public interface INativeObject {
         protected abstract void nRelease(long ptr);
 
         protected boolean destroyNativeOnRecycle(){
-            return true;
+            return createNative;
         }
     }
 }

@@ -18,17 +18,6 @@ const LuaRegistry<LuaBridge>::RegType LuaBridge::Register[] = {
         {nullptr,     nullptr}
 };
 
-/** the temp lua state. which assigned on start and null on end for constructor and method call. */
-lua_State *__tempL;
-
-void setTempLuaState(lua_State *L) {
-    __tempL = L;
-}
-
-lua_State *getTempLuaState() {
-    return __tempL;
-}
-
 void getLuaParam(lua_State *L, int id_value, LuaParam *lp) {
     int type = lua_type(L, id_value);
     switch (type) {
@@ -140,7 +129,6 @@ void getParams(lua_State *L, LuaMediator *holder, int count, int startIdx) {
 
 int callImpl(lua_State *L, LuaBridgeCaller *caller, const char *cn) {
     //br.call(method, args..., size)
-    setTempLuaState(L);
     const lua_Integer count = lua_tointeger(L, -1);
     const char *mname = luaL_checkstring(L, -1 - count - 1);
     LuaMediator *holder = new LuaMediator(count);
@@ -148,11 +136,10 @@ int callImpl(lua_State *L, LuaBridgeCaller *caller, const char *cn) {
     //lua -> java
     getParams(L, holder, count, -1);
     //java - lua
-    const void *result = caller->call(cn, mname, holder);
+    const void *result = caller->call(L, cn, mname, holder);
 
     const int rType = holder->resultType; //must be DTYPE_XX
     delete holder;
-    setTempLuaState(nullptr);
 
     switch (rType) {
         case DTYPE_NUMBER: {
@@ -214,11 +201,11 @@ void initLuaBridge(lua_State *L) {
     LuaRegistry<LuaBridge>::Register(L);
 }
 
-LuaBridgeCaller *CreateLBC(const char *classname, LuaMediator* holder) {
+LuaBridgeCaller *CreateLBC(lua_State *L, const char *classname, LuaMediator* holder) {
     if (__creator == nullptr) {
         return nullptr;
     }
-    return __creator(classname, holder);
+    return __creator(L, classname, holder);
 }
 
 void setLuaBridgeCallerCreator(LBCCreator creator) {
@@ -231,21 +218,17 @@ static int call(lua_State *L) {
     return callImpl(L, *ud, (*ud)->getClassname());
 }
 static int hasField(lua_State *L) {
-    setTempLuaState(L);
     LuaBridgeCaller **ud = static_cast<LuaBridgeCaller **>(luaL_checkudata(L, 1, LUA_WRAP));
     const char *name = luaL_checkstring(L, -1);
     bool result = (*ud)->hasField((*ud)->getClassname(), name);
     lua_pushboolean(L, result ? 1 : 0);
-    setTempLuaState(nullptr);
     return 0;
 }
 static int hasMethod(lua_State *L) {
-    setTempLuaState(L);
     LuaBridgeCaller **ud = static_cast<LuaBridgeCaller **>(luaL_checkudata(L, 1, LUA_WRAP));
     const char *name = luaL_checkstring(L, -1);
     bool result = (*ud)->hasMethod((*ud)->getClassname(), name);
     lua_pushboolean(L, result ? 1 : 0);
-    setTempLuaState(nullptr);
     return 0;
 }
 static int recycle(lua_State *L) {
@@ -256,7 +239,9 @@ static int recycle(lua_State *L) {
 }
 
 void lua_wrapObject(lua_State *L, LuaBridgeCaller *caller, const char *classname) {
-    caller->setClassname(classname);
+    if(classname != nullptr){
+        caller->setClassname(classname);
+    }
     if (luaL_newmetatable(L, LUA_WRAP)) {
         lua_pushvalue(L, -1);
         lua_setfield(L, -2, "__index"); //xxx.__index = xxx
@@ -274,7 +259,7 @@ void lua_wrapObject(lua_State *L, LuaBridgeCaller *caller, const char *classname
         lua_setfield(L, -2, "__gc");
     }
     LuaBridgeCaller** ud = static_cast<LuaBridgeCaller **>(lua_newuserdata(L, sizeof(LuaBridgeCaller*)));
-    *ud = caller;
+    *ud = caller; //{meta, ud}
     luaL_setmetatable(L, LUA_WRAP);
 }
 

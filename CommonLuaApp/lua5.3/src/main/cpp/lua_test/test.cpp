@@ -94,7 +94,7 @@ public:
     LuaBridgeCallerImpl(const char *classname, LuaMediator *holder){
     }
     LuaBridgeCallerImpl(){}
-    void *call(const char *cn, const char *mName ,LuaMediator * holder) {
+    void *call(lua_State* L,const char *cn, const char *mName ,LuaMediator * holder) {
         if(holder->count <= 0){
             lua_Number * a = new lua_Number();
             *a = 10086;
@@ -113,7 +113,7 @@ extern void initLuaBridge(lua_State* L);
 
 void call_testLuaRegistry(lua_State* L, char* luacontent){
     //c++ 11支持函数表达式
-    auto creator = [](const char *classname, LuaMediator *holder){
+    auto creator = [](lua_State *L, const char *classname, LuaMediator *holder){
         return (LuaBridgeCaller*)new LuaBridgeCallerImpl(classname, holder);
     };
     setLuaBridgeCallerCreator(creator);
@@ -129,7 +129,7 @@ void call_testLuaRegistry(lua_State* L, char* luacontent){
 }
 void call_testLuaRegistryWrapper(lua_State* L, char* luacontent){
     //c++ 11支持函数表达式
-    auto creator = [](const char *classname, LuaMediator *holder){
+    auto creator = [](lua_State *L, const char *classname, LuaMediator *holder){
         return (LuaBridgeCaller*)new LuaBridgeCallerImpl(classname, holder);
     };
     setLuaBridgeCallerCreator(creator);

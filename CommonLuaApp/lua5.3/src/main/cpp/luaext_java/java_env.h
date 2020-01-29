@@ -8,6 +8,7 @@
 #include <jni.h>
 #include "LuaJavaCaller.h"
 #define SIG_JSTRING "Ljava/lang/String;"
+#define SIG_OBJECT "Ljava/lang/Object;"
 
 typedef struct Registration{
     char* clazz;

@@ -47,7 +47,7 @@ jint lua_toboolean_(JNIEnv *env, jclass clazz, jlong ptr, int i);
 jlong lua_tointeger_(JNIEnv *env, jclass clazz, jlong ptr, int i);
 jdouble lua_tonumber_(JNIEnv *env, jclass clazz, jlong ptr, int i);
 jstring lua_tostring_(JNIEnv *env, jclass clazz, jlong ptr, int i);
-jobject lua_touserdata_(JNIEnv *env, jclass clazz, jlong ptr, int i); //returns void *
+//jobject lua_touserdata_(JNIEnv *env, jclass clazz, jlong ptr, int i); //returns void *
 
 jint lua_type_(JNIEnv *env, jclass clazz, jlong ptr, int i);
 jstring lua_typename_(JNIEnv *env, jclass clazz, jlong ptr, int tp);

@@ -5,6 +5,7 @@
 #ifndef COMMONLUAAPP_LUA_BRIDGE_H
 #define COMMONLUAAPP_LUA_BRIDGE_H
 
+
 #define DTYPE_NULL 1
 #define DTYPE_NUMBER 2
 #define DTYPE_STRING 3
@@ -18,6 +19,24 @@
 #define DTYPE_LIST 9
 #define DTYPE_MAP 10
 #define DTYPE_LUA2JAVA_VALUE 12
+
+/*
+#include "../lua/lua.hpp"
+extern "C"{
+    struct LuaValue{
+        union Value{
+            lua_Number n;
+            int b;
+            const char* str;
+            int stackIndex;
+        };
+        int type;
+        Value value;
+    };
+
+    typedef struct LuaValue LuaValue;
+};
+ */
 
 /**
  * create lua2java value object
