@@ -40,9 +40,11 @@ public final class Lua2JavaValue {
         }
         super.finalize();
     }
+    @Keep
     public final int getType(){
         return type;
     }
+    @Keep
     public final long getValuePtr(){
         return ptr;
     }

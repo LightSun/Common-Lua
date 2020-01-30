@@ -38,6 +38,7 @@ public final class ClassInfo {
         sBases.put(long.class, "J");
         sBases.put(float.class, "F");
         sBases.put(double.class, "D");
+        sBases.put(void.class, "V");
     }
 
     public ClassInfo(Class<?> clazz) {
@@ -133,9 +134,6 @@ public final class ClassInfo {
     private static String typeToSig(Class<?> type) {
         if(type.isArray()){
             return "["+ typeToSig(type.getComponentType());
-        }
-        if(type == void.class){
-            return "V";
         }
         String sig = sBases.get(type);
         if(sig != null){

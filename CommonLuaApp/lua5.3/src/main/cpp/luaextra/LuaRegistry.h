@@ -211,7 +211,10 @@ public:
         }
         //ext_print("LuaBridge is removed.", 0 , 1);
     }
-
+    LuaBridge(LuaBridgeCaller* obj,const char * cn){
+        this->obj = obj;
+        this->cn = cn;
+    }
     LuaBridge(lua_State *L){ //cname, ...params, count
         const lua_Integer count = lua_tointeger(L, -1);
         const char* mname = luaL_checkstring(L, -1 - count - 1);

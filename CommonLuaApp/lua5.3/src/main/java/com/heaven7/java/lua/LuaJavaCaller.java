@@ -53,11 +53,20 @@ public final class LuaJavaCaller {
         final LuaState luaState = new LuaState(luaStatePtr);
         try {
             ClassInfo info = sInfos.get(className);
+            if(info == null){
+                errorMsg[0] = "can't find classInfo for class = " + className;
+                return null;
+            }
             Class<?> clazz = Class.forName(className);
             if (args == null || args.length == 0) {
                 return clazz.newInstance();
             }
             List<MethodInfo> list = info.getConstructorInfoes(name, args.length);
+            if(list == null){
+                errorMsg[0] = "can't find constructor for class("+ className + "), constructor name = "
+                        + name  + ", args.length = " + args.length;
+                return null;
+            }
             //desc -> aesc
             for (int size = list.size(), i = size - 1; i >= 0; i--) {
                 MethodInfo mi = list.get(i);
@@ -93,9 +102,18 @@ public final class LuaJavaCaller {
         final LuaState luaState = new LuaState(luaStatePtr);
         try {
             ClassInfo info = sInfos.get(className);
+            if(info == null){
+                errorMsg[0] = "can't find classInfo for class = " + className;
+                return;
+            }
             Class<?> clazz = Class.forName(className);
 
             List<MethodInfo> list = info.getMethodInfoes(method, args.length);
+            if(list == null){
+                errorMsg[0] = "can't find method for class("+ className + "), method name = "
+                        + method  + ", args.length = " + args.length;
+                return;
+            }
             //desc -> aesc
             for (int size = list.size(), i = size - 1; i >= 0; i--) {
                 MethodInfo mi = list.get(i);

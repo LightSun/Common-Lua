@@ -6,15 +6,13 @@ import android.os.Bundle;
 import android.os.Environment;
 import android.view.View;
 
+import com.heaven7.androlua.bean.Person;
 import com.heaven7.core.util.Logger;
 import com.heaven7.core.util.PermissionHelper;
-import com.heaven7.java.base.util.IOUtils;
+import com.heaven7.java.lua.LuaJavaCaller;
 import com.heaven7.java.lua.LuaState;
 import com.heaven7.java.lua.LuaTest;
 
-
-import java.io.IOException;
-import java.io.InputStreamReader;
 import java.nio.charset.Charset;
 import java.util.Arrays;
 
@@ -100,7 +98,32 @@ public class MainActivity extends Activity {
         String file = Environment.getExternalStorageDirectory() + "/vida/lua.txt";
         LuaTest.bfDecodeFile(file);
     }
+    public void onClickTestWrapJavaObject(View view){
+        Person p = new Person();
+        p.setAge(18);
+        p.setName("Google/Heaven7");
+        LuaJavaCaller.registerJavaClass(Person.class);
 
+        LuaState luaState = mLuaer.getLuaState();
+        int k = luaState.saveLightly();
+        //luaState.dumpLuaStack();
+        luaState.push(p);
+        luaState.pushString("call");
+        luaState.getTable(-3); //get method
+
+        //br.call(method, args..., size)
+        luaState.pushString("getName");
+        luaState.pushNumber(0);
+        int code = luaState.pcall(2, 1, -1);
+        if(code != 0){
+            String str = luaState.toString(-1);
+            System.out.println("onClickTestWrapJavaObject >>>  exception = " + str);
+        }else {
+            System.out.println("onClickTestWrapJavaObject >>> ok!");
+        }
+        //luaState.dumpLuaStack();
+        luaState.restoreLightly(k);
+    }
     public void onClickTestLuaScript(View view) {
         executeLuaFile();
     }

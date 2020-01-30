@@ -282,7 +282,7 @@ void releaseNumber(JNIEnv *env, jclass clazz, long ptr) {
     delete ch;
 }
 
-JNINativeMethod lua2java_methods[] = {
+static JNINativeMethod lua2java_methods[] = {
         {"getString_",      "(J)" SIG_JSTRING, (void *) getStringValue},
         {"getBoolean_",     "(J)Z",            (void *) getBooleanValue},
         {"getNumber_",      "(J)D",            (void *) getDoubleValue},

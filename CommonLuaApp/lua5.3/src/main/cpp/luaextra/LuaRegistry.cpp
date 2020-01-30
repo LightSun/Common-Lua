@@ -175,7 +175,7 @@ int callImpl(lua_State *L, LuaBridgeCaller *caller, const char *cn) {
                 luaL_error(L, "for user data. return type must be 'LuaBridgeCaller*'.");
                 return LUA_ERRRUN;
             }
-            lua_wrapObject(L, lbc, holder->resultCN);
+            //lua_wrapObject(L, lbc, holder->resultCN);
             return LUA_YIELD; //must
         }
         //case DTYPE_OBJECT: //userdata. -- metatable
@@ -242,6 +242,10 @@ void lua_wrapObject(lua_State *L, LuaBridgeCaller *caller, const char *classname
     if(classname != nullptr){
         caller->setClassname(classname);
     }
+    /*lua_newtable(L);
+    LuaBridgeCaller** ud = static_cast<LuaBridgeCaller **>(lua_newuserdata(L, sizeof(LuaBridgeCaller*)));
+    *ud = caller;*/
+
     if (luaL_newmetatable(L, LUA_WRAP)) {
         lua_pushvalue(L, -1);
         lua_setfield(L, -2, "__index"); //xxx.__index = xxx
@@ -259,8 +263,9 @@ void lua_wrapObject(lua_State *L, LuaBridgeCaller *caller, const char *classname
         lua_setfield(L, -2, "__gc");
     }
     LuaBridgeCaller** ud = static_cast<LuaBridgeCaller **>(lua_newuserdata(L, sizeof(LuaBridgeCaller*)));
-    *ud = caller; //{meta, ud}
+    *ud = caller;
     luaL_setmetatable(L, LUA_WRAP);
+    //luaB_dumpStack(L);
 }
 
 

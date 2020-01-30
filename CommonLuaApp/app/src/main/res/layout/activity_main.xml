@@ -76,6 +76,14 @@
             android:onClick="onClickDecodeBlowfish"
             android:text="blow-fish decode" />
 
+        <Button
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="15dp"
+            android:onClick="onClickTestWrapJavaObject"
+            android:text="test wrap-java-object"
+            />
+
     </LinearLayout>
 
 </ScrollView>

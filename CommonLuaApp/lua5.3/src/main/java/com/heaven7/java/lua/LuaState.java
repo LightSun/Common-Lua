@@ -29,6 +29,15 @@ public final class LuaState extends INativeObject.BaseNativeObject{
         _nRelease(ptr);
     }
 
+    public int saveLightly(){
+        return getTop();
+    }
+    public void restoreLightly(int k){
+        int top = getTop();
+        if(top > k){
+            _pop(getNativePointer(), top - k);
+        }
+    }
     public int LdoString(String script){
         return _evaluateScript(getNativePointer(), script);
     }
@@ -100,6 +109,7 @@ public final class LuaState extends INativeObject.BaseNativeObject{
     private static synchronized native void  _rawseti(long ptr, int index, long arrayIndex);
     private static synchronized native void  _rawset(long ptr, int index);
 
+    private static synchronized native void  _pop(long ptr, int count);
     private static synchronized native void  _dumpLuaStack(long ptr);
     private static synchronized native long  _nCreate();
     private static synchronized native void  _nRelease(long ptr);

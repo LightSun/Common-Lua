@@ -72,19 +72,19 @@ jint lua_gettop_(JNIEnv *env, jclass clazz, jlong ptr) {
 }
 void lua_insert_(JNIEnv *env, jclass clazz, jlong ptr, jint index) {
     lua_State *L = reinterpret_cast<lua_State *>(ptr);
-    return lua_insert(L, index);
+    lua_insert(L, index);
 }
 void lua_pushvalue_(JNIEnv *env, jclass clazz, jlong ptr, int i) {
     lua_State *L = reinterpret_cast<lua_State *>(ptr);
-    return lua_pushvalue(L, i);
+    lua_pushvalue(L, i);
 }
 void lua_remove_(JNIEnv *env, jclass clazz, jlong ptr, int i) {
     lua_State *L = reinterpret_cast<lua_State *>(ptr);
-    return lua_remove(L, i);
+    lua_remove(L, i);
 }
 void lua_replace_(JNIEnv *env, jclass clazz, jlong ptr, int i) {
     lua_State *L = reinterpret_cast<lua_State *>(ptr);
-    return lua_replace(L, i);
+    lua_replace(L, i);
 }
 void lua_settop_(JNIEnv *env, jclass clazz, jlong ptr, int i) {
     lua_State *L = reinterpret_cast<lua_State *>(ptr);
@@ -92,7 +92,7 @@ void lua_settop_(JNIEnv *env, jclass clazz, jlong ptr, int i) {
 }
 void lua_pop_(JNIEnv *env, jclass clazz, jlong ptr, int n) {
     lua_State *L = reinterpret_cast<lua_State *>(ptr);
-    return lua_pop(L, n);
+    lua_pop(L, n);
 }
 //-------------------- read from stack -----------------
 
@@ -352,7 +352,7 @@ JNIEnv *getEnvFromState(lua_State *L) {
 }
 };
 
-JNINativeMethod lua_state_methods[] = {
+static JNINativeMethod lua_state_methods[] = {
         {"_nCreate",        "()J",                            (void *) nCreate_},
         {"_nRelease",       "(J)V",                           (void *) nRelease_},
         {"_evaluateScript", "(J" SIG_JSTRING ")I",            (void *) luaL_dostring_},
@@ -374,6 +374,7 @@ JNINativeMethod lua_state_methods[] = {
         {"_rawset",         "(JI)V",                          (void *) lua_rawset_},
 
         {"_dumpLuaStack",   "(J)V",                           (void *) dumpLuaStack_},
+        {"_pop",            "(JI)V",                          (void *) lua_pop_},
 };
 
 Registration getLuaStateRegistration() {
