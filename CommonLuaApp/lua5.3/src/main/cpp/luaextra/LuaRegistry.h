@@ -172,7 +172,6 @@ public:
     LuaParam* lp;
     int resultType;
     const char* className;
-    const char* resultCN; //result classname
 };
 
 class LuaBridgeCaller{
@@ -229,13 +228,13 @@ public:
         const char* name = luaL_checkstring(L, -1);
         bool result = obj->hasMethod(cn, name);
         lua_pushboolean(L, result ? 1 : 0);
-        return 0;
+        return 1;
     }
     const int hasField(lua_State *L){
         const char* name = luaL_checkstring(L, -1);
         bool result = obj->hasField(cn, name);
         lua_pushboolean(L, result ? 1 : 0);
-        return 0;
+        return 1;
     }
     const int call(lua_State *L){
         return callImpl(L, obj, cn);

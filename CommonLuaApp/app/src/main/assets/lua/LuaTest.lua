@@ -32,7 +32,6 @@ local function func(key, val)
     print(tostring(key), tostring(val))
 end
 
-dumpStack()
 local ff = FooWrapper(3)
 dumpStack()
 print("type ff = ", type(ff)) -- table

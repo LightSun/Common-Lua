@@ -45,7 +45,7 @@ public final class LuaJavaCaller {
      * @return the object.
      */
     @Keep
-    public static Object create(long luaStatePtr, String className, String name, Object[] args, String[] errorMsg) {
+    public static Object create(long luaStatePtr, String className, String name, Object[] args, Object[] errorMsg) {
         //name can be null
         if (name == null) {
             name = "<init>";
@@ -97,7 +97,7 @@ public final class LuaJavaCaller {
      * @param errorMsg  the out error msg
      */
     @Keep
-    public static void invoke(long luaStatePtr, Object owner, String className, String method, Object[] args, String[] errorMsg) {
+    public static void invoke(long luaStatePtr, Object owner, String className, String method, Object[] args, Object[] errorMsg) {
         //name can be null
         final LuaState luaState = new LuaState(luaStatePtr);
         try {

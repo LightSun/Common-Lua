@@ -18,17 +18,14 @@ extern "C" {
 #define MNAME_CREATE "create"
 #define MNAME_INVOKE "invoke"
 
-//Object create(long luaStatePtr, String className, String name, Object[] args, String[] errorMsg)
-#define SIG_CREATE "(J" STRING_NAME STRING_NAME "[" OBJECT_NAME "[" STRING_NAME ")" OBJECT_NAME
-//void invoke(long luaStatePtr, Object owner, String className, String method, Object[] args, String[] errorMsg)
-#define SIG_INVOKE "(J" OBJECT_NAME STRING_NAME STRING_NAME "[" OBJECT_NAME "[" STRING_NAME ")V"
+#define SIG_CREATE "(J" STRING_NAME STRING_NAME "[" OBJECT_NAME "[" OBJECT_NAME ")" OBJECT_NAME
+#define SIG_INVOKE "(J" OBJECT_NAME STRING_NAME STRING_NAME "[" OBJECT_NAME "[" OBJECT_NAME ")V"
 
 #define SIG_NEW_LUA2JAVA "(IJ)" "L" LUA2JAVA_CLASS ";"
 
 static jclass __callerClass;
 static jclass __objectClass;
 static jmethodID __mid_create;
-static jmethodID __mid_invoke;
 
 static jmethodID __mid_create_lua2java;
 static jmethodID __mid_getType_lua2java;
@@ -88,7 +85,6 @@ void initLuaJavaCaller() {
     __callerClass = env->FindClass(CALLER_CLASS);
     __objectClass = env->FindClass("java/lang/Object");
     __mid_create = env->GetStaticMethodID(__callerClass, MNAME_CREATE, SIG_CREATE);
-    __mid_invoke = env->GetStaticMethodID(__callerClass, MNAME_INVOKE, SIG_INVOKE);
 
     __lua2JavaClass = env->FindClass(LUA2JAVA_CLASS);
     __mid_create_lua2java = env->GetStaticMethodID(__lua2JavaClass, "of", SIG_NEW_LUA2JAVA);
@@ -108,7 +104,6 @@ void deInitLuaJavaCaller() {
     __callerClass = nullptr;
     __objectClass = nullptr;
     __mid_create = nullptr;
-    __mid_invoke = nullptr;
 
     __mid_create_lua2java = nullptr;
     __mid_getType_lua2java = nullptr;
@@ -120,10 +115,15 @@ class LuaJavaCaller: public LuaBridgeCaller {
 private:
     jobject jobj;
     jstring rawStr;
+
+    //must use global ref when used as member
+    void setJavaObject(JNIEnv * env,jobject obj){
+        this->jobj = env->NewGlobalRef(obj);
+    }
 public:
     ~LuaJavaCaller() {
         JNIEnv *const env = getJNIEnv();
-        env->DeleteLocalRef(jobj);
+        env->DeleteGlobalRef(jobj);
         if(rawStr != nullptr){
             env->ReleaseStringUTFChars(rawStr, getClassname());
             env->DeleteLocalRef(rawStr);
@@ -135,7 +135,7 @@ public:
         rawStr = cn;
 
         setClassname(classname);
-        this->jobj = jobj;
+        setJavaObject(env, jobj);
     }
     LuaJavaCaller(lua_State *L, const char *classname, LuaMediator *holder) {
         rawStr = nullptr;
@@ -151,7 +151,7 @@ public:
             luaL_error(L, msg);
         } else {
             if (holder->count == 0) {
-                jobj = env->AllocObject(jclazz); //default constructor
+                setJavaObject(env, env->AllocObject(jclazz));//default constructor
                 env->DeleteLocalRef(jclazz);
             } else {
                 env->DeleteLocalRef(jclazz);
@@ -200,7 +200,7 @@ public:
                         if (result == nullptr) {
                             luaL_error(L, "create object failed for class(%s)", classname);
                         } else {
-                            jobj = result;
+                            setJavaObject(env, result);
                         }
                     }
                 }
@@ -211,39 +211,40 @@ public:
     void *call(lua_State *L, const char *cn, const char *mName, LuaMediator *holder) {
         JNIEnv *const env = getJNIEnv();
         const int size = holder->count;
-        //params
-        bool success;
-        jobjectArray const args = env->NewObjectArray(size, __objectClass, nullptr);
+        //dumpReferenceTables(env);
+        jclass cls_obj = env->FindClass("java/lang/Object");
+        jclass cls_caller = env->FindClass(CALLER_CLASS);
+        jmethodID __mid_invoke = env->GetStaticMethodID(cls_caller, MNAME_INVOKE, SIG_INVOKE);
+
+        jobjectArray args = env->NewObjectArray(size, cls_obj, nullptr);
         for (int i = 0; i < size; ++i) {
             auto param = static_cast<jobject>(holder->lp[i].value);
             env->SetObjectArrayElement(args, i, param);
         }
 
         //prepare string array
-        jobjectArray const msgArr = env->NewObjectArray(1, env->FindClass("java/lang/String"),nullptr);
+        jobjectArray msgArr = env->NewObjectArray(1, cls_obj, nullptr);
         jvalue values[6];
-        values[0].j = (jlong)L;
+        values[0].j = reinterpret_cast<jlong>(L);
         values[1].l = jobj;
         values[2].l = env->NewStringUTF(holder->className);
         values[3].l = env->NewStringUTF(mName);
         values[4].l = args;
         values[5].l = msgArr;
         //create
-        env->CallStaticVoidMethodA(__callerClass, __mid_invoke, values);
-        jstring const msg = static_cast<jstring const>(env->GetObjectArrayElement(msgArr, 0));
-        void *callResult;
+        env->CallStaticVoidMethodA(cls_caller, __mid_invoke, values);
+        jstring const msg = static_cast<jstring>(env->GetObjectArrayElement(msgArr, 0));
+
+        env->DeleteLocalRef(args);
+        env->DeleteLocalRef(msgArr);
+        env->DeleteLocalRef(cls_obj);
+        env->DeleteLocalRef(cls_caller);
         if (msg != nullptr) {
             const char *chs = env->GetStringUTFChars(msg, nullptr);
             //release
-            env->DeleteLocalRef(args);
-            env->DeleteLocalRef(msgArr);
             luaL_error(L, chs);
             env->ReleaseStringUTFChars(msg, chs);
             env->DeleteLocalRef(msg);
-        } else {
-            //release
-            env->DeleteLocalRef(args);
-            env->DeleteLocalRef(msgArr);
         }
         // holder.resultType = LUA_TNUMBER;
 

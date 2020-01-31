@@ -109,17 +109,21 @@ public class MainActivity extends Activity {
         //luaState.dumpLuaStack();
         luaState.push(p);
         luaState.pushString("call");
-        luaState.getTable(-3); //get method
+        luaState.getTable(-2); //get method
+        luaState.dumpLuaStack(); //tab, func
 
         //br.call(method, args..., size)
         luaState.pushString("getName");
         luaState.pushNumber(0);
-        int code = luaState.pcall(2, 1, -1);
+        int code = luaState.pcall(2, 1, 0);
         if(code != 0){
             String str = luaState.toString(-1);
             System.out.println("onClickTestWrapJavaObject >>>  exception = " + str);
         }else {
-            System.out.println("onClickTestWrapJavaObject >>> ok!");
+            if(luaState.getType(-1) != LuaState.TYPE_STRING){
+                throw new IllegalStateException("result must be string");
+            }
+            System.out.println("onClickTestWrapJavaObject >>> ok! " + luaState.toString(-1));
         }
         //luaState.dumpLuaStack();
         luaState.restoreLightly(k);

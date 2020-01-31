@@ -84,3 +84,10 @@ JNIEnv *attachJNIEnv() {
 void detachJNIEnv() {
     g_jvm->DetachCurrentThread();
 }
+
+void dumpReferenceTables(JNIEnv *env) {
+    jclass vm_class = env->FindClass("dalvik/system/VMDebug");
+    jmethodID dump_mid = env->GetStaticMethodID(vm_class, "dumpReferenceTables", "()V");
+    env->CallStaticVoidMethod(vm_class, dump_mid);
+    env->DeleteLocalRef(vm_class);
+}

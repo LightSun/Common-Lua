@@ -30,5 +30,6 @@ JNIEnv *attachJNIEnv();
 
 void detachJNIEnv();
 
+void dumpReferenceTables(JNIEnv *env);
 
 #endif //COMMONLUAAPP_JAVA_ENV_H

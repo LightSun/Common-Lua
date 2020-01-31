@@ -45,6 +45,8 @@ public:
         lua_pushcfunction(L, &LuaPort::gc_obj);  //入栈
         //相当于t[k] = v 并把栈顶前2个弹出栈顶
         lua_settable(L, -3);
+
+        luaB_dumpStack(L);
     }
 
     static int constructor(lua_State* L){
@@ -93,6 +95,7 @@ public:
         // 取出function id
         int i = (int)lua_tonumber(L, lua_upvalueindex(1));
 
+        //luaB_dumpStack(L); // {tab, $args}
         // 取tt[0] 即local userdata = tt[0]
         lua_pushnumber(L, 0);
         /**

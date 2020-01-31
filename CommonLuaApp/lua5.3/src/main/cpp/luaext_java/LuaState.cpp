@@ -281,7 +281,9 @@ jint luaL_dofile_(JNIEnv *env, jclass clazz, jlong ptr, jstring filename) {
 jint luaL_dostring_(JNIEnv *env, jclass clazz, jlong ptr, jstring str) {
     lua_State *L = reinterpret_cast<lua_State *>(ptr);
     const char *utfStr = (env)->GetStringUTFChars(str, NULL);
-    return (jint) luaL_dostring(L, utfStr);
+    auto result = (jint) luaL_dostring(L, utfStr);
+    (env)->ReleaseStringUTFChars(str, utfStr);
+    return result;
 }
 jint lua_error_(JNIEnv *env, jclass clazz, jlong ptr) {
     lua_State *L = reinterpret_cast<lua_State *>(ptr);
@@ -304,6 +306,12 @@ jstring luaL_checkstring_(JNIEnv *env, jclass clazz, jlong ptr, jint n) {
     const char *result = luaL_checkstring(L, n);
     return env->NewStringUTF(result);
 }
+/*void luaL_checkudata_(JNIEnv *env, jclass clazz, jlong ptr, jint idx, jstring str){
+    lua_State *L = reinterpret_cast<lua_State *>(ptr);
+    const char *utfStr = (env)->GetStringUTFChars(str, NULL);
+    luaL_checkudata(L, idx, utfStr);
+    (env)->ReleaseStringUTFChars(str, utfStr);
+}*/
 void luaL_checktype_(JNIEnv *env, jclass clazz, jlong ptr, jint n, jint tp) {
     lua_State *L = reinterpret_cast<lua_State *>(ptr);
     luaL_checktype(L, n, tp);
@@ -357,7 +365,10 @@ static JNINativeMethod lua_state_methods[] = {
         {"_nRelease",       "(J)V",                           (void *) nRelease_},
         {"_evaluateScript", "(J" SIG_JSTRING ")I",            (void *) luaL_dostring_},
         {"_getGlobal",      "(J" SIG_JSTRING ")I",            (void *) lua_getglobal_},
+        {"_getTable",       "(JI)I",                          (void *) lua_gettable_},
+        {"_getType",        "(JI)I",                          (void *) lua_type_},
 
+        {"_pushValue",      "(JI)V",                          (void *) lua_pushvalue_},
         {"_pushString",     "(J" SIG_JSTRING ")" SIG_JSTRING, (void *) lua_pushString_},
         {"_pushNumber",     "(JD)V",                          (void *) lua_pushNumber_},
         {"_pushnil",        "(J)V",                           (void *) lua_pushnil_},

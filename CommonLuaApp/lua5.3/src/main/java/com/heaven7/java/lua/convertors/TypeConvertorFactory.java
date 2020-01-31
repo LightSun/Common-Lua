@@ -48,6 +48,8 @@ public final class TypeConvertorFactory {
         convertor = new DoubleConvertor();
         sBaseConvertors.put(double.class, convertor);
         sBaseConvertors.put(Double.class, convertor);
+
+        sBaseConvertors.put(String.class, new StringTypeConvertor());
     }
 
     public static void registerTypeConvertor(Class<?> clazz, TypeConvertor tc ,boolean includeChild){
