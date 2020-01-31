@@ -18,11 +18,12 @@ public class BooleanConvertor implements TypeConvertor {
     }
 
     @Override
-    public void convert(LuaState luaState, Object result) {
+    public int java2lua(LuaState luaState, Object result) {
         luaState.pushBoolean((Boolean)result);
+        return 1;
     }
     @Override
-    public Object convert(Lua2JavaValue arg) {
+    public Object lua2java(LuaState luaState, Lua2JavaValue arg) {
         return arg.toBooleanValue();
     }
 }

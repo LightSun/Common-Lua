@@ -4,9 +4,14 @@ public interface TypeConvertor {
 
     Object convert(String arg);
 
-    Object convert(Lua2JavaValue arg);
+    Object lua2java(LuaState luaState, Lua2JavaValue arg);
 
     Object defaultValue();
-
-    void convert(LuaState luaState, Object result);
+    /**
+     * convert java object to lua
+     * @param luaState the lua stack
+     * @param result the java object
+     * @return the push result count of lua stack
+     */
+    int java2lua(LuaState luaState, Object result);
 }

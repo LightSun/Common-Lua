@@ -12,11 +12,11 @@ import java.util.Set;
 
 public class CollectionTypeConvertor extends NonSimpleTypeConvertor {
 
-    public Object convert(Lua2JavaValue arg){
+    public Object lua2java(LuaState luaState, Lua2JavaValue arg){
         throw new UnsupportedOperationException("latter will support.");
     }
     @Override
-    public void convert(LuaState luaState, Object result){
+    public int java2lua(LuaState luaState, Object result){
         Collection<?> coll = (Collection<?>) result;
         luaState.newTable();
         int top = luaState.getTop();
@@ -27,7 +27,7 @@ public class CollectionTypeConvertor extends NonSimpleTypeConvertor {
                 Object ele = list.get(i);
                 //must only add one to lua stack
                 TypeConvertor convertor = TypeConvertorFactory.getTypeConvertor(ele.getClass());
-                convertor.convert(luaState, ele);
+                convertor.java2lua(luaState, ele);
                 LuaUtils.checkTopDelta(luaState, top + 1);
                 luaState.rawSeti(-2, i + 1); //lua array from 1
             }
@@ -35,7 +35,7 @@ public class CollectionTypeConvertor extends NonSimpleTypeConvertor {
             for (Iterator<?> it = coll.iterator(); it.hasNext() ; ){
                 Object ele = it.next();
                 TypeConvertor convertor = TypeConvertorFactory.getTypeConvertor(ele.getClass());
-                convertor.convert(luaState, ele);
+                convertor.java2lua(luaState, ele);
                 LuaUtils.checkTopDelta(luaState, top + 1);
                 luaState.pushBoolean(true);
                 luaState.rawSet(-3);
@@ -45,10 +45,11 @@ public class CollectionTypeConvertor extends NonSimpleTypeConvertor {
             for (Iterator<?> it = coll.iterator(); it.hasNext() ; i++ ){
                 Object ele = it.next();
                 TypeConvertor convertor = TypeConvertorFactory.getTypeConvertor(ele.getClass());
-                convertor.convert(luaState, ele);
+                convertor.java2lua(luaState, ele);
                 LuaUtils.checkTopDelta(luaState, top + 1);
                 luaState.rawSeti(-2, i + 1); //lua array from 1
             }
         }
+        return 1;
     }
 }

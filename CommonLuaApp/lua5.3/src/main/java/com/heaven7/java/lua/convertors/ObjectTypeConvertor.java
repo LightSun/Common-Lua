@@ -5,11 +5,12 @@ import com.heaven7.java.lua.LuaState;
 
 public class ObjectTypeConvertor extends NonSimpleTypeConvertor {
 
-    public Object convert(Lua2JavaValue arg){
+    public Object lua2java(LuaState luaState, Lua2JavaValue arg){
         throw new UnsupportedOperationException("latter will support.");
     }
     @Override
-    public void convert(LuaState luaState, Object result) {
+    public int java2lua(LuaState luaState, Object result) {
         luaState.push(result);
+        return 1;
     }
 }

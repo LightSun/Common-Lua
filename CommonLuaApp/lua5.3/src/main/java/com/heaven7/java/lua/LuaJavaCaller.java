@@ -97,14 +97,14 @@ public final class LuaJavaCaller {
      * @param errorMsg  the out error msg
      */
     @Keep
-    public static void invoke(long luaStatePtr, Object owner, String className, String method, Object[] args, Object[] errorMsg) {
+    public static int invoke(long luaStatePtr, Object owner, String className, String method, Object[] args, Object[] errorMsg) {
         //name can be null
         final LuaState luaState = new LuaState(luaStatePtr);
         try {
             ClassInfo info = sInfos.get(className);
             if(info == null){
                 errorMsg[0] = "can't find classInfo for class = " + className;
-                return;
+                return 0;
             }
             Class<?> clazz = Class.forName(className);
 
@@ -112,7 +112,7 @@ public final class LuaJavaCaller {
             if(list == null){
                 errorMsg[0] = "can't find method for class("+ className + "), method name = "
                         + method  + ", args.length = " + args.length;
-                return;
+                return 0;
             }
             //desc -> aesc
             for (int size = list.size(), i = size - 1; i >= 0; i--) {
@@ -121,8 +121,7 @@ public final class LuaJavaCaller {
                 convert(luaState, mi.getTypes(), args, out);
                 try {
                     Object result = clazz.getMethod(mi.getName(), mi.getTypes()).invoke(owner, out);
-                    convertResultToLua(luaState, result);
-                    break;
+                    return convertResultToLua(luaState, result);
                 } catch (Exception e) {
                     if (i == 0) {
                         //last. still error.
@@ -133,15 +132,16 @@ public final class LuaJavaCaller {
         } catch (Exception e) {
             errorMsg[0] = toString(e);
         }
+        return 0;
     }
 
-    private static void convertResultToLua(LuaState luaState, Object result) {
+    private static int convertResultToLua(LuaState luaState, Object result) {
         if (result == null) {
             luaState.pushNil();
-            return;
+            return 1;
         }
         TypeConvertor converter = TypeConvertorFactory.getTypeConvertor(result.getClass());
-        converter.convert(luaState, result);
+        return converter.java2lua(luaState, result);
     }
 
     private static String toString(Throwable e) {
@@ -157,7 +157,7 @@ public final class LuaJavaCaller {
             TypeConvertor converter = TypeConvertorFactory.getTypeConvertor(type);
             if (converter != null) {
                 if (args[i] instanceof Lua2JavaValue) {
-                    out[i] = converter.convert((Lua2JavaValue) args[i]);
+                    out[i] = converter.lua2java(luaState, (Lua2JavaValue) args[i]);
                 } else {
                     out[i] = converter.convert(args[i].toString());
                 }

@@ -11,7 +11,7 @@ public class StringTypeConvertor implements TypeConvertor {
         return arg;
     }
     @Override
-    public Object convert(Lua2JavaValue arg) {
+    public Object lua2java(LuaState luaState, Lua2JavaValue arg) {
         return arg.toStringValue();
     }
     @Override
@@ -19,7 +19,8 @@ public class StringTypeConvertor implements TypeConvertor {
         return null;
     }
     @Override
-    public void convert(LuaState luaState, Object result) {
+    public int java2lua(LuaState luaState, Object result) {
         luaState.pushString((String) result);
+        return 1;
     }
 }

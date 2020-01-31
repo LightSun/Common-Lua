@@ -128,56 +128,9 @@ public class MainActivity extends Activity {
         //luaState.dumpLuaStack();
         luaState.restoreLightly(k);
     }
-    public void onClickTestLuaScript(View view) {
-        executeLuaFile();
-    }
     private void initLua() {
         mLuaer.initLuaState();
         mLuaer.initEnv();
-    }
-
-    private void executeLuaFile() {
-       /* try {
-            //载入脚本
-            mLuaState.LdoString(IOUtils.readString(new InputStreamReader(getResources().openRawResource(R.raw.luafile))));
-
-            //执行函数
-            mLuaState.getGlobal("functionInLuaFile");
-            mLuaState.pushString("from Java params");// 将参数压入栈
-            // functionInLuaFile函数有一个参数，一个返回结果
-            int paramCount = 1;
-            int resultCount = 1;
-            int code = mLuaState.pcall(paramCount, resultCount, -1);
-            String result = mLuaState.toString(-1);
-            if (code != 0) {
-                System.err.println("error:" + result + " code:" + code);
-            }
-            // displayResult2.setText(mLuaState.toString(-1));// 输出 结果
-
-            mLuaState.getGlobal("GetVersion");
-            mLuaState.pushString("reload lua test");// 将参数压入栈
-//            mLuaState.pushInteger(10);//不能输入int
-//            mLuaState.pushString("10");
-            mLuaState.pushNumber(10);
-            int retCode = mLuaState.pcall(2, 1, -1);
-            result = mLuaState.toString(-1);
-            //retCode=0表示正确调用，否则有异常
-            if (retCode == 0) {
-                if (result == null) {
-                    System.out.println("GetVersion return empty value");
-                } else {
-                    System.out.println("GetVersion return value" + result);
-                }
-            } else {
-                System.out.println("error:" + result + " code:" + retCode);
-            }
-
-            //test error
-            mLuaState.getGlobal("testErrorHandler");
-            mLuaState.call(0, 0);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }*/
     }
 
 }

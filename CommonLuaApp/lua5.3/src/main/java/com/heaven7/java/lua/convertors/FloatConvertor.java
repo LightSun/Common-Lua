@@ -1,6 +1,7 @@
 package com.heaven7.java.lua.convertors;
 
 import com.heaven7.java.lua.Lua2JavaValue;
+import com.heaven7.java.lua.LuaState;
 import com.heaven7.java.lua.TypeConvertor;
 
 public class FloatConvertor extends NumberConvertor implements TypeConvertor {
@@ -15,7 +16,7 @@ public class FloatConvertor extends NumberConvertor implements TypeConvertor {
     }
 
     @Override
-    public Object convert(Lua2JavaValue arg) {
+    public Object lua2java(LuaState luaState, Lua2JavaValue arg) {
         return arg.toFloatValue();
     }
 }

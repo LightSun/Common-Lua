@@ -6,7 +6,8 @@ import com.heaven7.java.lua.TypeConvertor;
 /*public*/ abstract class NumberConvertor implements TypeConvertor {
 
     @Override
-    public void convert(LuaState luaState, Object result) {
+    public int java2lua(LuaState luaState, Object result) {
         luaState.pushNumber(((Number)result).doubleValue());
+        return 1;
     }
 }

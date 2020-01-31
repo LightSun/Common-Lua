@@ -9,12 +9,12 @@ import java.util.Map;
 
 public class MapTypeConvertor extends NonSimpleTypeConvertor {
 
-    public Object convert(Lua2JavaValue arg){
+    public Object lua2java(LuaState luaState, Lua2JavaValue arg){
         throw new UnsupportedOperationException("latter will support.");
     }
 
     @Override
-    public void convert(LuaState luaState, Object result) {
+    public int java2lua(LuaState luaState, Object result) {
         Map<?,?> map = (Map<?, ?>) result;
         int top = luaState.getTop();
         luaState.newTable();
@@ -23,10 +23,11 @@ public class MapTypeConvertor extends NonSimpleTypeConvertor {
             Object value = en.getValue();
             TypeConvertor kc = TypeConvertorFactory.getTypeConvertor(key.getClass());
             TypeConvertor vc = TypeConvertorFactory.getTypeConvertor(value.getClass());
-            kc.convert(luaState, key);
-            vc.convert(luaState, value);
+            kc.java2lua(luaState, key);
+            vc.java2lua(luaState, value);
             LuaUtils.checkTopDelta(luaState, top + 2);
             luaState.rawSet(-3);
         }
+        return 1;
     }
 }

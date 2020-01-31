@@ -6,7 +6,7 @@
 #define COMMONLUAAPP_JAVA_ENV_H
 
 #include <jni.h>
-#include "LuaJavaCaller.h"
+
 #define SIG_JSTRING "Ljava/lang/String;"
 #define SIG_OBJECT "Ljava/lang/Object;"
 
@@ -18,9 +18,11 @@ typedef struct Registration{
 
 Registration createRegistration(char* clazz, JNINativeMethod methods[], int len);
 
-Registration getLuaStateRegistration();
-
-Registration getLua2JavaRegistration();
+extern Registration getLuaStateRegistration();
+extern Registration getLua2JavaRegistration();
+extern void initLuaJavaCaller();
+extern void deInitLuaJavaCaller();
+jclass getGlobalClass(JNIEnv * env, const char* classname);
 
 int registerMethods(JNIEnv* env,Registration n);
 

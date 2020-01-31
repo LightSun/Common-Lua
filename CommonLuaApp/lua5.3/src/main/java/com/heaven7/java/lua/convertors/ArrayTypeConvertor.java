@@ -9,11 +9,11 @@ import java.lang.reflect.Array;
 
 public class ArrayTypeConvertor extends NonSimpleTypeConvertor{
 
-    public Object convert(Lua2JavaValue arg){
+    public Object lua2java(LuaState luaState, Lua2JavaValue arg){
         throw new UnsupportedOperationException("latter will support.");
     }
 
-    public void convert(LuaState luaState, Object result){
+    public int java2lua(LuaState luaState, Object result){
         luaState.newTable();
         int top = luaState.getTop();
         int length = Array.getLength(result);
@@ -21,10 +21,11 @@ public class ArrayTypeConvertor extends NonSimpleTypeConvertor{
             Object ele = Array.get(result, i);
             //must only add one to lua stack
             TypeConvertor convertor = TypeConvertorFactory.getTypeConvertor(ele.getClass());
-            convertor.convert(luaState, ele);
+            convertor.java2lua(luaState, ele);
             LuaUtils.checkTopDelta(luaState, top + 1);
             luaState.rawSeti(-2, i + 1); //lua array from 1
         }
+        return 1;
     }
 
 }

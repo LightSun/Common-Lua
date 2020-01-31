@@ -136,10 +136,10 @@ int callImpl(lua_State *L, LuaBridgeCaller *caller, const char *cn) {
     //lua -> java
     getParams(L, holder, count, -1);
     //java - lua
-    const void *result = caller->call(L, cn, mname, holder);
+    auto result = caller->call(L, cn, mname, holder);
 
     delete holder;
-    return LUA_YIELD;
+    return result > 0 ? LUA_YIELD : LUA_OK;
 }
 
 //------------------------

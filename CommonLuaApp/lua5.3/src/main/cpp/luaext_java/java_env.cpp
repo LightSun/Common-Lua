@@ -67,6 +67,17 @@ JNIEnv *getJNIEnv() {
     return env;
 }
 
+jclass getGlobalClass(JNIEnv * env, const char* classname){
+    auto cls = env->FindClass(classname);
+    if(cls == nullptr){
+        LOGD("JNI >>> can't find class. name = %s", classname);
+        return nullptr;
+    }
+    auto gref = static_cast<jclass>(env->NewGlobalRef(cls));
+    env->DeleteLocalRef(cls);
+    return gref;
+}
+
 /** if from sub thread . jni-env should attach first. */
 JNIEnv *attachJNIEnv() {
     JNIEnv *env = NULL;

@@ -176,7 +176,7 @@ public:
 
 class LuaBridgeCaller{
 public:
-    virtual void *call(lua_State* L, const char *cn, const char *mName ,LuaMediator * holder) = 0;
+    virtual int call(lua_State* L, const char *cn, const char *mName ,LuaMediator * holder) = 0;
 
     //opt impl. used for user data.
     void* getCObject(){

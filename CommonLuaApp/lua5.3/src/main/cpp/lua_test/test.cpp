@@ -94,17 +94,9 @@ public:
     LuaBridgeCallerImpl(const char *classname, LuaMediator *holder){
     }
     LuaBridgeCallerImpl(){}
-    void *call(lua_State* L,const char *cn, const char *mName ,LuaMediator * holder) {
-        if(holder->count <= 0){
-            lua_Number * a = new lua_Number();
-            *a = 10086;
-            holder->resultType = DTYPE_NUMBER;
-            return a;
-        } else{
-            LuaParam* param = &holder->lp[0];
-            holder->resultType = param->type;
-            return param->value;
-        }
+    int call(lua_State* L,const char *cn, const char *mName ,LuaMediator * holder) {
+        lua_pushnumber(L, 10086);
+        return 1;
     }
 };
 
