@@ -6,11 +6,8 @@ import android.os.Bundle;
 import android.os.Environment;
 import android.view.View;
 
-import com.heaven7.androlua.bean.Person;
 import com.heaven7.core.util.Logger;
 import com.heaven7.core.util.PermissionHelper;
-import com.heaven7.java.lua.LuaJavaCaller;
-import com.heaven7.java.lua.LuaState;
 import com.heaven7.java.lua.LuaTest;
 
 import java.nio.charset.Charset;
@@ -99,35 +96,10 @@ public class MainActivity extends Activity {
         LuaTest.bfDecodeFile(file);
     }
     public void onClickTestWrapJavaObject(View view){
-        Person p = new Person();
-        p.setAge(18);
-        p.setName("Google/Heaven7");
-        LuaJavaCaller.registerJavaClass(Person.class);
-
-        LuaState luaState = mLuaer.getLuaState();
-        int k = luaState.saveLightly();
-        //luaState.dumpLuaStack();
-        luaState.push(p);
-        luaState.pushString("call");
-        luaState.getTable(-2); //get method
-        luaState.dumpLuaStack(); //tab, func
-
-        //br.call(method, args..., size)
-        luaState.pushString("getName");
-        luaState.pushNumber(0);
-        int code = luaState.pcall(2, 1, 0);
-        if(code != 0){
-            String str = luaState.toString(-1);
-            System.out.println("onClickTestWrapJavaObject >>>  exception = " + str);
-        }else {
-            if(luaState.getType(-1) != LuaState.TYPE_STRING){
-                throw new IllegalStateException("result must be string");
-            }
-            System.out.println("onClickTestWrapJavaObject >>> ok! " + luaState.toString(-1));
-        }
-        //luaState.dumpLuaStack();
-        luaState.restoreLightly(k);
+       // WrapJavaTest.testWrapJavaObject(mLuaer.getLuaState());
+        WrapJavaTest.testWrapJavaObjectGlobal(mLuaer.getLuaState());
     }
+
     private void initLua() {
         mLuaer.initLuaState();
         mLuaer.initEnv();

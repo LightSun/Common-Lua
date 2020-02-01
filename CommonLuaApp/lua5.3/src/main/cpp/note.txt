@@ -22,3 +22,7 @@ any 'start h7'
 
 =======  next =======
 java-> lua . primitives, primitive-array, object, object-array. list, set, map
+
+
+======== lua bug fixed ===========
+in lgc.c :  in function 'clearkeys'

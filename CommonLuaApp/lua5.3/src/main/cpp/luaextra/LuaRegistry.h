@@ -51,9 +51,10 @@ void initLuaBridge(lua_State* L);
  * @param L the lua state
  * @param caller the bridge caller.
  * @param classname  the class name.
+ * @param globalKey  the key of lua global table. may be null
  */
 // wrap base, base-array, object, object array
-void lua_wrapObject(lua_State* L, LuaBridgeCaller* caller, const char* classname);
+void lua_wrapObject(lua_State* L, LuaBridgeCaller* caller, const char* classname, const char* globalKey);
 
 template <class T>
 class LuaRegistry{

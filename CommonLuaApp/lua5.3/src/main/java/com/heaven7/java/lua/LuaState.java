@@ -82,7 +82,13 @@ public final class LuaState extends INativeObject.BaseNativeObject {
     }
 
     public void push(Object result) {
-        _pushJavaObject(getNativePointer(), result, result.getClass().getName());
+        _pushJavaObject(getNativePointer(), result, result.getClass().getName(), null);
+    }
+    public void pushGlobal(Object result, String name) {
+        if(name == null){
+            throw new NullPointerException("push to global need set a name for it.");
+        }
+        _pushJavaObject(getNativePointer(), result, result.getClass().getName(), name);
     }
 
     public void pushValue(int idx) {
@@ -129,47 +135,30 @@ public final class LuaState extends INativeObject.BaseNativeObject {
         return _getType(getNativePointer(), idx);
     }
 
-    //TODO private static synchronized native int _getTable(long ptr, int index);
-    private static synchronized native int _getTop(long ptr);
-
-    private static synchronized native int _getType(long ptr, int idx);
-
     private static synchronized native int _evaluateScript(long ptr, String script);
-
+    private static synchronized native int _getTop(long ptr);
+    private static synchronized native int _getType(long ptr, int idx);
     private static synchronized native int _getGlobal(long ptr, String var);
-
     private static synchronized native int _getTable(long ptr, int idx);
-    // private static synchronized native int  _checkUserdata(long ptr, int idx, String tname);
 
     private static synchronized native String _toString(long ptr, int idx);
 
     private static synchronized native String _pushString(long ptr, String var);
-
     private static synchronized native void _pushNumber(long ptr, double n);
-
     private static synchronized native void _pushValue(long ptr, int idx);
-
     private static synchronized native void _pushnil(long ptr);
-
     private static synchronized native void _pushBoolean(long ptr, boolean val);
-
-    private static synchronized native void _pushJavaObject(long ptr, Object obj, String classname);
+    private static synchronized native void _pushJavaObject(long ptr, Object obj, String classname, String globalKey); //globalKey can be null
 
     private static synchronized native int _pcall(long ptr, int nArgs, int nResults, int errFunc);
-
     private static synchronized native void _call(long ptr, int nArgs, int nResults);
 
     private static synchronized native void _newTable(long ptr);
-
     private static synchronized native void _rawseti(long ptr, int index, long arrayIndex);
-
     private static synchronized native void _rawset(long ptr, int index);
 
     private static synchronized native void _pop(long ptr, int count);
-
     private static synchronized native void _dumpLuaStack(long ptr);
-
     private static synchronized native long _nCreate();
-
     private static synchronized native void _nRelease(long ptr);
 }

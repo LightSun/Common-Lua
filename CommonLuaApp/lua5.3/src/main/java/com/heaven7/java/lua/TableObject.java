@@ -14,6 +14,9 @@ public final class TableObject {
     public long getIndex() {
         return index;
     }
+    public void travel(LuaState luaState){
+        //TODO
+    }
     public Object call(LuaState luaState, String name, Object...params){
         //TODO
         int top = luaState.getTop();

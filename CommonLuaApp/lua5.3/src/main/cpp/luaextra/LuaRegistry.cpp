@@ -183,7 +183,7 @@ static int hasField(lua_State *L) {
     const char *name = luaL_checkstring(L, -1);
     bool result = (ud)->hasField((ud)->getClassname(), name);
     lua_pushboolean(L, result ? 1 : 0);
-    return 1;
+    return LUA_YIELD;
 }
 static int hasMethod(lua_State *L) {
     LuaBridgeCaller *ud = getLBC(L);
@@ -191,15 +191,15 @@ static int hasMethod(lua_State *L) {
     const char *name = luaL_checkstring(L, -1);
     bool result = (ud)->hasMethod((ud)->getClassname(), name);
     lua_pushboolean(L, result ? 1 : 0);
-    return 1;
+    return LUA_YIELD;
 }
 static int recycle(lua_State *L) {
     delete (getLBC(L));
-    return 0;
+    return LUA_OK;
 }
 }
 
-void lua_wrapObject(lua_State *L, LuaBridgeCaller *caller, const char *classname) {
+void lua_wrapObject(lua_State *L, LuaBridgeCaller *caller, const char *classname, const char* globalKey) {
     if(classname != nullptr){
         caller->setClassname(classname);
     } else{
@@ -245,8 +245,13 @@ void lua_wrapObject(lua_State *L, LuaBridgeCaller *caller, const char *classname
     lua_pushcclosure(L, &call, 2);
     lua_settable(L, -3);
 
-
     //luaB_dumpStack(L);
+
+    //set global if need
+    if(globalKey != nullptr){
+        lua_pushvalue(L, -1);
+        lua_setglobal(L, globalKey);
+    }
 }
 
 

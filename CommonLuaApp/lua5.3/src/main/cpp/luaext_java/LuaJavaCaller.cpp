@@ -129,8 +129,8 @@ public:
         JNIEnv *const env = getJNIEnv();
         auto classname = env->GetStringUTFChars(cn , nullptr);
         rawStr = cn;
-
         setClassname(classname);
+
         setJavaObject(env, jobj);
     }
     LuaJavaCaller(lua_State *L, const char *classname, LuaMediator *holder) {

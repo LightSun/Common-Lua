@@ -641,7 +641,10 @@ static void clearkeys (global_State *g, GCObject *l, GCObject *f) {
     Table *h = gco2t(l);
     Node *n, *limit = gnodelast(h);
     for (n = gnode(h, 0); n < limit; n++) {
-      if (!ttisnil(gval(n)) && (iscleared(g, gkey(n)))) {
+      //this will cause a bug that null value of string key. never clear.
+      //@see 'http://lua-users.org/lists/lua-l/2017-08/msg00065.html'
+      //if (!ttisnil(gval(n)) && (iscleared(g, gkey(n)))) {
+      if ((iscleared(g, gkey(n)))) {
         setnilvalue(gval(n));  /* remove value ... */
         removeentry(n);  /* and remove entry from table */
       }

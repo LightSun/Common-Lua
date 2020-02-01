@@ -4,6 +4,12 @@ public interface TypeConvertor {
 
     Object convert(String arg);
 
+    /**
+     * convert lua data to java
+     * @param luaState the lua state
+     * @param arg the argument
+     * @return the java value which represent lua data
+     */
     Object lua2java(LuaState luaState, Lua2JavaValue arg);
 
     Object defaultValue();
