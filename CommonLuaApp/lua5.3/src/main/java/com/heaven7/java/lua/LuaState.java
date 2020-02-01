@@ -117,6 +117,9 @@ public final class LuaState extends INativeObject.BaseNativeObject {
     public void pushFunction(LuaFunction func){
         push(func);
     }
+    public void pushFunctionGlobal(LuaFunction func, String name){
+        pushGlobal(func, name, true);
+    }
     public void pushFunctionGlobal(LuaFunction func, String name, boolean pushToStack){
         pushGlobal(func, name, pushToStack);
     }

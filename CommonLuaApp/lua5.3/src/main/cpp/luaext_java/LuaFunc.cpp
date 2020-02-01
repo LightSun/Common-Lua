@@ -24,9 +24,8 @@ static int func_gc(lua_State* L){
     return 0;
 }
 static int func_call(lua_State* L){
-    auto pEnv = getJNIEnv();
     auto jobj = getud(L);
-    return executeLuaFunction(pEnv, jobj, L) > 0 ? LUA_YIELD : LUA_OK;
+    return executeLuaFunction(jobj, L) > 0 ? LUA_YIELD : LUA_OK;
 }
 }
 
@@ -74,5 +73,5 @@ void pushFunc(JNIEnv *env, jclass clazz, jlong ptr, jobject func, jstring classn
         env->ReleaseStringUTFChars(globalKey, gk);
     }
     env->ReleaseStringUTFChars(classname, cn);
-    luaB_dumpStack(L);
+    //luaB_dumpStack(L);
 }

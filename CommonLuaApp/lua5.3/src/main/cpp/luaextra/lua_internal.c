@@ -16,14 +16,13 @@ LUALIB_API int luaB_dumpStack(lua_State* L){
     int i = 0;
     int top = lua_gettop(L);
 
-    char buf[20];
+    char buf[20]; //if string is to long. may cause stack exception.
     for (i = 1; i <= top; ++i) {
         int t = lua_type(L, i);
         switch (t) {
             case LUA_TSTRING:
             {
-                sprintf(buf, "'%s' ", lua_tostring(L, i));
-                __printImpl(buf, 0, 0);
+                __printImpl(lua_tostring(L, i), 0, 0);
             }
                 break;
             case LUA_TBOOLEAN:

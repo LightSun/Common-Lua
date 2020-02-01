@@ -63,9 +63,10 @@ void releaseJavaObject0(void *obj) {
     JNIEnv *const env = getJNIEnv();
     env->DeleteLocalRef(jobj);
 }
-int executeLuaFunction(JNIEnv* env,jobject obj, lua_State* L){
+int executeLuaFunction(jobject obj, lua_State* L){
+    auto env = getJNIEnv();
     auto mid = env->GetMethodID(__luaFuncClass, "execute", SIG_FUNC_EXECUTE);
-    auto result = env->CallIntMethod(obj, mid, (jlong)L);
+    auto result = env->CallIntMethod(obj, mid, reinterpret_cast<jlong>(L));
     return result;
 }
 

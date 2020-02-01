@@ -19,6 +19,7 @@ public final class WrapJavaTest {
         }else {
             System.out.println("testPushFunc >>>  exception = " + luaState.toString(-1));
         }
+        //luaState.dumpLuaStack();
         luaState.restoreLightly(k);
     }
 
