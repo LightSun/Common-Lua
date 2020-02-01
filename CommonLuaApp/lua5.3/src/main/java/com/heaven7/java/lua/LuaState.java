@@ -126,13 +126,20 @@ public final class LuaState extends INativeObject.BaseNativeObject {
     public void rawSet(int idx) {
         _rawset(getNativePointer(), idx);
     }
-
     public void dumpLuaStack() {
         _dumpLuaStack(getNativePointer());
     }
-
     public int getType(int idx) {
         return _getType(getNativePointer(), idx);
+    }
+    public boolean removeGlobal(String key){
+        if(key == null){
+            throw new NullPointerException();
+        }
+        return _removeGlobal(getNativePointer(), key);
+    }
+    public boolean hasGlobal(String key){
+        return _hasGlobal(getNativePointer(), key);
     }
 
     private static synchronized native int _evaluateScript(long ptr, String script);
@@ -140,6 +147,8 @@ public final class LuaState extends INativeObject.BaseNativeObject {
     private static synchronized native int _getType(long ptr, int idx);
     private static synchronized native int _getGlobal(long ptr, String var);
     private static synchronized native int _getTable(long ptr, int idx);
+    private static synchronized native boolean _removeGlobal(long ptr, String var);
+    private static synchronized native boolean _hasGlobal(long ptr, String var);
 
     private static synchronized native String _toString(long ptr, int idx);
 

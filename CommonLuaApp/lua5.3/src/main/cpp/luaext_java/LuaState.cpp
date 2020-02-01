@@ -68,6 +68,30 @@ void pushJavaObject(JNIEnv *env, jclass clazz, jlong ptr, jobject obj, jstring c
         env->ReleaseStringUTFChars(globalKey, key);
     }
 }
+// ----------------- global ------------
+jboolean removeGlobal(JNIEnv *env, jclass clazz, jlong ptr, jstring jkey) {
+    lua_State *L = reinterpret_cast<lua_State *>(ptr);
+    const char *key = env->GetStringUTFChars(jkey, nullptr);
+    lua_getglobal(L, key);
+    bool result = lua_type(L, -1) != LUA_TNIL;
+    lua_pop(L, 1);
+
+    lua_pushnil(L);
+    lua_setglobal(L, key);
+    env->ReleaseStringUTFChars(jkey, key);
+
+    return static_cast<jboolean>(result);
+}
+jboolean hasGlobal(JNIEnv *env, jclass clazz, jlong ptr, jstring jkey) {
+    lua_State *L = reinterpret_cast<lua_State *>(ptr);
+    const char *key = env->GetStringUTFChars(jkey, nullptr);
+    lua_getglobal(L, key);
+    bool result = lua_type(L, -1) != LUA_TNIL;
+    lua_pop(L, 1);
+    env->ReleaseStringUTFChars(jkey, key);
+    return static_cast<jboolean>(result);
+}
+
 //------------------ stack ---------------------
 jint lua_checkstack_(JNIEnv *env, jclass clazz, jlong ptr, int n) {
     lua_State *L = reinterpret_cast<lua_State *>(ptr);
@@ -368,6 +392,8 @@ static JNINativeMethod lua_state_methods[] = {
         {"_getGlobal",      "(J" SIG_JSTRING ")I",                        (void *) lua_getglobal_},
         {"_getTable",       "(JI)I",                                      (void *) lua_gettable_},
         {"_getType",        "(JI)I",                                      (void *) lua_type_},
+        {"_removeGlobal",   "(J" SIG_JSTRING ")Z",                        (void *) removeGlobal},
+        {"_hasGlobal",      "(J" SIG_JSTRING ")Z",                        (void *) hasGlobal},
 
         {"_pushValue",      "(JI)V",                                      (void *) lua_pushvalue_},
         {"_pushString",     "(J" SIG_JSTRING ")" SIG_JSTRING,             (void *) lua_pushString_},
