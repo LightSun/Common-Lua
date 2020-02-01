@@ -35,6 +35,7 @@ LUALIB_API void ext_print(const char *cs, int len, int flag);
 //static means internal func in c
 LUALIB_API int luaB_dumpStack(lua_State* L);
 
+//--------------------------
 #define EXIT_PRINT
 
 #ifdef EXIT_PRINT

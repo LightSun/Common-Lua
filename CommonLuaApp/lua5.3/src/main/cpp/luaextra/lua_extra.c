@@ -131,3 +131,17 @@ const char* getFieldAsString(lua_State* L, int idx, const char* name){
     lua_pop(L, -1);
     return value;
 }
+
+void travelTable(lua_State* L, int idx, TravelTable tt){
+    lua_pushnil(L);  /* first key */
+    while (lua_next(L, idx) != 0) {
+        //-2 is key, -1(top) is value
+        //if return 1 means need break
+        if(tt(L, -2, -1)){
+            lua_pop(L, 2);
+            break;
+        }
+        /* remove value, keep key for next iterate */
+        lua_pop(L, 1);
+    }
+}

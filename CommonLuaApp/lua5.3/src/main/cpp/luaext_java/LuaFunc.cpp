@@ -57,6 +57,10 @@ void pushFunc(JNIEnv *env, jclass clazz, jlong ptr, jobject func, jstring classn
     lua_pushstring(L, cn);
     lua_pushcclosure(L, &func_call, 2);
     lua_settable(L, -3);
+
+    lua_pushstring(L, LIB_LUA_WRAPPER);
+    lua_pushboolean(L, 1);
+    lua_settable(L, -3);
     //func
     lua_pushstring(L, "call");
     lua_gettable(L, -2); //{tab, func}

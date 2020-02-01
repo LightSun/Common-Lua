@@ -6,8 +6,6 @@
 #include "LuaRegistry.h"
 #include "../common/map2.h"
 
-#define LUA_WRAP "Lua_dynamic_wrap"
-
 //----------------- help memory ---------
 
 const char LuaBridge::className[] = "LuaBridge";
@@ -51,7 +49,8 @@ void getLuaParam(lua_State *L, int id_value, LuaParam *lp) {
             break;
         }
         case LUA_TFUNCTION: {
-            luaL_error(L, "Currently, lua param not support for 'function'.");
+            lp->value = newLua2JavaValue(DTYPE_FUNC, id_value);;
+            lp->type = DTYPE_LUA2JAVA_VALUE;
             break;
         }
         case LUA_TTHREAD: {
@@ -68,43 +67,6 @@ void getLuaParam(lua_State *L, int id_value, LuaParam *lp) {
         case LUA_TTABLE: {
             lp->value = newLua2JavaValue(DTYPE_TABLE, id_value);;
             lp->type = DTYPE_LUA2JAVA_VALUE;
-            //c++对象包装成lua可访问的对象时，有可能是userdata,也可能是table(cjson)
-
-            //TODO latter will support
-            //need make the table on the top.
-           /* lua_pushnil(L);
-            // 现在的栈：-1 => nil; index => table
-            Map<const char *, const char *> *tab = new Map<const char *, const char *>();
-            int luaCollType = -1;
-            while (lua_next(L, id_value)) {//相当于lua:  k,v = next(tab,key)
-                // 现在的栈：-1 => value; -2 => key; index => table
-                // 拷贝一份 key 到栈顶，然后对它做 lua_tostring 就不会改变原始的 key 值了
-                lua_pushvalue(L, -2);
-                // 现在的栈：-1 => key; -2 => value; -3 => key; index => table
-                const char *key = lua_tostring(L, -1);
-                const char *value = lua_tostring(L, -2);
-
-                int kt = lua_type(L, -1);
-                int vt = lua_type(L, -2);
-                if ((kt == LUA_TNUMBER || kt == LUA_TBOOLEAN || kt == LUA_TSTRING) &&
-                    (vt == LUA_TNUMBER || vt == LUA_TBOOLEAN || vt == LUA_TSTRING)) {
-                    tab->put(key, value);
-                } else if (kt == LUA_TFUNCTION &&
-                           key == "getCollectionType") { //lua defined collection. by heaven7
-                    luaCollType = static_cast<int>(lua_tointeger(L, -2));
-                }
-
-                // 弹出 value 和拷贝的 key，留下原始的 key 作为下一次 lua_next 的参数
-                lua_pop(L, 2);
-                // 现在的栈：-1 => key; index => table
-            }*/
-            // 现在的栈：index => table （最后 lua_next 返回 0 的时候它已经把上一次留下的 key 给弹出了）
-            // 所以栈已经恢复到进入这个函数时的状态
-            /*
-             *  m.COLLECTION_TYPE_LIST = 1
-                m.COLLECTION_TYPE_SET  = 2
-                m.COLLECTION_TYPE_MAP  = 3
-             */
             break;
         }
 
@@ -247,6 +209,9 @@ void lua_wrapObject(lua_State *L, LuaBridgeCaller *caller, const char *classname
     lua_pushcclosure(L, &call, 2);
     lua_settable(L, -3);
 
+    lua_pushliteral(L, LIB_LUA_WRAPPER);
+    lua_pushboolean(L, 1);
+    lua_settable(L, -3);
     //luaB_dumpStack(L);
 
     //set global if need

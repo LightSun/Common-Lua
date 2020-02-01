@@ -17,15 +17,20 @@ extern "C" {
 
 #define STRING_NAME "Ljava/lang/String;"
 #define OBJECT_NAME "Ljava/lang/Object;"
-#define CALLER_CLASS "com/heaven7/java/lua/LuaJavaCaller"
-#define LUA2JAVA_CLASS "com/heaven7/java/lua/Lua2JavaValue"
-#define FUNC_CLASS "com/heaven7/java/lua/LuaFunction"
+
+#define CALLER_CLASS    "com/heaven7/java/lua/LuaJavaCaller"
+#define LUA2JAVA_CLASS  "com/heaven7/java/lua/Lua2JavaValue"
+#define FUNC_CLASS      "com/heaven7/java/lua/LuaFunction"
+#define TRAVELLER_CLASS "com/heaven7/java/lua/LuaTraveller"
+
 #define MNAME_CREATE "create"
 #define MNAME_INVOKE "invoke"
 
+#define SIG_LUA2JAVA_CLASS "L" LUA2JAVA_CLASS ";"
 #define SIG_CREATE "(J" STRING_NAME STRING_NAME "[" OBJECT_NAME "[" OBJECT_NAME ")" OBJECT_NAME
 #define SIG_INVOKE "(J" OBJECT_NAME STRING_NAME STRING_NAME "[" OBJECT_NAME "[" OBJECT_NAME ")I"
 #define SIG_FUNC_EXECUTE "(J)I"
+#define SIG_TRAVEL "(J" SIG_LUA2JAVA_CLASS SIG_LUA2JAVA_CLASS ")I"
 
 #define SIG_NEW_LUA2JAVA "(IJ)" "L" LUA2JAVA_CLASS ";"
 
@@ -33,6 +38,7 @@ static jclass __callerClass;
 static jclass __objectClass;
 static jclass __lua2JavaClass;
 static jclass __luaFuncClass;
+static jclass __luaTravelClass;
 
 jstring getStringValue(JNIEnv *env, jclass clazz, long ptr);
 LuaBridgeCaller* LBCCreator_0(lua_State* L,const char* classname, LuaMediator* holder);
@@ -57,7 +63,6 @@ jlong getValuePtr_Lua2Java(jobject obj) {
     auto result = env->CallLongMethod(obj, __mid_getValuePtr_lua2java);
     return result;
 }
-
 void releaseJavaObject0(void *obj) {
     auto jobj = static_cast<jobject>(obj);
     JNIEnv *const env = getJNIEnv();
@@ -68,6 +73,12 @@ int executeLuaFunction(jobject obj, lua_State* L){
     auto mid = env->GetMethodID(__luaFuncClass, "execute", SIG_FUNC_EXECUTE);
     auto result = env->CallIntMethod(obj, mid, reinterpret_cast<jlong>(L));
     return result;
+}
+int travelImpl(lua_State* L, jobject t, void* key, void* value){
+    auto env = getJNIEnv();
+    auto mid = env->GetMethodID(__luaTravelClass, "travel", SIG_TRAVEL);
+    return env->CallIntMethod(t, mid, reinterpret_cast<jlong>(L),
+            static_cast<jobject>(key), static_cast<jobject>(value));
 }
 
 const char *getString(LuaParam *lp) {
@@ -99,6 +110,7 @@ void initLuaJavaCaller() {
     __objectClass = getGlobalClass(env, "java/lang/Object");
     __lua2JavaClass = getGlobalClass(env, LUA2JAVA_CLASS);
     __luaFuncClass = getGlobalClass(env, FUNC_CLASS);
+    __luaTravelClass = getGlobalClass(env, TRAVELLER_CLASS);
     //set callback
     setLua2JavaValue_Creator(&newLua2JavaValue0);
     setJava_Object_Releaser(&releaseJavaObject0);
@@ -111,10 +123,12 @@ void deInitLuaJavaCaller() {
     env->DeleteGlobalRef(__objectClass);
     env->DeleteGlobalRef(__lua2JavaClass);
     env->DeleteGlobalRef(__luaFuncClass);
+    env->DeleteGlobalRef(__luaTravelClass);
     __callerClass = nullptr;
     __objectClass = nullptr;
     __lua2JavaClass = nullptr;
     __luaFuncClass = nullptr;
+    __luaTravelClass = nullptr;
 }
 
 class LuaJavaCaller: public LuaBridgeCaller {

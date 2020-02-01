@@ -22,6 +22,8 @@ typedef void (*Lua_print)(char* cs, int len, int flag);
 
 typedef char* (*CreateTempFile)(const char * filename);
 
+typedef int (*TravelTable)(lua_State* L, int keyIdx, int valueIdx);
+
 // map function to lua. any like: int (*lua_CFunction) (lua_State *L);
 LUALIB_API void lua_BindFunctions(lua_State *L, luaL_Reg funcs[], int flag);
 
@@ -70,12 +72,20 @@ void ext_closeLuaThread(lua_State *main,lua_State* ls);
 void ext_setLuaPath(lua_State* L,const char* fieldName , const char* path);
 //====================================================
 /**
- * get filed as string then pop it.
+ * get field as string then pop it.
  * @param L the state
  * @param idx the id of userdata
  * @param name the key
  * @return the string value
  */
 const char* getFieldAsString(lua_State* L, int idx, const char* name);
+
+/**
+ * travel the lua table.
+ * @param L  he lua state
+ * @param idx the table idx
+ * @param tt the traveller to travel table. return true means need break travel.
+ */
+void travelTable(lua_State* L, int idx, TravelTable tt);
 
 #endif //COMMONLUAAPP_LUA_EXTRA_H

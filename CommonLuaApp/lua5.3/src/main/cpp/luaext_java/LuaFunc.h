@@ -8,6 +8,7 @@
 #include <jni.h>
 #include "java_env.h"
 #include "../lua/lua.hpp"
+#include "../luaextra/lua_bridge.h"
 
 void pushFunc(JNIEnv *env, jclass clazz, jlong ptr, jobject func, jstring classname,
               jstring globalKey, jboolean toStack);

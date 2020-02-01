@@ -1,7 +1,9 @@
 package com.heaven7.java.lua;
 
+//lua table, lua_wrap_java, userdata.
 public final class TableObject {
 
+    private static final String M_TRAVEL = "__travel";
     /** the table index. often is negative. -1 means top */
     private final int index;
 
@@ -14,8 +16,35 @@ public final class TableObject {
     public long getIndex() {
         return index;
     }
-    public void travel(LuaState luaState){
-        //TODO
+    //return true if can travel
+    public boolean travel(LuaState luaState, LuaTraveller lt){
+        //get travel method
+        luaState.pushString(M_TRAVEL);
+        luaState.getTable(index);
+
+        if(luaState.getType(-1) != LuaState.TYPE_FUNCTION){
+            luaState.pop(1);
+            if(luaState.isNativeWrapper(index)){
+                return false;
+            }
+            int type = luaState.getType(index);
+            if(type != LuaState.TYPE_TABLE){
+                return false;
+            }
+            //no travel method
+            luaState.travel(index, lt);
+        }else {
+            luaState.pushFunction(new LuaTravelFunction(lt));
+            //start travel
+            int result = luaState.pcall(1, 0, 0);
+            if(result == 0){
+                System.out.println("travel ok");
+            }else {
+                System.out.println("travel failed. " + luaState.toString(-1));
+                luaState.pop(1);
+            }
+        }
+        return true;
     }
     public Object call(LuaState luaState, String name, Object...params){
         //TODO
@@ -39,6 +68,20 @@ public final class TableObject {
     }
     public void setField(LuaState luaState, String name, Object val){
         int top = luaState.getTop();
+    }
+
+    private static class LuaTravelFunction extends LuaFunction{
+        final LuaTraveller lt;
+
+        public LuaTravelFunction(LuaTraveller lt) {
+            this.lt = lt;
+        }
+        @Override
+        protected int execute(LuaState state) {
+            Lua2JavaValue key = state.getLuaValue(-2);
+            Lua2JavaValue value = state.getLuaValue(-1);
+            return lt.travel(state.getNativePointer(), key, value);
+        }
     }
 }
 

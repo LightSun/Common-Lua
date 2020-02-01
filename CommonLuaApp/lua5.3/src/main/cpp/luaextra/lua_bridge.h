@@ -5,15 +5,16 @@
 #ifndef COMMONLUAAPP_LUA_BRIDGE_H
 #define COMMONLUAAPP_LUA_BRIDGE_H
 
+#include "lua.hpp"
+
+#define LIB_LUA_WRAPPER "__lib_common_lua_wrap_"
 
 #define DTYPE_NULL 1
 #define DTYPE_NUMBER 2
 #define DTYPE_STRING 3
 #define DTYPE_BOOLEAN 4
 #define DTYPE_TABLE 5
-#define DTYPE_OBJECT 11     //unknown-cpp object. often from user-data.
-#define DTYPE_LB_OBJECT 6  //luabridge object. which create by lua
-#define DTYPE_LBD_OBJECT 7 //luabridge dynamic. which create by native
+#define DTYPE_FUNC 6
 
 #define DTYPE_SET 8
 #define DTYPE_LIST 9
@@ -53,4 +54,5 @@ void setJava_Object_Releaser(Java_Object_Releaser releaser);
 void* newLua2JavaValue(int type, long long ptrOrIndex);
 void releaseJavaObject(void * obj);
 
+void* getLuaValue(lua_State *L, int id_value);
 #endif //COMMONLUAAPP_LUA_BRIDGE_H

@@ -10,6 +10,7 @@ public final class Lua2JavaValue {
     public static final int TYPE_STRING      = 3;
     public static final int TYPE_BOOLEAN     = 4;
     public static final int TYPE_TABLE_LIKE  = 5;
+    public static final int TYPE_FUNCTION    = 6;
 
     private long ptr; //value ptr
     private int type;

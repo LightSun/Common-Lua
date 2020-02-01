@@ -52,6 +52,9 @@ public final class LuaState extends INativeObject.BaseNativeObject {
             _pop(getNativePointer(), top - k);
         }
     }
+    public void pop(int n){
+        _pop(getNativePointer(), n);
+    }
 
     public int LdoString(String script) {
         return _evaluateScript(getNativePointer(), script);
@@ -165,6 +168,9 @@ public final class LuaState extends INativeObject.BaseNativeObject {
     public int getType(int idx) {
         return _getType(getNativePointer(), idx);
     }
+    public Lua2JavaValue getLuaValue(int idx){
+        return (Lua2JavaValue) _getLuaValue(getNativePointer(), idx);
+    }
     public boolean removeGlobal(String key){
         if(key == null){
             throw new NullPointerException();
@@ -174,8 +180,20 @@ public final class LuaState extends INativeObject.BaseNativeObject {
     public boolean hasGlobal(String key){
         return _hasGlobal(getNativePointer(), key);
     }
+    //TODO wait test
+    public void travel(int tab_idx, LuaTraveller lt){
+        _travel(getNativePointer(), tab_idx, lt);
+    }
+    //TODO wait test
+    public boolean isNativeWrapper(int idx){
+        return _isNativeWrapper(getNativePointer(), idx) > 0;
+    }
+    //=============================== native methods ========================================
+    private static synchronized native void _travel(long ptr, int idx, Object traveller);
+    private static synchronized native int _isNativeWrapper(long ptr, int idx);
 
     private static synchronized native int _evaluateScript(long ptr, String script);
+    private static synchronized native Object _getLuaValue(long ptr, int idx);
     private static synchronized native int _getTop(long ptr);
     private static synchronized native int _getType(long ptr, int idx);
     private static synchronized native int _getGlobal(long ptr, String var);
