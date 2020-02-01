@@ -1,12 +1,26 @@
 package com.heaven7.androlua;
 
 import com.heaven7.androlua.bean.Person;
+import com.heaven7.java.lua.LuaFunction;
 import com.heaven7.java.lua.LuaJavaCaller;
 import com.heaven7.java.lua.LuaState;
 
 public final class WrapJavaTest {
 
     private static final String TAG = "WrapJavaTest";
+
+    public static void testPushFunc(LuaState luaState){
+        int k = luaState.saveLightly();
+        luaState.pushFunction(new SimpleFunc());
+        luaState.pushString("testPushFunc");
+        int result = luaState.pcall(1, 1, 0);
+        if(result == 0){
+            System.out.println("testPushFunc >>> ok . " + luaState.toString(-1));
+        }else {
+            System.out.println("testPushFunc >>>  exception = " + luaState.toString(-1));
+        }
+        luaState.restoreLightly(k);
+    }
 
     public static void testWrapJavaObjectGlobal(LuaState luaState) {
         Person p = new Person();
@@ -71,5 +85,14 @@ public final class WrapJavaTest {
         }
         //luaState.dumpLuaStack();
         luaState.restoreLightly(k);
+    }
+
+    private static class SimpleFunc extends LuaFunction{
+        @Override
+        protected int execute(LuaState state) {
+            String inStr = state.toString(-1);
+            state.pushString("SimpleFunc__from__" + inStr);
+            return 1;
+        }
     }
 }

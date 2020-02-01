@@ -195,11 +195,13 @@ static int hasMethod(lua_State *L) {
 }
 static int recycle(lua_State *L) {
     delete (getLBC(L));
+    //ext_println("java object is recycled by lua gc.");
     return LUA_OK;
 }
 }
 
-void lua_wrapObject(lua_State *L, LuaBridgeCaller *caller, const char *classname, const char* globalKey) {
+void lua_wrapObject(lua_State *L, LuaBridgeCaller *caller, const char *classname, const char *globalKey,
+                    int toStack) {
     if(classname != nullptr){
         caller->setClassname(classname);
     } else{
@@ -249,7 +251,9 @@ void lua_wrapObject(lua_State *L, LuaBridgeCaller *caller, const char *classname
 
     //set global if need
     if(globalKey != nullptr){
-        lua_pushvalue(L, -1);
+        if(toStack){
+            lua_pushvalue(L, -1);
+        }
         lua_setglobal(L, globalKey);
     }
 }

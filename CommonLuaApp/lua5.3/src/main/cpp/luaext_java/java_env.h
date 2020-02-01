@@ -34,4 +34,6 @@ void detachJNIEnv();
 
 void dumpReferenceTables(JNIEnv *env);
 
+const char * stringReplace(const char* str, const char* src, const char* dst);
+
 #endif //COMMONLUAAPP_JAVA_ENV_H

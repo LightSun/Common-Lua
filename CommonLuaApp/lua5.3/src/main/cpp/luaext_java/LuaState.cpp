@@ -6,6 +6,7 @@
 #include "java_env.h"
 #include "LuaState.h"
 #include "LuaJavaCaller.h"
+#include "LuaFunc.h"
 
 extern "C" {
 #include "../luaextra/lua_extra.h"
@@ -56,18 +57,19 @@ void lua_pushinteger_(JNIEnv *env, jclass clazz, jlong ptr, jlong val) {
     lua_pushinteger(L, val);
 }
 void pushJavaObject(JNIEnv *env, jclass clazz, jlong ptr, jobject obj, jstring classname,
-                    jstring globalKey) {
+                    jstring globalKey, jboolean toStack) {
     lua_State *L = reinterpret_cast<lua_State *>(ptr);
 
     auto lbc = newJavaLBC(obj, classname);
     if (globalKey == nullptr) {
-        lua_wrapObject(L, lbc, nullptr, nullptr);
+        lua_wrapObject(L, lbc, nullptr, nullptr, 0);
     } else {
         const char *key = env->GetStringUTFChars(globalKey, nullptr);
-        lua_wrapObject(L, lbc, nullptr, key);
+        lua_wrapObject(L, lbc, nullptr, key, toStack ? 1 : 0);
         env->ReleaseStringUTFChars(globalKey, key);
     }
 }
+
 // ----------------- global ------------
 jboolean removeGlobal(JNIEnv *env, jclass clazz, jlong ptr, jstring jkey) {
     lua_State *L = reinterpret_cast<lua_State *>(ptr);
@@ -400,7 +402,8 @@ static JNINativeMethod lua_state_methods[] = {
         {"_pushNumber",     "(JD)V",                                      (void *) lua_pushNumber_},
         {"_pushnil",        "(J)V",                                       (void *) lua_pushnil_},
         {"_pushBoolean",    "(JZ)V",                                      (void *) lua_pushBoolean_},
-        {"_pushJavaObject", "(J" SIG_OBJECT SIG_JSTRING SIG_JSTRING ")V", (void *) pushJavaObject},
+        {"_pushJavaObject", "(J" SIG_OBJECT SIG_JSTRING SIG_JSTRING "Z)V", (void *) pushJavaObject},
+        {"_pushFunction", "(J" SIG_OBJECT SIG_JSTRING SIG_JSTRING "Z)V", (void *) pushFunc},
 
         {"_toString",       "(JI)" SIG_JSTRING,                           (void *) lua_tostring_},
         {"_pcall",          "(JIII)I",                                    (void *) lua_pcall_},

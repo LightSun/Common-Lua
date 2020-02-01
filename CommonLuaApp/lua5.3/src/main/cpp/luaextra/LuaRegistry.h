@@ -52,9 +52,10 @@ void initLuaBridge(lua_State* L);
  * @param caller the bridge caller.
  * @param classname  the class name.
  * @param globalKey  the key of lua global table. may be null
+ * @param toStack  1 means also push to stack. false means only push to global. Note this only used for global key is valid.
  */
 // wrap base, base-array, object, object array
-void lua_wrapObject(lua_State* L, LuaBridgeCaller* caller, const char* classname, const char* globalKey);
+void lua_wrapObject(lua_State *L, LuaBridgeCaller *caller, const char *classname, const char *globalKey, int toStack);
 
 template <class T>
 class LuaRegistry{

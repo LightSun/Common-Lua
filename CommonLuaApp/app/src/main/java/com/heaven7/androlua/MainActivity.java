@@ -97,7 +97,8 @@ public class MainActivity extends Activity {
     }
     public void onClickTestWrapJavaObject(View view){
        // WrapJavaTest.testWrapJavaObject(mLuaer.getLuaState());
-        WrapJavaTest.testWrapJavaObjectGlobal(mLuaer.getLuaState());
+       // WrapJavaTest.testWrapJavaObjectGlobal(mLuaer.getLuaState());
+        WrapJavaTest.testPushFunc(mLuaer.getLuaState());
     }
 
     private void initLua() {

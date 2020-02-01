@@ -19,17 +19,20 @@ extern "C" {
 #define OBJECT_NAME "Ljava/lang/Object;"
 #define CALLER_CLASS "com/heaven7/java/lua/LuaJavaCaller"
 #define LUA2JAVA_CLASS "com/heaven7/java/lua/Lua2JavaValue"
+#define FUNC_CLASS "com/heaven7/java/lua/LuaFunction"
 #define MNAME_CREATE "create"
 #define MNAME_INVOKE "invoke"
 
 #define SIG_CREATE "(J" STRING_NAME STRING_NAME "[" OBJECT_NAME "[" OBJECT_NAME ")" OBJECT_NAME
 #define SIG_INVOKE "(J" OBJECT_NAME STRING_NAME STRING_NAME "[" OBJECT_NAME "[" OBJECT_NAME ")I"
+#define SIG_FUNC_EXECUTE "(J)I"
 
 #define SIG_NEW_LUA2JAVA "(IJ)" "L" LUA2JAVA_CLASS ";"
 
 static jclass __callerClass;
 static jclass __objectClass;
 static jclass __lua2JavaClass;
+static jclass __luaFuncClass;
 
 jstring getStringValue(JNIEnv *env, jclass clazz, long ptr);
 LuaBridgeCaller* LBCCreator_0(lua_State* L,const char* classname, LuaMediator* holder);
@@ -60,6 +63,11 @@ void releaseJavaObject0(void *obj) {
     JNIEnv *const env = getJNIEnv();
     env->DeleteLocalRef(jobj);
 }
+int executeLuaFunction(JNIEnv* env,jobject obj, lua_State* L){
+    auto mid = env->GetMethodID(__luaFuncClass, "execute", SIG_FUNC_EXECUTE);
+    auto result = env->CallIntMethod(obj, mid, (jlong)L);
+    return result;
+}
 
 const char *getString(LuaParam *lp) {
     int type = lp->type;
@@ -89,6 +97,7 @@ void initLuaJavaCaller() {
     __callerClass = getGlobalClass(env, CALLER_CLASS);
     __objectClass = getGlobalClass(env, "java/lang/Object");
     __lua2JavaClass = getGlobalClass(env, LUA2JAVA_CLASS);
+    __luaFuncClass = getGlobalClass(env, FUNC_CLASS);
     //set callback
     setLua2JavaValue_Creator(&newLua2JavaValue0);
     setJava_Object_Releaser(&releaseJavaObject0);
@@ -100,9 +109,11 @@ void deInitLuaJavaCaller() {
     env->DeleteGlobalRef(__callerClass);
     env->DeleteGlobalRef(__objectClass);
     env->DeleteGlobalRef(__lua2JavaClass);
+    env->DeleteGlobalRef(__luaFuncClass);
     __callerClass = nullptr;
     __objectClass = nullptr;
     __lua2JavaClass = nullptr;
+    __luaFuncClass = nullptr;
 }
 
 class LuaJavaCaller: public LuaBridgeCaller {
@@ -111,7 +122,7 @@ private:
     jstring rawStr;
 
     //must use global ref when used as member
-    void setJavaObject(JNIEnv * env,jobject obj){
+    inline void setJavaObject(JNIEnv * env,jobject obj){
         this->jobj = env->NewGlobalRef(obj);
     }
 public:
@@ -120,7 +131,7 @@ public:
         env->DeleteGlobalRef(jobj);
         if(rawStr != nullptr){
             env->ReleaseStringUTFChars(rawStr, getClassname());
-            env->DeleteLocalRef(rawStr);
+            env->DeleteGlobalRef(rawStr);
         }
         jobj = nullptr;
         rawStr = nullptr;
@@ -128,7 +139,7 @@ public:
     LuaJavaCaller(jobject jobj, jstring cn){
         JNIEnv *const env = getJNIEnv();
         auto classname = env->GetStringUTFChars(cn , nullptr);
-        rawStr = cn;
+        rawStr = static_cast<jstring>(env->NewGlobalRef(cn));
         setClassname(classname);
 
         setJavaObject(env, jobj);

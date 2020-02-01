@@ -102,3 +102,19 @@ void dumpReferenceTables(JNIEnv *env) {
     env->CallStaticVoidMethod(vm_class, dump_mid);
     env->DeleteLocalRef(vm_class);
 }
+
+const char * stringReplace(const char* str, const char* src1, const char* dst1){
+    std::string strBig(str);
+    const std::string src(src1);
+    const std::string dst(dst1);
+
+    std::string::size_type pos = 0;
+    std::string::size_type srclen = src.size();
+    std::string::size_type dstlen = dst.size();
+    while( (pos=strBig.find(src, pos)) != std::string::npos ){
+        strBig.replace(pos, srclen, dst);
+        pos += dstlen;
+    }
+
+    return strBig.data();
+}

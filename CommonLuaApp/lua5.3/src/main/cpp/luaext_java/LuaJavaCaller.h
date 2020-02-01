@@ -15,4 +15,5 @@ LuaBridgeCaller* newJavaLBC(jobject jobj, jstring classname);
 int getType_Lua2Java(jobject obj);
 jlong getValuePtr_Lua2Java(jobject obj);
 
+
 #endif //COMMONLUAAPP_LUAJAVACALLER_H

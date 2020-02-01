@@ -5,32 +5,23 @@ import android.support.annotation.Keep;
 /**
  * Created by heaven7 on 2019/7/4.
  */
+@Keep
 public abstract class LuaFunction {
 
-    private final LuaState state;
-    private final String name;
-
-    public LuaFunction(LuaState state, String name) {
-        this.state = state;
-        this.name = name;
-    }
-
-    public LuaState getLuaState() {
-        return state;
-    }
-    public String getFunctionName(){
-        return name;
-    }
-
-    public void register(){
-        //TODO
-    }
     /**
      * called by lua
      * @return The number of values pushed onto the stack.
      */
     @Keep
-    public abstract int execute();
+    public int execute(long luaStatePtr){
+        LuaState state = new LuaState(luaStatePtr);
+        return execute(state);
+    }
 
-    //int name(luastate*)
+    /**
+     * execute this function
+     * @param state the lua state
+     * @return the result count
+     */
+    protected abstract int execute(LuaState state);
 }

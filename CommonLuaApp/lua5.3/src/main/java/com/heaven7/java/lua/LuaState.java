@@ -81,14 +81,44 @@ public final class LuaState extends INativeObject.BaseNativeObject {
         _pushBoolean(getNativePointer(), val);
     }
 
-    public void push(Object result) {
-        _pushJavaObject(getNativePointer(), result, result.getClass().getName(), null);
+    public void push(Object obj) {
+        if(obj == null){
+            throw new NullPointerException();
+        }
+        if(obj instanceof LuaFunction){
+            _pushFunction(getNativePointer(), obj, LuaFunction.class.getName(), null, false);
+        }else {
+            _pushJavaObject(getNativePointer(), obj, obj.getClass().getName(), null, false);
+        }
     }
-    public void pushGlobal(Object result, String name) {
+
+    public void pushGlobal(Object obj, String name){
+        pushGlobal(obj, name, true);
+    }
+    /**
+     * push a object to global.
+     * @param obj the object
+     * @param name the global name
+     * @param pushToStack true as also push it to current lua stack.
+     */
+    public void pushGlobal(Object obj, String name, boolean pushToStack){
+        if(obj == null){
+            throw new NullPointerException();
+        }
         if(name == null){
             throw new NullPointerException("push to global need set a name for it.");
         }
-        _pushJavaObject(getNativePointer(), result, result.getClass().getName(), name);
+        if(obj instanceof LuaFunction){
+            _pushFunction(getNativePointer(), obj, LuaFunction.class.getName(), name, pushToStack);
+        }else {
+            _pushJavaObject(getNativePointer(), obj, obj.getClass().getName(), name, pushToStack);
+        }
+    }
+    public void pushFunction(LuaFunction func){
+        push(func);
+    }
+    public void pushFunctionGlobal(LuaFunction func, String name, boolean pushToStack){
+        pushGlobal(func, name, pushToStack);
     }
 
     public void pushValue(int idx) {
@@ -157,7 +187,9 @@ public final class LuaState extends INativeObject.BaseNativeObject {
     private static synchronized native void _pushValue(long ptr, int idx);
     private static synchronized native void _pushnil(long ptr);
     private static synchronized native void _pushBoolean(long ptr, boolean val);
-    private static synchronized native void _pushJavaObject(long ptr, Object obj, String classname, String globalKey); //globalKey can be null
+    //globalKey can be null, pushToStack only used for global
+    private static synchronized native void _pushJavaObject(long ptr, Object obj, String classname, String globalKey, boolean pushToStack);
+    private static synchronized native void _pushFunction(long ptr, Object func, String classname, String globalKey, boolean pushToStack);
 
     private static synchronized native int _pcall(long ptr, int nArgs, int nResults, int errFunc);
     private static synchronized native void _call(long ptr, int nArgs, int nResults);
