@@ -22,7 +22,7 @@ typedef void (*Lua_print)(char* cs, int len, int flag);
 
 typedef char* (*CreateTempFile)(const char * filename);
 
-typedef int (*TravelTable)(lua_State* L, int keyIdx, int valueIdx);
+typedef int (*LuaStdFunc)(lua_State* L);
 
 // map function to lua. any like: int (*lua_CFunction) (lua_State *L);
 LUALIB_API void lua_BindFunctions(lua_State *L, luaL_Reg funcs[], int flag);
@@ -86,6 +86,6 @@ const char* getFieldAsString(lua_State* L, int idx, const char* name);
  * @param idx the table idx
  * @param tt the traveller to travel table. return true means need break travel.
  */
-void travelTable(lua_State* L, int idx, TravelTable tt);
+void travelTable(lua_State* L, int idx, LuaStdFunc tt);
 
 #endif //COMMONLUAAPP_LUA_EXTRA_H

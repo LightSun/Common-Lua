@@ -80,6 +80,7 @@ const LuaPort<FooWrapper>::RegType FooWrapper::Register[] = {
 void call_testLua(lua_State* L, char* luacontent){
     LuaPort<FooWrapper>::Register(L); // ok
 
+    lua_pushinteger(L, 5);
     int code = luaL_dostring(L, luacontent);
     const char* msg = lua_tostring(L, -1);
     ext_getLuaPrint()(const_cast<char *>(msg), 50, 1);

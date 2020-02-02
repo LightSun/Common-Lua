@@ -3,7 +3,9 @@ package com.heaven7.java.lua;
 //lua table, lua_wrap_java, userdata.
 public final class TableObject {
 
-    private static final String M_TRAVEL = "__travel";
+    private static final String M_TRAVEL          = "__travel";
+    private static final String M_GET_COLL_TYPE   = "__getCollectionType";
+
     /** the table index. often is negative. -1 means top */
     private final int index;
 
@@ -18,6 +20,16 @@ public final class TableObject {
     }
     //return true if can travel
     public boolean travel(LuaState luaState, LuaTraveller lt){
+        //get collection type
+        int collType = LuaTraveller.COLLECTION_TYPE_LIST;
+        luaState.pushString(M_GET_COLL_TYPE);
+        luaState.getTable(index);
+        if(luaState.getType(-1) == LuaState.TYPE_NUMMBER){
+            collType = luaState.toInt(-1);
+        }
+        luaState.pop(1);
+        lt.setCollectionType(collType);
+
         //get travel method
         luaState.pushString(M_TRAVEL);
         luaState.getTable(index);

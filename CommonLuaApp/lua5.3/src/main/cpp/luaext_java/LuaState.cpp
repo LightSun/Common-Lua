@@ -8,6 +8,8 @@
 #include "LuaJavaCaller.h"
 #include "LuaFunc.h"
 
+#include "../luaextra/lua_lambda.h"
+
 extern "C" {
 #include "../luaextra/lua_extra.h"
 }
@@ -15,9 +17,6 @@ extern "C" {
 #define CN_LUA_STATE  "com/heaven7/java/lua/LuaState"
 /* Constant that is used to index the JNI Environment */
 #define LUAJAVAJNIENVTAG      "__JNIEnv"
-/* Defines wheter the metatable is of a java Object */
-#define LUAJAVAOBJECTIND      "__IsJavaObject"
-
 
 extern "C" {
 jlong nCreate_(JNIEnv *env, jclass clazz) {
@@ -104,16 +103,25 @@ int isNativeWrapper_(JNIEnv *env, jclass clazz, jlong ptr, int idx) {
     }
     return 0;
 }
-void travel_(JNIEnv *env, jclass clazz, jlong ptr, int idx, jobject traveller) {
+void travel_(JNIEnv *env, jclass clazz, jlong ptr, jint idx, jobject traveller) {
     lua_State *L = reinterpret_cast<lua_State *>(ptr);
-    auto obj = env->NewGlobalRef(traveller);
-    TravelTable tt = [](lua_State *L, int keyIdx, int valueIdx) {
-        auto key = getLuaValue(L, keyIdx);
-        auto value = getLuaValue(L, valueIdx);
-        return travelImpl(L, obj, key, value);
+    // 1, can't direct access jobject in func callback. or else may cause bug
+    //    like 'JNI DETECTED ERROR IN APPLICATION: use of invalid jobject 0x7ff01a0e18'
+    //2. here can't use global ref even if delete after call 'travelTable'. or else may cause bug
+    //  'access deleted global reference.'
+    auto obj = env->NewWeakGlobalRef(traveller);
+    auto tt = [=](lua_State *L) {
+        auto key = getLuaValue(L, -2);
+        auto value = getLuaValue(L, -1);
+        // can't direct access jobject in func callback. or else may cause bug
+        // like 'JNI DETECTED ERROR IN APPLICATION: use of invalid jobject 0x7ff01a0e18'
+        // return  travelImpl(L, traveller, key, value);
+        auto pobj = env->NewLocalRef(obj);
+        auto result = travelImpl(L, pobj, key, value);
+        env->DeleteLocalRef(pobj);
+        return result;
     };
-    travelTable(L, idx, tt);
-    env->DeleteGlobalRef(obj);
+    travelTable(L, idx, luaTransform(tt));
 }
 
 //------------------ stack ---------------------
@@ -219,6 +227,10 @@ jstring luaL_typename_(JNIEnv *env, jclass clazz, jlong ptr, int i) {
     lua_State *L = reinterpret_cast<lua_State *>(ptr);
     const char *tn = luaL_typename(L, i);
     return (env)->NewStringUTF(tn);
+}
+jint toInt_(JNIEnv *env, jclass clazz, jlong ptr, int idx) {
+    lua_State *L = reinterpret_cast<lua_State *>(ptr);
+    return static_cast<jint>(lua_tonumber(L, idx));
 }
 
 //--------------------- table op -------------------------
@@ -344,9 +356,11 @@ jint luaL_dostring_(JNIEnv *env, jclass clazz, jlong ptr, jstring str) {
     (env)->ReleaseStringUTFChars(str, utfStr);
     return result;
 }
-jint lua_error_(JNIEnv *env, jclass clazz, jlong ptr) {
+void luaL_error_(JNIEnv *env, jclass clazz, jlong ptr, jstring msg) {
     lua_State *L = reinterpret_cast<lua_State *>(ptr);
-    return lua_error(L);
+    auto str = env->GetStringUTFChars(msg, nullptr);
+    luaL_error(L, str);
+    env->ReleaseStringUTFChars(msg, str);
 }
 void luaL_checkany_(JNIEnv *env, jclass clazz, jlong ptr, jint n) {
     lua_State *L = reinterpret_cast<lua_State *>(ptr);
@@ -433,6 +447,7 @@ static JNINativeMethod lua_state_methods[] = {
         {"_pushFunction",    "(J" SIG_OBJECT SIG_JSTRING SIG_JSTRING "Z)V", (void *) pushFunc},
 
         {"_toString",        "(JI)" SIG_JSTRING,                            (void *) lua_tostring_},
+        {"_toInt",           "(JI)I",                                       (void *) toInt_},
         {"_pcall",           "(JIII)I",                                     (void *) lua_pcall_},
         {"_call",            "(JII)V",                                      (void *) lua_call_},
         {"_getTop",          "(J)I",                                        (void *) lua_gettop_},
@@ -445,6 +460,7 @@ static JNINativeMethod lua_state_methods[] = {
         {"_pop",             "(JI)V",                                       (void *) lua_pop_},
         {"_isNativeWrapper", "(JI)I",                                       (void *) isNativeWrapper_},
         {"_travel",          "(JI" SIG_OBJECT ")V",                         (void *) travel_},
+        {"_error",           "(J" SIG_JSTRING ")V",                         (void *) luaL_error_},
 };
 
 Registration getLuaStateRegistration() {

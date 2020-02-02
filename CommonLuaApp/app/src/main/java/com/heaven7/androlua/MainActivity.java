@@ -6,6 +6,8 @@ import android.os.Bundle;
 import android.os.Environment;
 import android.view.View;
 
+import com.heaven7.androlua.test.LuaTravellerTest;
+import com.heaven7.androlua.test.WrapJavaTest;
 import com.heaven7.core.util.Logger;
 import com.heaven7.core.util.PermissionHelper;
 import com.heaven7.java.lua.LuaTest;
@@ -99,6 +101,10 @@ public class MainActivity extends Activity {
        // WrapJavaTest.testWrapJavaObject(mLuaer.getLuaState());
        // WrapJavaTest.testWrapJavaObjectGlobal(mLuaer.getLuaState());
         WrapJavaTest.testPushFunc(mLuaer.getLuaState());
+    }
+
+    public void onClickTestLuaTravel(View view){
+        LuaTravellerTest.testBase(mLuaer.getLuaState());
     }
 
     private void initLua() {

@@ -83,7 +83,13 @@
             android:onClick="onClickTestWrapJavaObject"
             android:text="test wrap-java-object"
             />
-
+        <Button
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="15dp"
+            android:onClick="onClickTestLuaTravel"
+            android:text="test lua travel"
+            />
     </LinearLayout>
 
 </ScrollView>

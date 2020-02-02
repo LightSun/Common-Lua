@@ -1,4 +1,4 @@
-package com.heaven7.androlua;
+package com.heaven7.androlua.test;
 
 import com.heaven7.androlua.bean.Person;
 import com.heaven7.java.lua.LuaFunction;

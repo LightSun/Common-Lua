@@ -130,11 +130,12 @@ public final class LuaState extends INativeObject.BaseNativeObject {
     public void pushValue(int idx) {
         _pushValue(getNativePointer(), idx);
     }
-
     public String toString(int idx) {
         return _toString(getNativePointer(), idx);
     }
-
+    public int toInt(int idx) {
+        return _toInt(getNativePointer(), idx);
+    }
     public int pcall(int nArgs, int nResults, int errFunc) {
         return _pcall(getNativePointer(), nArgs, nResults, errFunc);
     }
@@ -168,6 +169,14 @@ public final class LuaState extends INativeObject.BaseNativeObject {
     public int getType(int idx) {
         return _getType(getNativePointer(), idx);
     }
+
+    /**
+     * report a error msg to lua
+     * @param msg the error msg
+     */
+    public void error(String msg){
+        _error(getNativePointer(), msg);
+    }
     public Lua2JavaValue getLuaValue(int idx){
         return (Lua2JavaValue) _getLuaValue(getNativePointer(), idx);
     }
@@ -180,7 +189,6 @@ public final class LuaState extends INativeObject.BaseNativeObject {
     public boolean hasGlobal(String key){
         return _hasGlobal(getNativePointer(), key);
     }
-    //TODO wait test
     public void travel(int tab_idx, LuaTraveller lt){
         _travel(getNativePointer(), tab_idx, lt);
     }
@@ -189,6 +197,7 @@ public final class LuaState extends INativeObject.BaseNativeObject {
         return _isNativeWrapper(getNativePointer(), idx) > 0;
     }
     //=============================== native methods ========================================
+    private static synchronized native void  _error(long ptr, String msg);
     private static synchronized native void _travel(long ptr, int idx, Object traveller);
     private static synchronized native int _isNativeWrapper(long ptr, int idx);
 
@@ -202,6 +211,7 @@ public final class LuaState extends INativeObject.BaseNativeObject {
     private static synchronized native boolean _hasGlobal(long ptr, String var);
 
     private static synchronized native String _toString(long ptr, int idx);
+    private static synchronized native int _toInt(long ptr, int idx);
 
     private static synchronized native String _pushString(long ptr, String var);
     private static synchronized native void _pushNumber(long ptr, double n);

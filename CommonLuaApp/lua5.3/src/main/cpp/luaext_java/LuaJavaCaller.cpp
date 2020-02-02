@@ -77,8 +77,10 @@ int executeLuaFunction(jobject obj, lua_State* L){
 int travelImpl(lua_State* L, jobject t, void* key, void* value){
     auto env = getJNIEnv();
     auto mid = env->GetMethodID(__luaTravelClass, "travel", SIG_TRAVEL);
-    return env->CallIntMethod(t, mid, reinterpret_cast<jlong>(L),
-            static_cast<jobject>(key), static_cast<jobject>(value));
+    auto k = static_cast<jobject>(key);
+    auto v = static_cast<jobject>(value);
+    auto result = env->CallIntMethod(t, mid, reinterpret_cast<jlong>(L), k, v);
+    return result;
 }
 
 const char *getString(LuaParam *lp) {
