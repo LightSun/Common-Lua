@@ -25,6 +25,7 @@ public class ArrayTypeConvertor extends NonSimpleTypeConvertor{
             LuaUtils.checkTopDelta(luaState, top + 1);
             luaState.rawSeti(-2, i + 1); //lua array from 1
         }
+        luaState.setCollectionTypeAsMeta(-1, LuaState.COLLECTION_TYPE_LIST);
         return 1;
     }
 

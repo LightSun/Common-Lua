@@ -20,14 +20,11 @@ public final class TableObject {
     }
     //return true if can travel
     public boolean travel(LuaState luaState, LuaTraveller lt){
-        //get collection type
-        int collType = LuaTraveller.COLLECTION_TYPE_LIST;
-        luaState.pushString(M_GET_COLL_TYPE);
-        luaState.getTable(index);
-        if(luaState.getType(-1) == LuaState.TYPE_NUMMBER){
-            collType = luaState.toInt(-1);
+        //get collection type as field
+        int collType = luaState.getCollectionType(index);
+        if(collType == LuaState.COLLECTION_TYPE_UNKNOWN){
+            collType = LuaState.COLLECTION_TYPE_LIST;
         }
-        luaState.pop(1);
         lt.setCollectionType(collType);
 
         //get travel method
@@ -35,6 +32,7 @@ public final class TableObject {
         luaState.getTable(index);
 
         if(luaState.getType(-1) != LuaState.TYPE_FUNCTION){
+            //no travel method
             luaState.pop(1);
             if(luaState.isNativeWrapper(index)){
                 return false;
@@ -43,7 +41,6 @@ public final class TableObject {
             if(type != LuaState.TYPE_TABLE){
                 return false;
             }
-            //no travel method
             luaState.travel(index, lt);
         }else {
             luaState.pushFunction(new LuaTravelFunction(lt));

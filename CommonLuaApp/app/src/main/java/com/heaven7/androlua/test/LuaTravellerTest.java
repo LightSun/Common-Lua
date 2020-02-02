@@ -12,12 +12,15 @@ public final class LuaTravellerTest {
 
     public static void testBase(LuaState luaState){
         int k = luaState.saveLightly();
-        int[] arr = {1,2,3};
+        int[] arr = {11,22,33};
         TypeConvertor tc = TypeConvertorFactory.getTypeConvertor(arr.getClass());
         int i = tc.java2lua(luaState, arr);
         if(i != 1){
             throw new IllegalStateException();
         }
+        int collectionType = luaState.getCollectionType(-1);
+       // luaState.dumpLuaStack();
+        System.out.println("collectionType = " + collectionType);
         //luaState.dumpLuaStack();
         class Traveller extends LuaTraveller {
             private final LuaState ls;
@@ -35,6 +38,7 @@ public final class LuaTravellerTest {
             }
         }
         luaState.travel(-1, new Traveller(luaState));
+        //luaState.dumpLuaStack();
         luaState.restoreLightly(k);
     }
 

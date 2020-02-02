@@ -95,6 +95,7 @@ public final class LuaJavaCaller {
      * @param method    the method name
      * @param args      the args
      * @param errorMsg  the out error msg
+     * @return the push count to lua stack
      */
     @Keep
     public static int invoke(long luaStatePtr, Object owner, String className, String method, Object[] args, Object[] errorMsg) {

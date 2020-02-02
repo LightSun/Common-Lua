@@ -5,10 +5,6 @@ import android.support.annotation.Keep;
 @Keep
 public abstract class LuaTraveller {
 
-    public static final int COLLECTION_TYPE_LIST = 1;
-    public static final int COLLECTION_TYPE_SET  = 2;
-    public static final int COLLECTION_TYPE_MAP  = 3;
-
     private int collectionType;
 
     public int getCollectionType() {

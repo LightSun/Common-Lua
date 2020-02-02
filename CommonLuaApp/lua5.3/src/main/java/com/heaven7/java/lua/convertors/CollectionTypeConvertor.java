@@ -31,6 +31,7 @@ public class CollectionTypeConvertor extends NonSimpleTypeConvertor {
                 LuaUtils.checkTopDelta(luaState, top + 1);
                 luaState.rawSeti(-2, i + 1); //lua array from 1
             }
+            luaState.setCollectionTypeAsMeta(-1, LuaState.COLLECTION_TYPE_LIST);
         }else if(coll instanceof Set){
             for (Iterator<?> it = coll.iterator(); it.hasNext() ; ){
                 Object ele = it.next();
@@ -40,6 +41,7 @@ public class CollectionTypeConvertor extends NonSimpleTypeConvertor {
                 luaState.pushBoolean(true);
                 luaState.rawSet(-3);
             }
+            luaState.setCollectionTypeAsMeta(-1, LuaState.COLLECTION_TYPE_SET);
         } else {
             int i = 0;
             for (Iterator<?> it = coll.iterator(); it.hasNext() ; i++ ){
@@ -49,6 +51,7 @@ public class CollectionTypeConvertor extends NonSimpleTypeConvertor {
                 LuaUtils.checkTopDelta(luaState, top + 1);
                 luaState.rawSeti(-2, i + 1); //lua array from 1
             }
+            luaState.setCollectionTypeAsMeta(-1, LuaState.COLLECTION_TYPE_LIST);
         }
         return 1;
     }

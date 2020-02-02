@@ -10,9 +10,12 @@
 #include "../lua/lua.hpp"
 #include "../luaextra/lua_bridge.h"
 
+extern int executeLuaFunction(jobject obj, lua_State* L);
+
 void pushFunc(JNIEnv *env, jclass clazz, jlong ptr, jobject func, jstring classname,
               jstring globalKey, jboolean toStack);
 
-extern int executeLuaFunction(jobject obj, lua_State* L);
+void setCollectionTypeAsMeta_(JNIEnv *env, jclass clazz, jlong ptr, jint idx, jint type);
+jint getCollectionType_(JNIEnv *env, jclass clazz, jlong ptr, jint idx);
 
 #endif //COMMONLUAAPP_LUAFUNC_H

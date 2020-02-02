@@ -8,6 +8,12 @@
 #include "lua.hpp"
 
 #define LIB_LUA_WRAPPER "__lib_common_lua_wrap_"
+#define NAME_COLLECTION_TYPE  "__GetCollectionType"
+
+#define COLLECTION_TYPE_LIST 1;
+#define COLLECTION_TYPE_SET 2;
+#define COLLECTION_TYPE_MAP 3;
+#define COLLECTION_TYPE_UNKNOWN -1;
 
 #define DTYPE_NULL 1
 #define DTYPE_NUMBER 2

@@ -387,6 +387,8 @@ void dumpLuaStack_(JNIEnv *env, jclass clazz, jlong ptr) {
     lua_State *L = reinterpret_cast<lua_State *>(ptr);
     luaB_dumpStack(L);
 }
+//------------------------- extra ------------------------
+
 //------------------------- env --------------------------
 
 void pushJNIEnv(JNIEnv *env, lua_State *L) {
@@ -428,39 +430,41 @@ JNIEnv *getEnvFromState(lua_State *L) {
 };
 
 static JNINativeMethod lua_state_methods[] = {
-        {"_nCreate",         "()J",                                         (void *) nCreate_},
-        {"_nRelease",        "(J)V",                                        (void *) nRelease_},
-        {"_evaluateScript",  "(J" SIG_JSTRING ")I",                         (void *) luaL_dostring_},
-        {"_getGlobal",       "(J" SIG_JSTRING ")I",                         (void *) lua_getglobal_},
-        {"_getTable",        "(JI)I",                                       (void *) lua_gettable_},
-        {"_getType",         "(JI)I",                                       (void *) lua_type_},
-        {"_getLuaValue",     "(JI)" SIG_OBJECT,                             (void *) getLuaValue_},
-        {"_removeGlobal",    "(J" SIG_JSTRING ")Z",                         (void *) removeGlobal},
-        {"_hasGlobal",       "(J" SIG_JSTRING ")Z",                         (void *) hasGlobal},
+        {"_nCreate",                 "()J",                                         (void *) nCreate_},
+        {"_nRelease",                "(J)V",                                        (void *) nRelease_},
+        {"_evaluateScript",          "(J" SIG_JSTRING ")I",                         (void *) luaL_dostring_},
+        {"_getGlobal",               "(J" SIG_JSTRING ")I",                         (void *) lua_getglobal_},
+        {"_getTable",                "(JI)I",                                       (void *) lua_gettable_},
+        {"_getType",                 "(JI)I",                                       (void *) lua_type_},
+        {"_getLuaValue",             "(JI)" SIG_OBJECT,                             (void *) getLuaValue_},
+        {"_removeGlobal",            "(J" SIG_JSTRING ")Z",                         (void *) removeGlobal},
+        {"_hasGlobal",               "(J" SIG_JSTRING ")Z",                         (void *) hasGlobal},
 
-        {"_pushValue",       "(JI)V",                                       (void *) lua_pushvalue_},
-        {"_pushString",      "(J" SIG_JSTRING ")" SIG_JSTRING,              (void *) lua_pushString_},
-        {"_pushNumber",      "(JD)V",                                       (void *) lua_pushNumber_},
-        {"_pushnil",         "(J)V",                                        (void *) lua_pushnil_},
-        {"_pushBoolean",     "(JZ)V",                                       (void *) lua_pushBoolean_},
-        {"_pushJavaObject",  "(J" SIG_OBJECT SIG_JSTRING SIG_JSTRING "Z)V", (void *) pushJavaObject},
-        {"_pushFunction",    "(J" SIG_OBJECT SIG_JSTRING SIG_JSTRING "Z)V", (void *) pushFunc},
+        {"_pushValue",               "(JI)V",                                       (void *) lua_pushvalue_},
+        {"_pushString",              "(J" SIG_JSTRING ")" SIG_JSTRING,              (void *) lua_pushString_},
+        {"_pushNumber",              "(JD)V",                                       (void *) lua_pushNumber_},
+        {"_pushnil",                 "(J)V",                                        (void *) lua_pushnil_},
+        {"_pushBoolean",             "(JZ)V",                                       (void *) lua_pushBoolean_},
+        {"_pushJavaObject",          "(J" SIG_OBJECT SIG_JSTRING SIG_JSTRING "Z)V", (void *) pushJavaObject},
+        {"_pushFunction",            "(J" SIG_OBJECT SIG_JSTRING SIG_JSTRING "Z)V", (void *) pushFunc},
 
-        {"_toString",        "(JI)" SIG_JSTRING,                            (void *) lua_tostring_},
-        {"_toInt",           "(JI)I",                                       (void *) toInt_},
-        {"_pcall",           "(JIII)I",                                     (void *) lua_pcall_},
-        {"_call",            "(JII)V",                                      (void *) lua_call_},
-        {"_getTop",          "(J)I",                                        (void *) lua_gettop_},
+        {"_toString",                "(JI)" SIG_JSTRING,                            (void *) lua_tostring_},
+        {"_toInt",                   "(JI)I",                                       (void *) toInt_},
+        {"_pcall",                   "(JIII)I",                                     (void *) lua_pcall_},
+        {"_call",                    "(JII)V",                                      (void *) lua_call_},
+        {"_getTop",                  "(J)I",                                        (void *) lua_gettop_},
 
-        {"_newTable",        "(J)V",                                        (void *) lua_newtable_},
-        {"_rawseti",         "(JIJ)V",                                      (void *) lua_rawseti_},
-        {"_rawset",          "(JI)V",                                       (void *) lua_rawset_},
+        {"_newTable",                "(J)V",                                        (void *) lua_newtable_},
+        {"_rawseti",                 "(JIJ)V",                                      (void *) lua_rawseti_},
+        {"_rawset",                  "(JI)V",                                       (void *) lua_rawset_},
 
-        {"_dumpLuaStack",    "(J)V",                                        (void *) dumpLuaStack_},
-        {"_pop",             "(JI)V",                                       (void *) lua_pop_},
-        {"_isNativeWrapper", "(JI)I",                                       (void *) isNativeWrapper_},
-        {"_travel",          "(JI" SIG_OBJECT ")V",                         (void *) travel_},
-        {"_error",           "(J" SIG_JSTRING ")V",                         (void *) luaL_error_},
+        {"_dumpLuaStack",            "(J)V",                                        (void *) dumpLuaStack_},
+        {"_pop",                     "(JI)V",                                       (void *) lua_pop_},
+        {"_isNativeWrapper",         "(JI)I",                                       (void *) isNativeWrapper_},
+        {"_travel",                  "(JI" SIG_OBJECT ")V",                         (void *) travel_},
+        {"_error",                   "(J" SIG_JSTRING ")V",                         (void *) luaL_error_},
+        {"_setCollectionTypeAsMeta", "(JII)V",                                      (void *) setCollectionTypeAsMeta_},
+        {"_getCollectionType",       "(JI)I",                                       (void *) getCollectionType_},
 };
 
 Registration getLuaStateRegistration() {

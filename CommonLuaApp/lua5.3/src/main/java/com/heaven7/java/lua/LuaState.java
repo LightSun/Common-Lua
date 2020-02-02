@@ -18,6 +18,11 @@ public final class LuaState extends INativeObject.BaseNativeObject {
     public static final int TYPE_FUNCTION = 6;
     public static final int TYPE_USERDATA = 7;
     public static final int TYPE_THREAD = 8;
+    //collection type
+    public static final int COLLECTION_TYPE_LIST = 1;
+    public static final int COLLECTION_TYPE_SET  = 2;
+    public static final int COLLECTION_TYPE_MAP  = 3;
+    public static final int COLLECTION_TYPE_UNKNOWN  = -1;
 
     static {
         System.loadLibrary("lua");
@@ -196,7 +201,15 @@ public final class LuaState extends INativeObject.BaseNativeObject {
     public boolean isNativeWrapper(int idx){
         return _isNativeWrapper(getNativePointer(), idx) > 0;
     }
+    public void setCollectionTypeAsMeta(int idx, int type) {
+        _setCollectionTypeAsMeta(getNativePointer(), idx, type);
+    }
+    public int getCollectionType(int idx){
+       return _getCollectionType(getNativePointer(), idx);
+    }
     //=============================== native methods ========================================
+    private static synchronized native void  _setCollectionTypeAsMeta(long ptr, int idx, int collType);
+    private static synchronized native int  _getCollectionType(long ptr, int idx);
     private static synchronized native void  _error(long ptr, String msg);
     private static synchronized native void _travel(long ptr, int idx, Object traveller);
     private static synchronized native int _isNativeWrapper(long ptr, int idx);

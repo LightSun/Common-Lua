@@ -28,6 +28,7 @@ public class MapTypeConvertor extends NonSimpleTypeConvertor {
             LuaUtils.checkTopDelta(luaState, top + 2);
             luaState.rawSet(-3);
         }
+        luaState.setCollectionTypeAsMeta(-1, LuaState.COLLECTION_TYPE_MAP);
         return 1;
     }
 }

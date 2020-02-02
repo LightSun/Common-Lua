@@ -44,26 +44,26 @@ void pushFunc(JNIEnv *env, jclass clazz, jlong ptr, jobject func, jstring classn
     lua_pushvalue(L, -2-2);
     lua_pushstring(L, cn);
     lua_pushcclosure(L, &func_gc, 2);
-    lua_settable(L, -3);
+    lua_rawset(L, -3);
 
     lua_setmetatable(L, -2);
     //t[0] = ud
     lua_pushnumber(L, 0);
     lua_insert(L, -2);
-    lua_settable(L, -3);
+    lua_rawset(L, -3);
     //call
     lua_pushstring(L, "call");
     lua_pushvalue(L, -2); //push table to up index
     lua_pushstring(L, cn);
     lua_pushcclosure(L, &func_call, 2);
-    lua_settable(L, -3);
+    lua_rawset(L, -3);
 
     lua_pushstring(L, LIB_LUA_WRAPPER);
     lua_pushboolean(L, 1);
-    lua_settable(L, -3);
+    lua_rawset(L, -3);
     //func
     lua_pushstring(L, "call");
-    lua_gettable(L, -2); //{tab, func}
+    lua_rawget(L, -2); //{tab, func}
 
     lua_insert(L, -2);   //{func, tab}
     lua_pop(L, 1);       //{func}
@@ -78,4 +78,37 @@ void pushFunc(JNIEnv *env, jclass clazz, jlong ptr, jobject func, jstring classn
     }
     env->ReleaseStringUTFChars(classname, cn);
     //luaB_dumpStack(L);
+}
+
+void setCollectionTypeAsMeta_(JNIEnv *env, jclass clazz, jlong ptr, jint idx, jint type){
+    lua_State *L = reinterpret_cast<lua_State *>(ptr);
+    luaL_checkany(L, idx);
+
+    luaL_newmetatable(L, NAME_COLLECTION_TYPE);//idx -1
+
+    lua_pushstring(L, "__index");
+    lua_pushvalue(L, -2);
+    lua_rawset(L, -3);
+
+    lua_pushstring(L, NAME_COLLECTION_TYPE);
+    lua_pushnumber(L, type);
+    lua_rawset(L, -3); //{tab, tab, meta}
+
+    lua_setmetatable(L, idx - 1); //{ ...t[idx]... }
+   // luaB_dumpStack(L);
+}
+jint getCollectionType_(JNIEnv *env, jclass clazz, jlong ptr, jint idx){
+    lua_State *L = reinterpret_cast<lua_State *>(ptr);
+
+    lua_pushstring(L, NAME_COLLECTION_TYPE);
+    lua_gettable(L, idx - 1); //{$val}
+
+    //luaB_dumpStack(L);
+    if(lua_isnil(L, -1) || lua_type(L, -1) != LUA_TNUMBER){
+        lua_pop(L, 1);
+        return COLLECTION_TYPE_UNKNOWN;
+    }
+    auto result = lua_tonumber(L, -1);
+    lua_pop(L, 1);
+    return static_cast<jint>(result);
 }
