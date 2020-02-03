@@ -101,7 +101,7 @@ int callImpl(lua_State *L, LuaBridgeCaller *caller, const char *cn) {
     auto result = caller->call(L, cn, mname, holder);
 
     delete holder;
-    return result > 0 ? LUA_YIELD : LUA_OK;
+    return result;
 }
 
 //------------------------
@@ -145,7 +145,7 @@ static int hasField(lua_State *L) {
     const char *name = luaL_checkstring(L, -1);
     bool result = (ud)->hasField((ud)->getClassname(), name);
     lua_pushboolean(L, result ? 1 : 0);
-    return LUA_YIELD;
+    return 1;
 }
 static int hasMethod(lua_State *L) {
     LuaBridgeCaller *ud = getLBC(L);
@@ -153,12 +153,12 @@ static int hasMethod(lua_State *L) {
     const char *name = luaL_checkstring(L, -1);
     bool result = (ud)->hasMethod((ud)->getClassname(), name);
     lua_pushboolean(L, result ? 1 : 0);
-    return LUA_YIELD;
+    return 1;
 }
 static int recycle(lua_State *L) {
     delete (getLBC(L));
     //ext_println("java object is recycled by lua gc.");
-    return LUA_OK;
+    return 0;
 }
 }
 

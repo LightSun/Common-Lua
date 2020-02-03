@@ -172,7 +172,6 @@ public:
     }
     int count;
     LuaParam* lp;
-    int resultType;
     const char* className;
 };
 

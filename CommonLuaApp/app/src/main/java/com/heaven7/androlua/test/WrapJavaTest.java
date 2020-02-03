@@ -10,8 +10,11 @@ public final class WrapJavaTest {
     private static final String TAG = "WrapJavaTest";
 
     public static void testPushFunc(LuaState luaState){
+        //luaState.dumpLuaStack();
         int k = luaState.saveLightly();
         luaState.pushFunction(new SimpleFunc());
+        boolean wrapper = luaState.isNativeWrapper(-1);
+        System.out.println("testPushFunc >> isNativeWrapper = " + wrapper);
         luaState.pushString("testPushFunc");
         int result = luaState.pcall(1, 1, 0);
         if(result == 0){
@@ -19,7 +22,7 @@ public final class WrapJavaTest {
         }else {
             System.out.println("testPushFunc >>>  exception = " + luaState.toString(-1));
         }
-        //luaState.dumpLuaStack();
+       // luaState.dumpLuaStack();
         luaState.restoreLightly(k);
     }
 

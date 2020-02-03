@@ -92,16 +92,17 @@ jboolean hasGlobal(JNIEnv *env, jclass clazz, jlong ptr, jstring jkey) {
     env->ReleaseStringUTFChars(jkey, key);
     return static_cast<jboolean>(result);
 }
-int isNativeWrapper_(JNIEnv *env, jclass clazz, jlong ptr, int idx) {
+jint isNativeWrapper_(JNIEnv *env, jclass clazz, jlong ptr, int idx) {
     lua_State *L = reinterpret_cast<lua_State *>(ptr);
     lua_pushstring(L, LIB_LUA_WRAPPER);
     lua_gettable(L, idx); // {value}
+    luaB_dumpStack(L);
+    jint result = 0;
     if (lua_type(L, -1) == LUA_TBOOLEAN) {
-        auto result = lua_toboolean(L, -1);
-        lua_pop(L, 1);
-        return result;
+        result = lua_toboolean(L, -1);
     }
-    return 0;
+    lua_pop(L, 1);
+    return result;
 }
 void travel_(JNIEnv *env, jclass clazz, jlong ptr, jint idx, jobject traveller) {
     lua_State *L = reinterpret_cast<lua_State *>(ptr);
@@ -212,7 +213,8 @@ jdouble lua_tonumber_(JNIEnv *env, jclass clazz, jlong ptr, int i) {
 
 jobject getLuaValue_(JNIEnv *env, jclass clazz, jlong ptr, jint n) {
     lua_State *L = reinterpret_cast<lua_State *>(ptr);
-    return static_cast<jobject>(getLuaValue(L, n));
+    auto val = getLuaValue(L, n);
+    return val != nullptr ? static_cast<jobject>(val) : nullptr;
 }
 jint lua_type_(JNIEnv *env, jclass clazz, jlong ptr, int i) {
     lua_State *L = reinterpret_cast<lua_State *>(ptr);

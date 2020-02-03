@@ -1,25 +1,33 @@
 package com.heaven7.java.lua;
 
+import java.lang.ref.WeakReference;
+
 //lua table, lua_wrap_java, userdata.
 public final class TableObject {
 
     private static final String M_TRAVEL          = "__travel";
-    private static final String M_GET_COLL_TYPE   = "__getCollectionType";
 
     /** the table index. often is negative. -1 means top */
     private final int index;
+    private WeakReference<LuaState> mWeakState;
 
-    public static TableObject from(int stackIndex){
-        return new TableObject(stackIndex);
+    public static TableObject from(LuaState state, int stackIndex){
+        return new TableObject(state, stackIndex);
     }
-    private TableObject(int index) {
+    private TableObject(LuaState state, int index) {
+        this.mWeakState = new WeakReference<>(state);
         this.index = index;
     }
     public long getIndex() {
         return index;
     }
     //return true if can travel
-    public boolean travel(LuaState luaState, LuaTraveller lt){
+    public boolean travel(LuaTraveller lt){
+        final LuaState luaState = getLuaState();
+        if(luaState == null){
+            throw new IllegalStateException("you can't save this object all the time.");
+        }
+        final int idx = LuaUtils.adjustIdx(luaState, index);
         //get collection type as field
         int collType = luaState.getCollectionType(index);
         if(collType == LuaState.COLLECTION_TYPE_UNKNOWN){
@@ -29,19 +37,19 @@ public final class TableObject {
 
         //get travel method
         luaState.pushString(M_TRAVEL);
-        luaState.getTable(index);
+        luaState.getTable(idx);
 
         if(luaState.getType(-1) != LuaState.TYPE_FUNCTION){
             //no travel method
             luaState.pop(1);
-            if(luaState.isNativeWrapper(index)){
+            if(luaState.isNativeWrapper(idx)){
                 return false;
             }
-            int type = luaState.getType(index);
+            int type = luaState.getType(idx);
             if(type != LuaState.TYPE_TABLE){
                 return false;
             }
-            luaState.travel(index, lt);
+            luaState.travel(idx, lt);
         }else {
             luaState.pushFunction(new LuaTravelFunction(lt));
             //start travel
@@ -50,12 +58,12 @@ public final class TableObject {
                 System.out.println("travel ok");
             }else {
                 System.out.println("travel failed. " + luaState.toString(-1));
-                luaState.pop(1);
             }
         }
         return true;
     }
-    public Object call(LuaState luaState, String name, Object...params){
+    public Object call(String name, Object...params){
+        final LuaState luaState = getLuaState();
         //TODO
         int top = luaState.getTop();
         //result=xx.$name(params)
@@ -70,13 +78,19 @@ public final class TableObject {
         //4, restore lua stack
         return null;
     }
-    public Object getField(LuaState luaState, String name){
-        int top = luaState.getTop();
+    public Object getField(String name){
 
         return null;
     }
-    public void setField(LuaState luaState, String name, Object val){
-        int top = luaState.getTop();
+    public void setField(String name, Object val){
+    }
+
+    private LuaState getLuaState(){
+        final LuaState luaState = mWeakState.get();
+        if(luaState == null){
+            throw new IllegalStateException("you can't save this object all the time.");
+        }
+        return luaState;
     }
 
     private static class LuaTravelFunction extends LuaFunction{

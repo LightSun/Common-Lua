@@ -49,9 +49,15 @@ public final class Lua2JavaValue {
     public final long getValuePtr(){
         return ptr;
     }
-    public TableObject toTableValue(){
+    public LuaFunctionProxy toFunction(LuaState state){
+        if(getType() != TYPE_FUNCTION){
+            throw new IllegalStateException("toFunction(). can only called by function type.");
+        }
+        return new LuaFunctionProxy(state, (int) ptr);
+    }
+    public TableObject toTableValue(LuaState state){
         if(getType() == TYPE_TABLE_LIKE){
-            return TableObject.from((int) ptr);
+            return TableObject.from(state, (int) ptr);
         }
         throw new IllegalStateException("type" + (getType()) + " can't cast to table.");
     }
@@ -72,7 +78,7 @@ public final class Lua2JavaValue {
     }
     public double toDoubleValue(){
         if(getType() != TYPE_NUMBER){
-            throw new IllegalStateException("");
+            throw new IllegalStateException("type must be number");
         }
         return getNumber_(ptr);
     }
@@ -99,7 +105,9 @@ public final class Lua2JavaValue {
             case TYPE_TABLE_LIKE:
                 prefix = "table-like";
                 break;
-
+            case TYPE_FUNCTION:
+                prefix = "function";
+                break;
             default:
                 throw new UnsupportedOperationException("unsupport type = " + getType());
         }
@@ -138,6 +146,10 @@ public final class Lua2JavaValue {
                 prefix = "table-like";
                 break;
 
+            case TYPE_FUNCTION:
+                prefix = "function";
+                break;
+
             default:
                 throw new UnsupportedOperationException("unsupport type = " + getType());
         }
@@ -167,6 +179,9 @@ public final class Lua2JavaValue {
             case TYPE_TABLE_LIKE:
                 throw new IllegalStateException("table value can't cast to boolean.");
 
+            case TYPE_FUNCTION:
+                throw new IllegalStateException("function value can't cast to boolean.");
+
             default:
                 throw new UnsupportedOperationException("unsupport type = " + getType());
         }
@@ -177,4 +192,15 @@ public final class Lua2JavaValue {
     private static native double getNumber_(long ptr);
     private static native void releaseNumber_(long ptr);
     private static native void releaseBoolean_(long ptr);
+
+   /* private static class LuaFunctionWrapper extends LuaFunction{
+        private final int funcIndex;
+        LuaFunctionWrapper(int funcIndex) {
+            this.funcIndex = funcIndex;
+        }/
+        @Override
+        protected int execute(LuaState state, int parameterCount, int resultCount) {
+            return state.executeFunction(funcIndex);
+        }
+    }*/
 }

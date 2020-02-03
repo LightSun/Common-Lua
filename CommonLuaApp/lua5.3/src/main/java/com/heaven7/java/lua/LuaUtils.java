@@ -11,4 +11,8 @@ public final class LuaUtils {
             throw new IllegalStateException("wrong top = " + cTop + ",expect top = " + (expect));
         }
     }
+
+    public static int adjustIdx(LuaState ls, int idx){
+        return idx < 0 ? ls.getTop() + idx + 1 : idx;
+    }
 }

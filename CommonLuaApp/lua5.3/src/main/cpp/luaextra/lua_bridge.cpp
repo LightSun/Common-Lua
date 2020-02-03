@@ -47,7 +47,7 @@ void* getLuaValue(lua_State *L, int id_value) {
             return newLua2JavaValue(DTYPE_FUNC, id_value);;
         }
         case LUA_TUSERDATA: {
-            luaL_error(L, "Currently, lua param not support for 'userdata'.");
+           // luaL_error(L, "Currently, lua param not support for 'userdata'.");
             return newLua2JavaValue(DTYPE_TABLE, id_value);;
         }
         case LUA_TTABLE: {

@@ -20,12 +20,12 @@ static int func_gc(lua_State* L){
     auto jobj = getud(L);
     pEnv->DeleteGlobalRef(jobj);
     delete(jobj);
-    ext_println("func_gc is called.");
+    //ext_println("func_gc is called.");
     return 0;
 }
 static int func_call(lua_State* L){
     auto jobj = getud(L);
-    return executeLuaFunction(jobj, L) > 0 ? LUA_YIELD : LUA_OK;
+    return executeLuaFunction(jobj, L);
 }
 }
 
@@ -94,14 +94,14 @@ void setCollectionTypeAsMeta_(JNIEnv *env, jclass clazz, jlong ptr, jint idx, ji
     lua_pushnumber(L, type);
     lua_rawset(L, -3); //{tab, tab, meta}
 
-    lua_setmetatable(L, idx - 1); //{ ...t[idx]... }
+    lua_setmetatable(L,  idx < 0 ? idx - 1 : idx); //{ ...t[idx]... }
    // luaB_dumpStack(L);
 }
 jint getCollectionType_(JNIEnv *env, jclass clazz, jlong ptr, jint idx){
     lua_State *L = reinterpret_cast<lua_State *>(ptr);
 
     lua_pushstring(L, NAME_COLLECTION_TYPE);
-    lua_gettable(L, idx - 1); //{$val}
+    lua_gettable(L, idx < 0 ? idx - 1 : idx); //{$val}
 
     //luaB_dumpStack(L);
     if(lua_isnil(L, -1) || lua_type(L, -1) != LUA_TNUMBER){

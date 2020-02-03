@@ -134,8 +134,8 @@ const char* getFieldAsString(lua_State* L, int idx, const char* name){
 
 void travelTable(lua_State* L, int idx, LuaStdFunc tt){
     if(lua_istable(L, idx) || lua_isuserdata(L, idx)){
-        lua_pushnil(L);            /* first key */
-        const int tIdx = idx - 1; //idx changed now by first key
+        lua_pushnil(L);                            /* first key */
+        const int tIdx = idx < 0 ? idx - 1 : idx;  //idx changed now by first key
        // luaB_dumpStack(L);
         while (lua_next(L, tIdx) != 0) {
             //-2 is key, -1(top) is value
