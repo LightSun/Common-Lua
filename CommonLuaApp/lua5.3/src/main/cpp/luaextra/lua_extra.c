@@ -151,3 +151,6 @@ void travelTable(lua_State* L, int idx, LuaStdFunc tt){
         luaL_error(L, "can't travel table for idx = %d", idx);
     }
 }
+int ext_adjustIdx(lua_State* L, int idx){
+    return idx < 0 ? lua_gettop(L) + 1 + idx : idx;
+}

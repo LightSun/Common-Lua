@@ -7,7 +7,7 @@
 
 #include "lua.hpp"
 
-#define LIB_LUA_WRAPPER "__lib_common_lua_wrap_"
+#define LIB_LUA_WRAPPER "__LIB_common_lua_WRAP__"
 #define NAME_COLLECTION_TYPE  "__GetCollectionType"
 
 #define COLLECTION_TYPE_LIST 1;

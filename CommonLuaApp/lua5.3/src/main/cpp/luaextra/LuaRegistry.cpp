@@ -180,14 +180,14 @@ void lua_wrapObject(lua_State *L, LuaBridgeCaller *caller, const char *classname
     lua_pushvalue(L, -2-2);
     lua_pushstring(L, classname);
     lua_pushcclosure(L, &recycle, 2);
-    lua_settable(L, -3);
+    lua_rawset(L, -3);
     //luaL_setmetatable(L, classname);
     lua_setmetatable(L, -2);
     //luaB_dumpStack(L);
     //t[0]=ud
     lua_pushnumber(L, 0);
     lua_insert(L, -2);
-    lua_settable(L, -3);
+    lua_rawset(L, -3);
 
     //luaB_dumpStack(L);
 
@@ -195,23 +195,23 @@ void lua_wrapObject(lua_State *L, LuaBridgeCaller *caller, const char *classname
     lua_pushvalue(L, -2);
     lua_pushstring(L, classname);
     lua_pushcclosure(L, &hasField, 2);
-    lua_settable(L, -3);
+    lua_rawset(L, -3);
 
     lua_pushstring(L, "hasMethod");
     lua_pushvalue(L, -2);
     lua_pushstring(L, classname);
     lua_pushcclosure(L, &hasMethod, 2);
-    lua_settable(L, -3);
+    lua_rawset(L, -3);
 
     lua_pushstring(L, "call");
     lua_pushvalue(L, -2); //push table to up index
     lua_pushstring(L, classname);
     lua_pushcclosure(L, &call, 2);
-    lua_settable(L, -3);
+    lua_rawset(L, -3);
 
-    lua_pushliteral(L, LIB_LUA_WRAPPER);
+    lua_pushstring(L, LIB_LUA_WRAPPER);
     lua_pushboolean(L, 1);
-    lua_settable(L, -3);
+    lua_rawset(L, -3);
     //luaB_dumpStack(L);
 
     //set global if need

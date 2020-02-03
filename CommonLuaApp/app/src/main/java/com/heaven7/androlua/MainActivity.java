@@ -98,7 +98,7 @@ public class MainActivity extends Activity {
         LuaTest.bfDecodeFile(file);
     }
     public void onClickTestWrapJavaObject(View view){
-       // WrapJavaTest.testWrapJavaObject(mLuaer.getLuaState());
+        //WrapJavaTest.testWrapJavaObject(mLuaer.getLuaState());
        // WrapJavaTest.testWrapJavaObjectGlobal(mLuaer.getLuaState());
         WrapJavaTest.testPushFunc(mLuaer.getLuaState());
     }

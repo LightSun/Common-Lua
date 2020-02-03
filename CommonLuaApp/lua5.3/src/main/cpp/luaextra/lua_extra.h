@@ -88,4 +88,6 @@ const char* getFieldAsString(lua_State* L, int idx, const char* name);
  */
 void travelTable(lua_State* L, int idx, LuaStdFunc tt);
 
+int ext_adjustIdx(lua_State* L, int idx);
+
 #endif //COMMONLUAAPP_LUA_EXTRA_H

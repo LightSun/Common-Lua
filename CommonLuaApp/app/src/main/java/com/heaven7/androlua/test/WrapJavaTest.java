@@ -70,6 +70,9 @@ public final class WrapJavaTest {
         int k = luaState.saveLightly();
         //luaState.dumpLuaStack();
         luaState.push(p);
+        boolean wrapper = luaState.isNativeWrapper(-1);
+        System.out.println("testWrapJavaObject >> isNativeWrapper = " + wrapper);
+
         luaState.pushString("call");
         luaState.getTable(-2); //get method
         luaState.dumpLuaStack(); //tab, func

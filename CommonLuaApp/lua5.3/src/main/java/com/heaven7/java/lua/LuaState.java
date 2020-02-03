@@ -197,7 +197,6 @@ public final class LuaState extends INativeObject.BaseNativeObject {
     public void travel(int tab_idx, LuaTraveller lt){
         _travel(getNativePointer(), tab_idx, lt);
     }
-    //TODO wait test
     public boolean isNativeWrapper(int idx){
         return _isNativeWrapper(getNativePointer(), idx) > 0;
     }

@@ -94,10 +94,28 @@ jboolean hasGlobal(JNIEnv *env, jclass clazz, jlong ptr, jstring jkey) {
 }
 jint isNativeWrapper_(JNIEnv *env, jclass clazz, jlong ptr, int idx) {
     lua_State *L = reinterpret_cast<lua_State *>(ptr);
-    lua_pushstring(L, LIB_LUA_WRAPPER);
-    lua_gettable(L, idx); // {value}
-    luaB_dumpStack(L);
+    idx = ext_adjustIdx(L, idx);
     jint result = 0;
+
+    switch (lua_type(L, idx)){
+        case LUA_TFUNCTION:{
+            lua_pushvalue(L, idx);
+            lua_pushstring(L, LIB_LUA_WRAPPER);
+            if(lua_pcall(L, 1, 1, 0)){
+                return 0;
+            }
+        }
+            break;
+
+        case LUA_TUSERDATA:
+        case LUA_TTABLE:
+            lua_pushstring(L, LIB_LUA_WRAPPER);
+            lua_gettable(L, idx); // {value}
+            //luaB_dumpStack(L);
+            break;
+        default:
+            return 0;
+    }
     if (lua_type(L, -1) == LUA_TBOOLEAN) {
         result = lua_toboolean(L, -1);
     }
