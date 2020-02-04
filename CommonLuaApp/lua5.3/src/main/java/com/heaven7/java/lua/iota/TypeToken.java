@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.heaven7.java.lua.internal;
+package com.heaven7.java.lua.iota;
 
 import com.heaven7.java.base.util.$Types;
 import com.heaven7.java.base.util.Throwables;

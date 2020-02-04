@@ -66,14 +66,14 @@ public final class TableObject {
         luaState.restoreLightly(k);
         return true;
     }
-    public Lua2JavaValue call1(String name, Object... params){
+    public Lua2JavaValue call1(String name, LuaParameter... params){
         LuaResult result = call(name, 1, params);
         if(result != null){
             return result.getValue1();
         }
         return null;
     }
-    public LuaResult call(String name, int resultCount, Object... params){
+    public LuaResult call(String name, int resultCount, LuaParameter... params){
         if(resultCount > LuaResult.MAX_RESULT_COUNT){
             throw new UnsupportedOperationException("only support max lua result is 5.");
         }
@@ -91,8 +91,8 @@ public final class TableObject {
             //2, push params
             final int pCount = params != null ? params.length : 0;
             if(pCount > 0){
-                for (Object p : params){
-                    LuaUtils.java2lua(luaState, p);
+                for (LuaParameter p : params){
+                    p.java2lua(luaState);
                 }
             }
             //3, for lua_pcall need result count. we here just make a correct count. like 5.
@@ -117,10 +117,10 @@ public final class TableObject {
         luaState.pop(1);
         return result;
     }
-    public void setField(String name, Object val){
+    public void setField(String name, LuaParameter val){
         final LuaState luaState = getLuaState();
         final int idx = LuaUtils.adjustIdx(luaState, index);
-        LuaUtils.java2lua(luaState, val);
+        val.java2lua(luaState);
         luaState.pushString(name);
         luaState.setTable(idx);
     }

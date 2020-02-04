@@ -2,13 +2,14 @@ package com.heaven7.java.lua;
 
 import android.support.annotation.Keep;
 
-import com.heaven7.java.lua.convertors.TypeConvertorFactory;
-import com.heaven7.java.lua.internal.LuaUtils;
-
 import java.io.PrintWriter;
 import java.io.StringWriter;
+import java.lang.reflect.Method;
+import java.lang.reflect.Type;
 import java.util.HashMap;
 import java.util.List;
+
+import static com.heaven7.java.lua.LuaInitializer.getLuaTypeAdapterManager;
 
 /**
  * Created by heaven7 on 2019/7/29.
@@ -74,7 +75,7 @@ public final class LuaJavaCaller {
                 Object[] out = new Object[mi.getParameterCount()];
                 convert(luaState, mi.getTypes(), args, out);
                 try {
-                    return clazz.getConstructor(mi.getTypes()).newInstance(out);
+                    return clazz.getConstructor(mi.getRawTypes()).newInstance(out);
                 } catch (Exception e) {
                     if (i == 0) {
                         //last. still error.
@@ -122,8 +123,9 @@ public final class LuaJavaCaller {
                 Object[] out = new Object[mi.getParameterCount()];
                 convert(luaState, mi.getTypes(), args, out);
                 try {
-                    Object result = clazz.getMethod(mi.getName(), mi.getTypes()).invoke(owner, out);
-                    return convertResultToLua(luaState, result);
+                    Method m = clazz.getMethod(mi.getName(), mi.getRawTypes());
+                    Object result = m.invoke(owner, out);
+                    return convertResultToLua(luaState, m.getGenericReturnType(), result);
                 } catch (Exception e) {
                     if (i == 0) {
                         //last. still error.
@@ -137,12 +139,13 @@ public final class LuaJavaCaller {
         return 0;
     }
 
-    private static int convertResultToLua(LuaState luaState, Object result) {
+    private static int convertResultToLua(LuaState luaState, Type genericReturnType, Object result) {
         if (result == null) {
             luaState.pushNil();
             return 1;
         }
-        return LuaUtils.java2lua(luaState, result);
+        LuaTypeAdapter lta = LuaTypeAdapter.get(genericReturnType);
+        return lta.java2lua(luaState, result);
     }
 
     private static String toString(Throwable e) {
@@ -152,15 +155,15 @@ public final class LuaJavaCaller {
         return sw.toString();
     }
 
-    private static boolean convert(LuaState luaState, Class<?>[] types, Object[] args, Object[] out) {
+    private static boolean convert(LuaState luaState, Type[] types, Object[] args, Object[] out) {
         for (int size = args.length, i = 0; i < size; i++) {
-            Class<?> type = types[i];
-            LuaTypeAdapter converter = TypeConvertorFactory.getTypeConvertor(type);
-            if (converter != null) {
+            Type type = types[i];
+            LuaTypeAdapter adapter = LuaTypeAdapter.get(type, getLuaTypeAdapterManager());
+            if (adapter != null) {
                 if (args[i] instanceof Lua2JavaValue) {
-                    out[i] = converter.lua2java(luaState, (Lua2JavaValue) args[i]);
+                    out[i] = adapter.lua2java(luaState, (Lua2JavaValue) args[i]);
                 } else {
-                    out[i] = converter.convert(args[i].toString());
+                    out[i] = adapter.convert(args[i].toString());
                 }
             } else {
                 //change nothing
@@ -170,9 +173,9 @@ public final class LuaJavaCaller {
         //补全
         if (args.length < types.length) {
             for (int i = args.length, end = types.length; i < end; i++) {
-                LuaTypeAdapter converter = TypeConvertorFactory.getTypeConvertor(types[i]);
-                if (converter != null) {
-                    out[i] = converter.defaultValue();
+                LuaTypeAdapter adapter = LuaTypeAdapter.get(types[i], getLuaTypeAdapterManager());
+                if (adapter != null) {
+                    out[i] = adapter.defaultValue();
                 } else {
                     out[i] = null;
                 }

@@ -1,4 +1,4 @@
-package com.heaven7.java.lua.convertors;
+package com.heaven7.java.lua.adapter;
 
 
 import com.heaven7.java.lua.Lua2JavaValue;

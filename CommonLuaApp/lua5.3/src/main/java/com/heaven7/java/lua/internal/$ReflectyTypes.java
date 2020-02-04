@@ -16,7 +16,10 @@
  */
 package com.heaven7.java.lua.internal;
 
+import android.support.annotation.RestrictTo;
+
 import com.heaven7.java.base.util.Predicates;
+import com.heaven7.java.lua.iota.TypeNode;
 
 import java.lang.reflect.*;
 import java.util.*;
@@ -25,6 +28,7 @@ import java.util.*;
  * the reflecty types
  * @author heaven7
  */
+@RestrictTo(RestrictTo.Scope.LIBRARY)
 public final class $ReflectyTypes {
 
     private static WeakHashMap<Class<?>, List<TypeVariablePair>> sTypeVars = new WeakHashMap<>();

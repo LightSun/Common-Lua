@@ -14,7 +14,7 @@
   * See the License for the specific language governing permissions and
   * limitations under the License.
   */
- package com.heaven7.java.lua.internal;
+ package com.heaven7.java.lua.iota;
 
 
  import com.heaven7.java.lua.LuaTypeAdapter;
@@ -27,7 +27,7 @@
   *
   * @author heaven7
   */
- public interface LuaTypeAdapterManager{
+ public interface LuaTypeAdapterManager extends BasicTypeAdapterProvider{
 
      /**
       * get the type adapter context
@@ -78,7 +78,7 @@
      LuaTypeAdapter getKeyAdapter(Class<?> type);
      /**
       * get the value adapter for target map class type. this often used when you want to use a self-type map.
-      * can non-extend {@linkplain Map}. see {@linkplain LuaReflectyContext#isMap(Class)} and {@linkplain ReflectyContext#createMap(Class)}.
+      * can non-extend {@linkplain Map}. see {@linkplain LuaReflectyContext#isMap(Class)} and {@linkplain LuaReflectyContext#createMap(Class)}.
       * @param type the class . can be any class like {@linkplain Map}.
       * @return the value type adapter. or null if you haven't use self-type map.
       */
@@ -91,9 +91,7 @@
       * @return the element type adapter. or null if you haven't use self-type collection.
       */
      LuaTypeAdapter getSetElementAdapter(Class<?> type);
-
      LuaTypeAdapter getListElementAdapter(Class<?> type);
-
      LuaTypeAdapter getCollectionElementAdapter(Class<?> type);
      //========================================================================
 
@@ -101,11 +99,12 @@
       * create collection type adapter
       *
       * @param collectionClass  the expect collection class
-      * @param componentAdapter the component adapter
+      * @param component the component adapter
       * @return the type adapter
       */
-     LuaTypeAdapter createCollectionTypeAdapter(Class<?> collectionClass, LuaTypeAdapter componentAdapter);
-
+     LuaTypeAdapter createCollectionTypeAdapter(Class<?> collectionClass, LuaTypeAdapter component);
+     LuaTypeAdapter createSetTypeAdapter(Class<?> type, LuaTypeAdapter component);
+     LuaTypeAdapter createListTypeAdapter(Class<?> type, LuaTypeAdapter component);
      /**
       * create array type adapter
       *
@@ -133,8 +132,7 @@
       */
      LuaTypeAdapter createObjectTypeAdapter(Class<?> objectClazz);
 
-     LuaTypeAdapter createSetTypeAdapter(Class<?> type, LuaTypeAdapter component);
-     LuaTypeAdapter createListTypeAdapter(Class<?> type, LuaTypeAdapter component);
+
 
 
 

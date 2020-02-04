@@ -1,6 +1,5 @@
 package com.heaven7.java.lua;
 
-import com.heaven7.java.lua.convertors.TypeConvertorFactory;
 import com.heaven7.java.lua.internal.LuaUtils;
 
 /**
@@ -22,7 +21,7 @@ public final class LuaFunctionProxy {
      * @param cb the callback of receive result or error msg
      * @return the result count.
      */
-    public final int execute(Object[] args, int resultCount, LuaCallback cb){
+    public final int execute(LuaParameter[] args, int resultCount, LuaCallback cb){
         //adjust to positive
         int func_idx = LuaUtils.adjustIdx(mState, mFuncIdx);
         final int k = mState.saveLightly();
@@ -34,9 +33,8 @@ public final class LuaFunctionProxy {
         //push args
         int pCount = args != null ? args.length : 0;
         if(pCount > 0){
-            for (Object obj : args){
-                TypeConvertorFactory.getTypeConvertor(obj.getClass())
-                        .java2lua(mState, obj);
+            for (LuaParameter obj : args){
+                obj.java2lua(mState);
             }
         }
         int result = mState.pcall(pCount, resultCount, errFunc);

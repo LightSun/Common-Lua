@@ -57,7 +57,8 @@ public final class ClassInfo {
 
             MethodInfo info = new MethodInfo();
             info.setName("<init>");
-            info.setTypes(con.getParameterTypes());
+            info.setTypes(con.getGenericParameterTypes());
+            info.setRawTypes(con.getParameterTypes());
 
             getSigAndFill(sb, mConstructorMap, null, luaMethodName, info);
         }
@@ -69,7 +70,8 @@ public final class ClassInfo {
 
             MethodInfo info = new MethodInfo();
             info.setName(m.getName());
-            info.setTypes(m.getParameterTypes());
+            info.setTypes(m.getGenericParameterTypes());
+            info.setRawTypes(m.getParameterTypes());
             getSigAndFill(sb, mMethodMap, m.getReturnType(), luaMethodName, info);
         }
         //sort param count. desc
@@ -84,7 +86,7 @@ public final class ClassInfo {
     //for constructor. returnType = null
     private static void getSigAndFill(StringBuilder sb, Map<String, List<MethodInfo>> map, Class<?> returnType, String methodName, MethodInfo info) {
         sb.append("(");
-        for (Class<?> cla : info.getTypes()) {
+        for (Class<?> cla : info.getRawTypes()) {
             sb.append(typeToSig(cla));
         }
         sb.append(")");

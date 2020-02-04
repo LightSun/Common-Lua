@@ -1,4 +1,4 @@
-package com.heaven7.java.lua.convertors;
+package com.heaven7.java.lua.adapter;
 
 import com.heaven7.java.lua.Lua2JavaValue;
 import com.heaven7.java.lua.LuaState;
@@ -6,11 +6,23 @@ import com.heaven7.java.lua.LuaTypeAdapter;
 import com.heaven7.java.lua.internal.LuaUtils;
 
 import java.lang.reflect.Array;
+import java.util.ArrayList;
+import java.util.List;
 
 public class ArrayLuaTypeAdapter extends LuaTypeAdapter {
 
+    private final Class<?> mComponentClass;
+    private final LuaTypeAdapter mComponentAdapter;
+
+    public ArrayLuaTypeAdapter(Class<?> mComponentClass, LuaTypeAdapter mComponentAdapter) {
+        this.mComponentClass = mComponentClass;
+        this.mComponentAdapter = mComponentAdapter;
+    }
+
     public Object lua2java(LuaState luaState, Lua2JavaValue arg){
-        throw new UnsupportedOperationException("latter will support.");
+        List list = new ArrayList();
+        arg.toTableValue(luaState).travel(new CollectionTraveller(mComponentAdapter, list));
+        return list.toArray((Object[]) Array.newInstance(mComponentClass, list.size()));
     }
 
     public int java2lua(LuaState luaState, Object result){
@@ -20,8 +32,7 @@ public class ArrayLuaTypeAdapter extends LuaTypeAdapter {
         for (int i = 0 ; i < length ; i ++){
             Object ele = Array.get(result, i);
             //must only add one to lua stack
-            LuaTypeAdapter convertor = TypeConvertorFactory.getTypeConvertor(ele.getClass());
-            convertor.java2lua(luaState, ele);
+            mComponentAdapter.java2lua(luaState, ele);
             LuaUtils.checkTopDelta(luaState, top + 1);
             luaState.rawSeti(-2, i + 1); //lua array from 1
         }
