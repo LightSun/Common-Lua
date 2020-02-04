@@ -156,7 +156,9 @@ public final class LuaState extends INativeObject.BaseNativeObject {
     public int getTable(int index) {
         return _getTable(getNativePointer(), index);
     }
-
+    public void setTable(int index){
+        _setTable(getNativePointer(), index);
+    }
     public void newTable() {
         _newTable(getNativePointer());
     }
@@ -219,6 +221,7 @@ public final class LuaState extends INativeObject.BaseNativeObject {
     private static synchronized native int _getType(long ptr, int idx);
     private static synchronized native int _getGlobal(long ptr, String var);
     private static synchronized native int _getTable(long ptr, int idx);
+    private static synchronized native void  _setTable(long ptr, int idx);
     private static synchronized native boolean _removeGlobal(long ptr, String var);
     private static synchronized native boolean _hasGlobal(long ptr, String var);
 

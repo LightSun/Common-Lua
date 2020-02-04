@@ -36,6 +36,7 @@ public final class TableObject {
             collType = LuaState.COLLECTION_TYPE_LIST;
         }
         lt.setCollectionType(collType);
+        int k = luaState.saveLightly();
 
         //get travel method
         luaState.pushString(M_TRAVEL);
@@ -62,40 +63,59 @@ public final class TableObject {
                 System.err.println("travel failed. " + luaState.toString(-1));
             }
         }
+        luaState.restoreLightly(k);
         return true;
     }
-    public Object call(String name, Object... params){
+    public LuaResult call(String name, int resultCount, Object... params){
+        if(resultCount > LuaResult.MAX_RESULT_COUNT){
+            throw new UnsupportedOperationException("only support max lua result is 5.");
+        }
         final LuaState luaState = getLuaState();
         final int idx = LuaUtils.adjustIdx(luaState, index);
-        //TODO
-        int top = luaState.getTop();
+        final int k = luaState.saveLightly();
         //result=xx.$name(params)
         //1, get func
         luaState.pushString(name);
         luaState.getTable(idx);
-        //2, push params
-        int pCount = params != null ? params.length : 0;
-        if(pCount > 0){
-            for (Object p : params){
-                TypeConvertorFactory.getTypeConvertor(p.getClass()).java2lua(luaState, p);
+        try {
+            if(luaState.getType(-1) != LuaState.TYPE_FUNCTION){
+                throw new IllegalStateException("can't find method name = " + name);
             }
+            //2, push params
+            final int pCount = params != null ? params.length : 0;
+            if(pCount > 0){
+                for (Object p : params){
+                    LuaUtils.java2lua(luaState, p);
+                }
+            }
+            //3, for lua_pcall need result count. we here just make a correct count. like 5.
+            int result = luaState.pcall(pCount, resultCount, 0);
+            if(result != 0){
+                System.err.println("call method error. name = " + name + " ,error msg = " + luaState.toString(-1));
+            }else {
+                 return LuaResult.of(luaState, resultCount);
+            }
+        }finally {
+            //4, restore lua stack
+            luaState.restoreLightly(k);
         }
-        //3, for lua_pcall need result count. we here just make a correct count. like 3 or 5.
-        //TODO luaState.pcall(pCount, )
-
-        //4, restore lua stack
         return null;
     }
-    public Object getField(String name){
+    public Lua2JavaValue getField(String name){
         final LuaState luaState = getLuaState();
         final int idx = LuaUtils.adjustIdx(luaState, index);
         luaState.pushString(name);
         luaState.getTable(idx);
-        //TODO
-        return null;
+        Lua2JavaValue result = luaState.getLuaValue(-1);
+        luaState.pop(1);
+        return result;
     }
     public void setField(String name, Object val){
-        //TODO
+        final LuaState luaState = getLuaState();
+        final int idx = LuaUtils.adjustIdx(luaState, index);
+        LuaUtils.java2lua(luaState, val);
+        luaState.pushString(name);
+        luaState.setTable(idx);
     }
 
     private LuaState getLuaState(){

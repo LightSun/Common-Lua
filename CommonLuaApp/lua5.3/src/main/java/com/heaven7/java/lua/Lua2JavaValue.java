@@ -5,6 +5,8 @@ import android.support.annotation.Keep;
 //TODO toArray/toList/set/map
 public final class Lua2JavaValue {
 
+    public static final Lua2JavaValue NULL = new Lua2JavaValue(Lua2JavaValue.TYPE_NULL, 0);
+
     public static final int TYPE_NULL        = 1;
     public static final int TYPE_NUMBER      = 2;
     public static final int TYPE_STRING      = 3;
@@ -12,7 +14,7 @@ public final class Lua2JavaValue {
     public static final int TYPE_TABLE_LIKE  = 5;
     public static final int TYPE_FUNCTION    = 6;
 
-    private long ptr; //value ptr
+    private long ptr; //value ptr or stack index
     private int type;
 
     private Lua2JavaValue(int type, long ptrOrIndex){
@@ -22,12 +24,15 @@ public final class Lua2JavaValue {
 
     @Keep
     public static Lua2JavaValue of(int type, long ptrOrIndex){
+        if(type == TYPE_NULL){
+            return NULL;
+        }
         return new Lua2JavaValue(type, ptrOrIndex);
     }
 
     @Override
     protected void finalize() throws Throwable {
-        if(getType() != TYPE_TABLE_LIKE && ptr != 0){
+        if(ptr != 0){
             switch (type){
                 case TYPE_NUMBER:
                     releaseNumber_(ptr);

@@ -1,5 +1,6 @@
 package com.heaven7.java.lua.convertors;
 
+import com.heaven7.java.lua.LuaState;
 import com.heaven7.java.lua.TypeConvertor;
 
 import java.lang.reflect.Type;
@@ -85,9 +86,13 @@ public final class TypeConvertorFactory {
         // array, collection, map
         if(clazz.isArray()){
             return new ArrayTypeConvertor();
+        }else if(Set.class.isAssignableFrom(clazz)){
+            return new SetTypeConvertor();
         }else if(Collection.class.isAssignableFrom(clazz)){
-            return new CollectionTypeConvertor();
-        }else if(Map.class.isAssignableFrom(clazz)){
+            //as list
+            return new ListTypeConvertor();
+        }
+        else if(Map.class.isAssignableFrom(clazz)){
             return new MapTypeConvertor();
         }else {
             //3, check super class

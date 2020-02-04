@@ -455,6 +455,7 @@ static JNINativeMethod lua_state_methods[] = {
         {"_evaluateScript",          "(J" SIG_JSTRING ")I",                         (void *) luaL_dostring_},
         {"_getGlobal",               "(J" SIG_JSTRING ")I",                         (void *) lua_getglobal_},
         {"_getTable",                "(JI)I",                                       (void *) lua_gettable_},
+        {"_setTable",                "(JI)V",                                       (void *) lua_settable_},
         {"_getType",                 "(JI)I",                                       (void *) lua_type_},
         {"_getLuaValue",             "(JI)" SIG_OBJECT,                             (void *) getLuaValue_},
         {"_removeGlobal",            "(J" SIG_JSTRING ")Z",                         (void *) removeGlobal},
