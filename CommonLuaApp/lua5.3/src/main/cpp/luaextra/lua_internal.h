@@ -7,10 +7,18 @@
 
 #include "../lua/config.h"
 #include "../lua/lua.h"
+#include "string.h"
 #include "stdio.h"
 #include "blowfish.h"
 #define BF_HEADER "l:u:a:nat"
 #define BF_HEADER_SIZE 9
+
+#define pro_concatStr(s1, s2, x) \
+      const char* __str = concatStr(s1, s2); \
+      (x); \
+      free(__str)
+
+const char* concatStr(const char *s1, const char *s2);
 
 LUALIB_API char * getLuaFilename(const char* moduleName);
 LUALIB_API char * getCLibFilename(const char* moduleName);

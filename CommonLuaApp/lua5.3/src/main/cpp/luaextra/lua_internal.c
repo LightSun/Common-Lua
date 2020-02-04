@@ -11,6 +11,15 @@
 #define BF_KEY "heaven7"
 #define BF_KEY_LEN 7
 
+const char* concatStr(const char *s1, const char *s2){
+    char *result = malloc(strlen(s1)+strlen(s2)+1);//+1 for the zero-terminator
+    //in real code you would check for errors in malloc here
+    if (result == NULL) exit (1);
+    strcpy(result, s1);
+    strcat(result, s2);
+    return result;
+}
+
 LUALIB_API int luaB_dumpStack(lua_State* L){
     __printImpl("\nbegin dump lua stack: ", 0, 1);
     int i = 0;
@@ -22,7 +31,7 @@ LUALIB_API int luaB_dumpStack(lua_State* L){
         switch (t) {
             case LUA_TSTRING:
             {
-                __printImpl(lua_tostring(L, i), 0, 0);
+                pro_concatStr(lua_tostring(L, i), " ", __printImpl(__str, 0, 0));
             }
                 break;
             case LUA_TBOOLEAN:

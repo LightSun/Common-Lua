@@ -19,9 +19,7 @@ public final class LuaTravellerTest {
             throw new IllegalStateException();
         }
         int collectionType = luaState.getCollectionType(-1);
-       // luaState.dumpLuaStack();
         System.out.println("collectionType = " + collectionType);
-        //luaState.dumpLuaStack();
         class Traveller extends LuaTraveller {
             private final LuaState ls;
             public Traveller(LuaState ls) {

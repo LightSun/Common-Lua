@@ -10,7 +10,7 @@ public final class LuaFunctionProxy {
     private final LuaState mState;
     private final int mFuncIdx;
 
-    public LuaFunctionProxy(LuaState mState, int func_idx) {
+    /*public*/ LuaFunctionProxy(LuaState mState, int func_idx) {
         this.mState = mState;
         this.mFuncIdx = func_idx;
     }
@@ -27,7 +27,7 @@ public final class LuaFunctionProxy {
         final int k = mState.saveLightly();
         // push error
         mState.pushFunction(new ErrorFunction(cb));
-        int errFunc = mState.getTop();
+        final int errFunc = mState.getTop();
         //push func
         mState.pushValue(func_idx);
         //push args

@@ -1,5 +1,7 @@
 package com.heaven7.java.lua;
 
+import com.heaven7.java.lua.convertors.TypeConvertorFactory;
+
 import java.lang.ref.WeakReference;
 
 //lua table, lua_wrap_java, userdata.
@@ -11,7 +13,7 @@ public final class TableObject {
     private final int index;
     private WeakReference<LuaState> mWeakState;
 
-    public static TableObject from(LuaState state, int stackIndex){
+    /*public*/ static TableObject from(LuaState state, int stackIndex){
         return new TableObject(state, stackIndex);
     }
     private TableObject(LuaState state, int index) {
@@ -29,7 +31,7 @@ public final class TableObject {
         }
         final int idx = LuaUtils.adjustIdx(luaState, index);
         //get collection type as field
-        int collType = luaState.getCollectionType(index);
+        int collType = luaState.getCollectionType(idx);
         if(collType == LuaState.COLLECTION_TYPE_UNKNOWN){
             collType = LuaState.COLLECTION_TYPE_LIST;
         }
@@ -57,32 +59,43 @@ public final class TableObject {
             if(result == 0){
                 System.out.println("travel ok");
             }else {
-                System.out.println("travel failed. " + luaState.toString(-1));
+                System.err.println("travel failed. " + luaState.toString(-1));
             }
         }
         return true;
     }
-    public Object call(String name, Object...params){
+    public Object call(String name, Object... params){
         final LuaState luaState = getLuaState();
+        final int idx = LuaUtils.adjustIdx(luaState, index);
         //TODO
         int top = luaState.getTop();
         //result=xx.$name(params)
         //1, get func
-        //luaState.pushTable(index);
         luaState.pushString(name);
-        luaState.getTable(index);
+        luaState.getTable(idx);
         //2, push params
-
-        //3, lua_pcall
+        int pCount = params != null ? params.length : 0;
+        if(pCount > 0){
+            for (Object p : params){
+                TypeConvertorFactory.getTypeConvertor(p.getClass()).java2lua(luaState, p);
+            }
+        }
+        //3, for lua_pcall need result count. we here just make a correct count. like 3 or 5.
+        //TODO luaState.pcall(pCount, )
 
         //4, restore lua stack
         return null;
     }
     public Object getField(String name){
-
+        final LuaState luaState = getLuaState();
+        final int idx = LuaUtils.adjustIdx(luaState, index);
+        luaState.pushString(name);
+        luaState.getTable(idx);
+        //TODO
         return null;
     }
     public void setField(String name, Object val){
+        //TODO
     }
 
     private LuaState getLuaState(){
