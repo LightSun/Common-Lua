@@ -1,23 +1,26 @@
 package com.heaven7.java.lua;
 
-public interface TypeConvertor {
+public abstract class LuaTypeAdapter {
 
-    Object convert(String arg);
-
+    public Object convert(String arg){
+        return null;
+    }
+    public Object defaultValue(){
+        return null;
+    }
     /**
      * convert lua data to java
      * @param luaState the lua state
      * @param arg the argument
      * @return the java value which represent lua data
      */
-    Object lua2java(LuaState luaState, Lua2JavaValue arg);
+    public abstract Object lua2java(LuaState luaState, Lua2JavaValue arg);
 
-    Object defaultValue();
     /**
      * convert java object to lua
      * @param luaState the lua stack
      * @param result the java object
      * @return the push result count of lua stack
      */
-    int java2lua(LuaState luaState, Object result);
+    public abstract int java2lua(LuaState luaState, Object result);
 }

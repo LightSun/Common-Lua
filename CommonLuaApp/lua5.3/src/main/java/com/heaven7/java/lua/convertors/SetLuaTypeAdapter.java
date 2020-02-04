@@ -2,13 +2,13 @@ package com.heaven7.java.lua.convertors;
 
 import com.heaven7.java.lua.Lua2JavaValue;
 import com.heaven7.java.lua.LuaState;
-import com.heaven7.java.lua.LuaUtils;
-import com.heaven7.java.lua.TypeConvertor;
+import com.heaven7.java.lua.LuaTypeAdapter;
+import com.heaven7.java.lua.internal.LuaUtils;
 
 import java.util.Iterator;
 import java.util.Set;
 
-public class SetTypeConvertor extends NonSimpleTypeConvertor{
+public class SetLuaTypeAdapter extends LuaTypeAdapter {
 
     public Object lua2java(LuaState luaState, Lua2JavaValue arg){
         throw new UnsupportedOperationException("latter will support.");
@@ -20,7 +20,7 @@ public class SetTypeConvertor extends NonSimpleTypeConvertor{
         final Set<?> set = (Set) result;
         for (Iterator<?> it = set.iterator(); it.hasNext() ; ){
             Object ele = it.next();
-            TypeConvertor convertor = TypeConvertorFactory.getTypeConvertor(ele.getClass());
+            LuaTypeAdapter convertor = TypeConvertorFactory.getTypeConvertor(ele.getClass());
             convertor.java2lua(luaState, ele);
             LuaUtils.checkTopDelta(luaState, top + 1);
             luaState.pushBoolean(true);

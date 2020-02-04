@@ -1,29 +1,27 @@
 package com.heaven7.java.lua.convertors;
 
-
 import com.heaven7.java.lua.Lua2JavaValue;
 import com.heaven7.java.lua.LuaState;
-import com.heaven7.java.lua.TypeConvertor;
+import com.heaven7.java.lua.LuaTypeAdapter;
 
-public class BooleanConvertor implements TypeConvertor {
+public class CharLuaTypeAdapter extends LuaTypeAdapter {
 
     @Override
     public Object convert(String arg) {
-        return Float.valueOf(arg).byteValue() == 1;
+        return arg.charAt(0);
     }
-
     @Override
     public Object defaultValue() {
-        return false;
+        throw new RuntimeException("char type must be initialize.");
     }
-
     @Override
     public int java2lua(LuaState luaState, Object result) {
-        luaState.pushBoolean((Boolean)result);
+        char ch = (Character) result;
+        luaState.pushString(new String(new char[]{ ch }));
         return 1;
     }
     @Override
     public Object lua2java(LuaState luaState, Lua2JavaValue arg) {
-        return arg.toBooleanValue();
+        return arg.toCharValue();
     }
 }

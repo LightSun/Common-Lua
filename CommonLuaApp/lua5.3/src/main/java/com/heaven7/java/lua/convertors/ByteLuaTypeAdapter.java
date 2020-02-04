@@ -3,7 +3,7 @@ package com.heaven7.java.lua.convertors;
 import com.heaven7.java.lua.Lua2JavaValue;
 import com.heaven7.java.lua.LuaState;
 
-public class ByteConvertor extends IntConvertor {
+public class ByteLuaTypeAdapter extends IntLuaTypeAdapter {
 
     @Override
     public Object convert(String arg) {

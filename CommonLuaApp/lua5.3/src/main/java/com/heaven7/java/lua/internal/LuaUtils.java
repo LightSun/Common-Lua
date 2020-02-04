@@ -1,6 +1,8 @@
-package com.heaven7.java.lua;
+package com.heaven7.java.lua.internal;
 
 import android.support.annotation.RestrictTo;
+
+import com.heaven7.java.lua.LuaState;
 
 import static com.heaven7.java.lua.convertors.TypeConvertorFactory.getTypeConvertor;
 
@@ -26,4 +28,5 @@ public final class LuaUtils {
             return getTypeConvertor(val.getClass()).java2lua(luaState, val);
         }
     }
+
 }

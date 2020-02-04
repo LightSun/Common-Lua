@@ -3,6 +3,7 @@ package com.heaven7.java.lua;
 import android.support.annotation.Keep;
 
 import com.heaven7.java.lua.convertors.TypeConvertorFactory;
+import com.heaven7.java.lua.internal.LuaUtils;
 
 import java.io.PrintWriter;
 import java.io.StringWriter;
@@ -141,8 +142,7 @@ public final class LuaJavaCaller {
             luaState.pushNil();
             return 1;
         }
-        TypeConvertor converter = TypeConvertorFactory.getTypeConvertor(result.getClass());
-        return converter.java2lua(luaState, result);
+        return LuaUtils.java2lua(luaState, result);
     }
 
     private static String toString(Throwable e) {
@@ -155,7 +155,7 @@ public final class LuaJavaCaller {
     private static boolean convert(LuaState luaState, Class<?>[] types, Object[] args, Object[] out) {
         for (int size = args.length, i = 0; i < size; i++) {
             Class<?> type = types[i];
-            TypeConvertor converter = TypeConvertorFactory.getTypeConvertor(type);
+            LuaTypeAdapter converter = TypeConvertorFactory.getTypeConvertor(type);
             if (converter != null) {
                 if (args[i] instanceof Lua2JavaValue) {
                     out[i] = converter.lua2java(luaState, (Lua2JavaValue) args[i]);
@@ -170,7 +170,7 @@ public final class LuaJavaCaller {
         //补全
         if (args.length < types.length) {
             for (int i = args.length, end = types.length; i < end; i++) {
-                TypeConvertor converter = TypeConvertorFactory.getTypeConvertor(types[i]);
+                LuaTypeAdapter converter = TypeConvertorFactory.getTypeConvertor(types[i]);
                 if (converter != null) {
                     out[i] = converter.defaultValue();
                 } else {

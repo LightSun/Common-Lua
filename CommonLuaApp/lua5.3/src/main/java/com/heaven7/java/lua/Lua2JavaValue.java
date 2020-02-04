@@ -2,7 +2,6 @@ package com.heaven7.java.lua;
 
 import android.support.annotation.Keep;
 
-//TODO toArray/toList/set/map
 public final class Lua2JavaValue {
 
     public static final Lua2JavaValue NULL = new Lua2JavaValue(Lua2JavaValue.TYPE_NULL, 0);
@@ -82,10 +81,13 @@ public final class Lua2JavaValue {
         return Double.valueOf(toDoubleValue()).floatValue();
     }
     public double toDoubleValue(){
-        if(getType() != TYPE_NUMBER){
-            throw new IllegalStateException("type must be number");
+        switch (getType()){
+            case TYPE_STRING:
+                return Double.valueOf(getString_(ptr));
+            case TYPE_NUMBER:
+                return getNumber_(ptr);
         }
-        return getNumber_(ptr);
+        throw new IllegalStateException("type must be number");
     }
     public String toStringValue(){
         String prefix;

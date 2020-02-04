@@ -5,8 +5,6 @@ import android.support.annotation.Keep;
 import android.support.v4.util.ArraySet;
 import android.util.Log;
 
-import com.heaven7.core.util.MD5Util;
-
 import java.io.File;
 import java.util.Set;
 
@@ -47,8 +45,7 @@ public final class LuaWrapper {
         if(!file.exists()){
             file.mkdirs();
         }
-        String key = MD5Util.encode(fn + SALT);
-        File dst = new File(dir, "h7" + key);
+        File dst = new File(dir, SALT + "_" + System.currentTimeMillis());
         if(dst.exists()){
             dst.delete();
         }

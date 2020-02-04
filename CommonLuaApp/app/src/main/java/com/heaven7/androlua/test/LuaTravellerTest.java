@@ -3,7 +3,7 @@ package com.heaven7.androlua.test;
 import com.heaven7.java.lua.Lua2JavaValue;
 import com.heaven7.java.lua.LuaState;
 import com.heaven7.java.lua.LuaTraveller;
-import com.heaven7.java.lua.TypeConvertor;
+import com.heaven7.java.lua.LuaTypeAdapter;
 import com.heaven7.java.lua.convertors.TypeConvertorFactory;
 
 import java.util.Locale;
@@ -13,7 +13,7 @@ public final class LuaTravellerTest {
     public static void testBase(LuaState luaState){
         int k = luaState.saveLightly();
         int[] arr = {11,22,33};
-        TypeConvertor tc = TypeConvertorFactory.getTypeConvertor(arr.getClass());
+        LuaTypeAdapter tc = TypeConvertorFactory.getTypeConvertor(arr.getClass());
         int i = tc.java2lua(luaState, arr);
         if(i != 1){
             throw new IllegalStateException();

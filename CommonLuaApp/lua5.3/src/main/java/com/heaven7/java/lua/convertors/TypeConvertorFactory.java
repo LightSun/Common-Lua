@@ -1,59 +1,59 @@
 package com.heaven7.java.lua.convertors;
 
-import com.heaven7.java.lua.LuaState;
-import com.heaven7.java.lua.TypeConvertor;
+import com.heaven7.java.lua.LuaTypeAdapter;
 
 import java.lang.reflect.Type;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
 public final class TypeConvertorFactory {
 
-    private static final Map<Type, TypeConvertor> sBaseConvertors = new HashMap<>();
-    private static final Map<Type, TypeConvertor> sRegisterConvertors = new HashMap<>();
+    private static final Map<Type, LuaTypeAdapter> sBaseConvertors = new HashMap<>();
+    private static final Map<Type, LuaTypeAdapter> sRegisterConvertors = new HashMap<>();
     private static final Set<Class> sIncludeChildClasses = new HashSet<>();
     private static final Set<Class> sIncludeChildInterfaces = new HashSet<>();
 
     static {
-        TypeConvertor convertor = new BooleanConvertor();
+        LuaTypeAdapter convertor = new BooleanLuaTypeAdapter();
         sBaseConvertors.put(boolean.class, convertor);
         sBaseConvertors.put(Boolean.class, convertor);
 
-        convertor = new ByteConvertor();
+        convertor = new ByteLuaTypeAdapter();
         sBaseConvertors.put(byte.class, convertor);
         sBaseConvertors.put(Byte.class, convertor);
 
-        convertor = new CharConvertor();
+        convertor = new CharLuaTypeAdapter();
         sBaseConvertors.put(char.class, convertor);
         sBaseConvertors.put(Character.class, convertor);
 
-        convertor = new ShortConvertor();
+        convertor = new ShortLuaTypeAdapter();
         sBaseConvertors.put(short.class, convertor);
         sBaseConvertors.put(Short.class, convertor);
 
-        convertor = new IntConvertor();
+        convertor = new IntLuaTypeAdapter();
         sBaseConvertors.put(int.class, convertor);
         sBaseConvertors.put(Integer.class, convertor);
 
-        convertor = new LongConvertor();
+        convertor = new LongLuaTypeAdapter();
         sBaseConvertors.put(long.class, convertor);
         sBaseConvertors.put(Long.class, convertor);
 
-        convertor = new FloatConvertor();
+        convertor = new FloatLuaTypeAdapter();
         sBaseConvertors.put(float.class, convertor);
         sBaseConvertors.put(Float.class, convertor);
 
-        convertor = new DoubleConvertor();
+        convertor = new DoubleLuaTypeAdapter();
         sBaseConvertors.put(double.class, convertor);
         sBaseConvertors.put(Double.class, convertor);
 
-        sBaseConvertors.put(String.class, new StringTypeConvertor());
+        sBaseConvertors.put(String.class, new StringLuaTypeAdapter());
     }
 
-    public static void registerTypeConvertor(Class<?> clazz, TypeConvertor tc ,boolean includeChild){
+    public static void registerTypeConvertor(Class<?> clazz, LuaTypeAdapter tc , boolean includeChild){
         sRegisterConvertors.put(clazz, tc);
         if(includeChild){
             if(clazz.isInterface()){
@@ -72,9 +72,9 @@ public final class TypeConvertorFactory {
         }
     }
 
-    public static TypeConvertor getTypeConvertor(Class<?> clazz){
+    public static LuaTypeAdapter getTypeConvertor(Class<?> clazz){
         //1, bases
-        TypeConvertor convertor = sBaseConvertors.get(clazz);
+        LuaTypeAdapter convertor = sBaseConvertors.get(clazz);
         if(convertor != null){
             return convertor;
         }
@@ -85,15 +85,15 @@ public final class TypeConvertorFactory {
         }
         // array, collection, map
         if(clazz.isArray()){
-            return new ArrayTypeConvertor();
+            return new ArrayLuaTypeAdapter();
         }else if(Set.class.isAssignableFrom(clazz)){
-            return new SetTypeConvertor();
-        }else if(Collection.class.isAssignableFrom(clazz)){
-            //as list
-            return new ListTypeConvertor();
-        }
-        else if(Map.class.isAssignableFrom(clazz)){
-            return new MapTypeConvertor();
+            return new SetLuaTypeAdapter();
+        }else if(List.class.isAssignableFrom(clazz)){
+            return new ListLuaTypeAdapter();
+        } else if(Collection.class.isAssignableFrom(clazz)){
+            return new CollectionLuaTypeAdapter();
+        } else if(Map.class.isAssignableFrom(clazz)){
+            return new MapLuaTypeAdapter();
         }else {
             //3, check super class
             Class<?> superclass = clazz.getSuperclass();
@@ -124,7 +124,7 @@ public final class TypeConvertorFactory {
                 }while (superclass != null);
             }
             //wrap java to c++ then bind to lua
-            return new ObjectTypeConvertor();
+            return new ObjectLuaTypeAdapter();
         }
     }
 }

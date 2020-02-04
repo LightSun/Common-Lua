@@ -1,9 +1,9 @@
 package com.heaven7.java.lua.convertors;
 
 import com.heaven7.java.lua.LuaState;
-import com.heaven7.java.lua.TypeConvertor;
+import com.heaven7.java.lua.LuaTypeAdapter;
 
-/*public*/ abstract class NumberConvertor implements TypeConvertor {
+/*public*/ abstract class NumberAdapterLua extends LuaTypeAdapter {
 
     @Override
     public int java2lua(LuaState luaState, Object result) {

@@ -2,7 +2,6 @@
 // Created by Administrator on 2020/2/1 0001.
 //
 
-#include <string>
 #include "LuaFunc.h"
 
 extern "C"{
@@ -28,9 +27,7 @@ static int func_call(lua_State* L){
     //cmp the key world of LIB_LUA_WRAPPER.
     auto key = lua_tostring(L, -1);
     if(key != nullptr){
-        std::string k(key);
-        std::string v(LIB_LUA_WRAPPER);
-        if(k == v){
+        if(strcmp(key, LIB_LUA_WRAPPER) == 0){
             lua_pushboolean(L, 1);
             return 1;
         }

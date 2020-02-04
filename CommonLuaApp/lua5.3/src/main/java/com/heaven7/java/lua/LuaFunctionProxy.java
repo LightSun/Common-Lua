@@ -1,6 +1,7 @@
 package com.heaven7.java.lua;
 
 import com.heaven7.java.lua.convertors.TypeConvertorFactory;
+import com.heaven7.java.lua.internal.LuaUtils;
 
 /**
  * the lua function proxy

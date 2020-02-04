@@ -1,6 +1,6 @@
 package com.heaven7.java.lua;
 
-import com.heaven7.java.lua.convertors.TypeConvertorFactory;
+import com.heaven7.java.lua.internal.LuaUtils;
 
 import java.lang.ref.WeakReference;
 
@@ -65,6 +65,13 @@ public final class TableObject {
         }
         luaState.restoreLightly(k);
         return true;
+    }
+    public Lua2JavaValue call1(String name, Object... params){
+        LuaResult result = call(name, 1, params);
+        if(result != null){
+            return result.getValue1();
+        }
+        return null;
     }
     public LuaResult call(String name, int resultCount, Object... params){
         if(resultCount > LuaResult.MAX_RESULT_COUNT){
