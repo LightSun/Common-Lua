@@ -5,11 +5,6 @@ import com.heaven7.java.lua.LuaState;
 import com.heaven7.java.lua.LuaTypeAdapter;
 
 public class StringLuaTypeAdapter extends LuaTypeAdapter {
-
-    @Override
-    public Object convert(String arg) {
-        return arg;
-    }
     @Override
     public Object lua2java(LuaState luaState, Lua2JavaValue arg) {
         return arg.toStringValue();

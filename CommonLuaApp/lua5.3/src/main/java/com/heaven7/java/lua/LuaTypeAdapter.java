@@ -20,10 +20,6 @@ public abstract class LuaTypeAdapter {
         }
         return IotaUtils.getTypeAdapter($ReflectyTypes.getTypeNode(type), tam);
     }
-
-    public Object convert(String arg){
-        return null;
-    }
     public Object defaultValue(){
         return null;
     }

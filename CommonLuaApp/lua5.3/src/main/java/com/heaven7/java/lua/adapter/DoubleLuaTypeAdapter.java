@@ -6,11 +6,6 @@ import com.heaven7.java.lua.LuaState;
 public class DoubleLuaTypeAdapter extends NumberAdapterLua {
 
     @Override
-    public Object convert(String arg) {
-        return Double.valueOf(arg);
-    }
-
-    @Override
     public Object defaultValue() {
         return 0d;
     }

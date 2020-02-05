@@ -5,11 +5,6 @@ import com.heaven7.java.lua.LuaState;
 
 public class FloatLuaTypeAdapter extends NumberAdapterLua{
     @Override
-    public Object convert(String arg) {
-        return Float.valueOf(arg);
-    }
-
-    @Override
     public Object defaultValue() {
         return 0f;
     }

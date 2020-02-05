@@ -5,6 +5,7 @@ import com.heaven7.java.lua.LuaState;
 import com.heaven7.java.lua.LuaTypeAdapter;
 import com.heaven7.java.lua.internal.LuaUtils;
 import com.heaven7.java.lua.iota.LuaReflectyContext;
+import com.heaven7.java.lua.iota.Wrapper;
 
 import java.util.Collection;
 import java.util.Iterator;
@@ -24,7 +25,7 @@ public class CollectionLuaTypeAdapter extends LuaTypeAdapter {
     public Object lua2java(LuaState luaState, Lua2JavaValue arg){
         Collection list = mContext.createCollection(mClass);
         arg.toTableValue(luaState).travel(new CollectionTraveller(mComponentAdapter, list));
-        return list;
+        return list instanceof Wrapper ? ((Wrapper) list).unwrap(): list;
     }
 
     public int java2lua(LuaState luaState, Object result){

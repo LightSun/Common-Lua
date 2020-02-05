@@ -7,10 +7,6 @@ import com.heaven7.java.lua.LuaTypeAdapter;
 public class CharLuaTypeAdapter extends LuaTypeAdapter {
 
     @Override
-    public Object convert(String arg) {
-        return arg.charAt(0);
-    }
-    @Override
     public Object defaultValue() {
         throw new RuntimeException("char type must be initialize.");
     }

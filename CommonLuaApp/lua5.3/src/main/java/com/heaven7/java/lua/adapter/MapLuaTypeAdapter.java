@@ -6,6 +6,7 @@ import com.heaven7.java.lua.LuaTraveller;
 import com.heaven7.java.lua.LuaTypeAdapter;
 import com.heaven7.java.lua.internal.LuaUtils;
 import com.heaven7.java.lua.iota.LuaReflectyContext;
+import com.heaven7.java.lua.iota.Wrapper;
 
 import java.util.Map;
 
@@ -27,7 +28,7 @@ public class MapLuaTypeAdapter extends LuaTypeAdapter {
         Map map = mContext.createMap(mMapClass);
         arg.toTableValue(luaState)
                 .travel(new MapTraveller(mKeyAdapter, mValueAdapter, map));
-        return map;
+        return map instanceof Wrapper ? ((Wrapper) map).unwrap(): map;
     }
 
     @Override

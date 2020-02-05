@@ -8,11 +8,6 @@ import com.heaven7.java.lua.LuaTypeAdapter;
 public class BooleanLuaTypeAdapter extends LuaTypeAdapter {
 
     @Override
-    public Object convert(String arg) {
-        return Float.valueOf(arg).byteValue() == 1;
-    }
-
-    @Override
     public Object defaultValue() {
         return false;
     }

@@ -163,7 +163,7 @@ public final class LuaJavaCaller {
                 if (args[i] instanceof Lua2JavaValue) {
                     out[i] = adapter.lua2java(luaState, (Lua2JavaValue) args[i]);
                 } else {
-                    out[i] = adapter.convert(args[i].toString());
+                    throw new IllegalStateException("args must be Lua2JavaValue.");
                 }
             } else {
                 //change nothing
