@@ -2,6 +2,7 @@ package com.heaven7.java.lua.iota;
 
 import com.heaven7.java.lua.LuaTypeAdapter;
 
+import java.util.Collection;
 import java.util.Map;
 
 /**
@@ -12,22 +13,12 @@ import java.util.Map;
 public abstract class MapIotaPlugin extends IotaPlugin {
 
      public MapIotaPlugin(Class<?> type) {
-         super(type);
+         super(TYPE_MAP, type);
      }
 
-    /**
-     * create map for target object. eg: sparse array to map. that means wrap target object to map.
-     * @param obj the object. can be sparse array and etc.
-     * @return the map.
-     */
-     public abstract Map<?,?> createMap(Object obj);
+    public abstract Map<?,?> create(Object obj);
 
-    /**
-     * create default map for class.
-     * @param clazz the similar map class.
-     * @return the map.
-     */
-    public abstract Map<?,?> createMap(Class<?> clazz);
+    public abstract Map<?,?> create(Class<?> clazz);
 
     /**
      * get the key adapter for target map class type. this often used when you want to use a self-type map.

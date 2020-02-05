@@ -7,7 +7,7 @@ import com.heaven7.java.lua.LuaTypeAdapter;
 public class ObjectLuaTypeAdapter extends LuaTypeAdapter {
 
     public Object lua2java(LuaState luaState, Lua2JavaValue arg){
-        throw new UnsupportedOperationException("latter will support.");
+        throw new UnsupportedOperationException("ObjectLuaTypeAdapter >>> latter will support lua2java.");
     }
     @Override
     public int java2lua(LuaState luaState, Object result) {

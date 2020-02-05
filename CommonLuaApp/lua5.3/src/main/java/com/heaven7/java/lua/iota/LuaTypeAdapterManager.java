@@ -1,139 +1,148 @@
- /*
-  * Copyright 2019
-  * heaven7(donshine723@gmail.com)
+package com.heaven7.java.lua.iota;
 
-  * Licensed under the Apache License, Version 2.0 (the "License");
-  * you may not use this file except in compliance with the License.
-  * You may obtain a copy of the License at
-  *
-  * http://www.apache.org/licenses/LICENSE-2.0
-  *
-  * Unless required by applicable law or agreed to in writing, software
-  * distributed under the License is distributed on an "AS IS" BASIS,
-  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-  * See the License for the specific language governing permissions and
-  * limitations under the License.
-  */
- package com.heaven7.java.lua.iota;
+import com.heaven7.java.lua.LuaTypeAdapter;
+import com.heaven7.java.lua.adapter.ArrayLuaTypeAdapter;
+import com.heaven7.java.lua.adapter.BooleanLuaTypeAdapter;
+import com.heaven7.java.lua.adapter.ByteLuaTypeAdapter;
+import com.heaven7.java.lua.adapter.CharLuaTypeAdapter;
+import com.heaven7.java.lua.adapter.CollectionLuaTypeAdapter;
+import com.heaven7.java.lua.adapter.DoubleLuaTypeAdapter;
+import com.heaven7.java.lua.adapter.FloatLuaTypeAdapter;
+import com.heaven7.java.lua.adapter.IntLuaTypeAdapter;
+import com.heaven7.java.lua.adapter.ListLuaTypeAdapter;
+import com.heaven7.java.lua.adapter.LongLuaTypeAdapter;
+import com.heaven7.java.lua.adapter.MapLuaTypeAdapter;
+import com.heaven7.java.lua.adapter.ObjectLuaTypeAdapter;
+import com.heaven7.java.lua.adapter.SetLuaTypeAdapter;
+import com.heaven7.java.lua.adapter.ShortLuaTypeAdapter;
+import com.heaven7.java.lua.adapter.StringLuaTypeAdapter;
+import com.heaven7.java.lua.internal.$ReflectyTypes;
 
+import java.lang.reflect.Type;
+import java.util.HashMap;
+import java.util.Map;
 
- import com.heaven7.java.lua.LuaTypeAdapter;
+public class LuaTypeAdapterManager implements ILuaTypeAdapterManager {
 
- import java.lang.reflect.Type;
- import java.util.Map;
+    private static final Map<TypeNode, LuaTypeAdapter> sBaseAdapters = new HashMap<>();
 
- /**
-  * the type adapter manager
-  *
-  * @author heaven7
-  */
- public interface LuaTypeAdapterManager extends BasicTypeAdapterProvider{
+    private final Map<TypeNode, LuaTypeAdapter> mAdapterMap = new HashMap<>();
+    private final IotaPluginManager mIotaPM = new IotaPluginManager(this);
+    private final LuaReflectyContext mContext;
 
-     /**
-      * get the type adapter context
-      *
-      * @return the type adapter context
-      */
-     LuaReflectyContext getReflectyContext();
+    public LuaTypeAdapterManager(LuaReflectyContext context) {
+        mContext = new GroupLuaReflectyContext(context);
+    }
+    public void addIotaPlugin(IotaPlugin plugin){
+        mIotaPM.addIotaPlugin(plugin);
+    }
+    @Override
+    public LuaReflectyContext getReflectyContext() {
+        return mContext;
+    }
+    @Override
+    public LuaTypeAdapter getTypeAdapter(TypeNode genericNode) {
+        LuaTypeAdapter ta = sBaseAdapters.get(genericNode);
+        if(ta != null){
+            return ta;
+        }
+        return mAdapterMap.get(genericNode);
+    }
+    @Override
+    public void registerTypeAdapter(Type type, LuaTypeAdapter adapter) {
+        mAdapterMap.put($ReflectyTypes.getTypeNode(type), adapter);
+    }
+    @Override
+    public void registerBasicTypeAdapter(Class<?> baseType, LuaTypeAdapter adapter) {
 
-     /**
-      * get the type adapter for type node.
-      *
-      * @param genericNode  the type node
-      * @return the type adapter
-      */
-     LuaTypeAdapter getTypeAdapter(TypeNode genericNode);
+    }
+    @Override
+    public LuaTypeAdapter getBasicTypeAdapter(Class<?> baseType) {
+        return sBaseAdapters.get($ReflectyTypes.getTypeNode(baseType));
+    }
 
-     /**
-      * register type adapter
-      *
-      * @param type    the type
-      * @param adapter the type adapter
-      */
-     void registerTypeAdapter(Type type, LuaTypeAdapter adapter);
+    @Override
+    public LuaTypeAdapter getKeyAdapter(Class<?> type) {
+        return mIotaPM.getKeyAdapter(type);
+    }
+    @Override
+    public LuaTypeAdapter getValueAdapter(Class<?> type) {
+        return mIotaPM.getValueAdapter(type);
+    }
+    @Override
+    public LuaTypeAdapter getSetElementAdapter(Class<?> type) {
+        return mIotaPM.getSetElementAdapter(type);
+    }
+    @Override
+    public LuaTypeAdapter getListElementAdapter(Class<?> type) {
+        return mIotaPM.getListElementAdapter(type);
+    }
+    @Override
+    public LuaTypeAdapter getCollectionElementAdapter(Class<?> type) {
+        return mIotaPM.getCollectionElementAdapter(type);
+    }
+    @Override
+    public LuaTypeAdapter createCollectionTypeAdapter(Class<?> collectionClass, LuaTypeAdapter component) {
+        return new CollectionLuaTypeAdapter(mContext, collectionClass, component);
+    }
+    @Override
+    public LuaTypeAdapter createSetTypeAdapter(Class<?> type, LuaTypeAdapter component) {
+        return new SetLuaTypeAdapter(mContext, type, component);
+    }
+    @Override
+    public LuaTypeAdapter createListTypeAdapter(Class<?> type, LuaTypeAdapter component) {
+        return new ListLuaTypeAdapter(mContext, type, component);
+    }
+    @Override
+    public LuaTypeAdapter createArrayTypeAdapter(Class<?> type, LuaTypeAdapter componentAdapter) {
+        return new ArrayLuaTypeAdapter(type, componentAdapter);
+    }
+    @Override
+    public LuaTypeAdapter createMapTypeAdapter(Class<?> mapClazz, LuaTypeAdapter keyAdapter, LuaTypeAdapter valueAdapter) {
+        return new MapLuaTypeAdapter(mContext, mapClazz, keyAdapter, valueAdapter);
+    }
+    @Override
+    public LuaTypeAdapter createObjectTypeAdapter(Class<?> objectClazz) {
+        //TODO
+        return new ObjectLuaTypeAdapter();
+    }
 
-     /**
-      * register basic type adapter. for basic types. can include un-change type.
-      *
-      * @param baseType the basic type
-      * @param adapter  the type adapter
-      */
-     void registerBasicTypeAdapter(Class<?> baseType, LuaTypeAdapter adapter);
+    private static void putBaseTypeAdapter(Class<?> clazz, LuaTypeAdapter ta){
+        sBaseAdapters.put($ReflectyTypes.getTypeNode(clazz), ta);
+    }
+    static {
+        LuaTypeAdapter convertor = new BooleanLuaTypeAdapter();
+        putBaseTypeAdapter(boolean.class, convertor);
+        putBaseTypeAdapter(Boolean.class, convertor);
 
-     /**
-      * get the base type adapter
-      *
-      * @param baseType the base type class
-      * @return the base {@linkplain LuaTypeAdapter}.
-      */
-     LuaTypeAdapter getBasicTypeAdapter(Class<?> baseType);
+        convertor = new ByteLuaTypeAdapter();
+        putBaseTypeAdapter(byte.class, convertor);
+        putBaseTypeAdapter(Byte.class, convertor);
 
-     //================================================================================================
-     /**
-      * get the key adapter for target map class type. this often used when you want to use a self-type map.
-      * can non-extend {@linkplain Map}. see {@linkplain LuaReflectyContext#isMap(Class)} and {@linkplain LuaReflectyContext#createMap(Class)}.
-      * @param type the class. can be {@linkplain com.heaven7.java.base.util.SparseArrayDelegate}.
-      * @return the key type adapter
-      */
-     LuaTypeAdapter getKeyAdapter(Class<?> type);
-     /**
-      * get the value adapter for target map class type. this often used when you want to use a self-type map.
-      * can non-extend {@linkplain Map}. see {@linkplain LuaReflectyContext#isMap(Class)} and {@linkplain LuaReflectyContext#createMap(Class)}.
-      * @param type the class . can be any class like {@linkplain Map}.
-      * @return the value type adapter. or null if you haven't use self-type map.
-      */
-     LuaTypeAdapter getValueAdapter(Class<?> type);
+        convertor = new CharLuaTypeAdapter();
+        putBaseTypeAdapter(char.class, convertor);
+        putBaseTypeAdapter(Character.class, convertor);
 
-     /**
-      * get the element type adapter for collection class type. this often used when you want to use a self-type collection.
-      * can non-extend {@linkplain java.util.Collection}. see {@linkplain LuaReflectyContext#isCollection(Class)} and {@linkplain LuaReflectyContext#createCollection(Class)}.
-      * @param type the collection class. can be any similar collection. like {@linkplain java.util.Collection}
-      * @return the element type adapter. or null if you haven't use self-type collection.
-      */
-     LuaTypeAdapter getSetElementAdapter(Class<?> type);
-     LuaTypeAdapter getListElementAdapter(Class<?> type);
-     LuaTypeAdapter getCollectionElementAdapter(Class<?> type);
-     //========================================================================
+        convertor = new ShortLuaTypeAdapter();
+        putBaseTypeAdapter(short.class, convertor);
+        putBaseTypeAdapter(Short.class, convertor);
 
-     /**
-      * create collection type adapter
-      *
-      * @param collectionClass  the expect collection class
-      * @param component the component adapter
-      * @return the type adapter
-      */
-     LuaTypeAdapter createCollectionTypeAdapter(Class<?> collectionClass, LuaTypeAdapter component);
-     LuaTypeAdapter createSetTypeAdapter(Class<?> type, LuaTypeAdapter component);
-     LuaTypeAdapter createListTypeAdapter(Class<?> type, LuaTypeAdapter component);
-     /**
-      * create array type adapter
-      *
-      * @param componentClass   the component class
-      * @param componentAdapter the component adapter
-      * @return the array type adapter
-      */
-     LuaTypeAdapter createArrayTypeAdapter(Class<?> componentClass, LuaTypeAdapter componentAdapter);
+        convertor = new IntLuaTypeAdapter();
+        putBaseTypeAdapter(int.class, convertor);
+        putBaseTypeAdapter(Integer.class, convertor);
 
-     /**
-      * create map type adapter
-      *
-      * @param mapClazz     the map class. can be sparse array
-      * @param keyAdapter   the key adapter
-      * @param valueAdapter the value adapter
-      * @return the map type adapter
-      */
-     LuaTypeAdapter createMapTypeAdapter(Class<?> mapClazz, LuaTypeAdapter keyAdapter, LuaTypeAdapter valueAdapter);
+        convertor = new LongLuaTypeAdapter();
+        putBaseTypeAdapter(long.class, convertor);
+        putBaseTypeAdapter(Long.class, convertor);
 
-     /**
-      * create the object type adapter
-      *
-      * @param objectClazz  the object class. not collection or map.
-      * @return the type adapter
-      */
-     LuaTypeAdapter createObjectTypeAdapter(Class<?> objectClazz);
+        convertor = new FloatLuaTypeAdapter();
+        putBaseTypeAdapter(float.class, convertor);
+        putBaseTypeAdapter(Float.class, convertor);
 
+        convertor = new DoubleLuaTypeAdapter();
+        putBaseTypeAdapter(double.class, convertor);
+        putBaseTypeAdapter(Double.class, convertor);
 
-
-
-
- }
+        putBaseTypeAdapter(String.class, new StringLuaTypeAdapter());
+    }
+}

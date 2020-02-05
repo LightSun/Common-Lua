@@ -1,15 +1,15 @@
 package com.heaven7.java.lua;
 
-import com.heaven7.java.lua.iota.LuaTypeAdapterManager;
+import com.heaven7.java.lua.iota.ILuaTypeAdapterManager;
 
 public final class LuaInitializer {
 
-    private static LuaTypeAdapterManager sTAM;
+    private static ILuaTypeAdapterManager sTAM;
 
-    public static void setLuaTypeAdapterManager(LuaTypeAdapterManager tam){
+    public static void setLuaTypeAdapterManager(ILuaTypeAdapterManager tam){
         sTAM = tam;
     }
-    public static LuaTypeAdapterManager getLuaTypeAdapterManager(){
+    public static ILuaTypeAdapterManager getLuaTypeAdapterManager(){
         return sTAM;
     }
 }

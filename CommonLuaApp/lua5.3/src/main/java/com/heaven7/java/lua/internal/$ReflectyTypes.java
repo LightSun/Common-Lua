@@ -31,7 +31,7 @@ import java.util.*;
 @RestrictTo(RestrictTo.Scope.LIBRARY)
 public final class $ReflectyTypes {
 
-    private static WeakHashMap<Class<?>, List<TypeVariablePair>> sTypeVars = new WeakHashMap<>();
+    private static final WeakHashMap<Class<?>, List<TypeVariablePair>> sTypeVars = new WeakHashMap<>();
 
     public static TypeNode getTypeNode(Type type){
         GenericNode node = new GenericNode();

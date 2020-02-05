@@ -2,6 +2,8 @@ package com.heaven7.java.lua;
 
 import android.support.annotation.Keep;
 
+import com.heaven7.java.lua.internal.LuaUtils;
+
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.lang.reflect.Method;
@@ -125,7 +127,7 @@ public final class LuaJavaCaller {
                 try {
                     Method m = clazz.getMethod(mi.getName(), mi.getRawTypes());
                     Object result = m.invoke(owner, out);
-                    return convertResultToLua(luaState, m.getGenericReturnType(), result);
+                    return LuaUtils.java2lua(luaState, m.getGenericReturnType(), result);
                 } catch (Exception e) {
                     if (i == 0) {
                         //last. still error.
@@ -139,15 +141,6 @@ public final class LuaJavaCaller {
         return 0;
     }
 
-    private static int convertResultToLua(LuaState luaState, Type genericReturnType, Object result) {
-        if (result == null) {
-            luaState.pushNil();
-            return 1;
-        }
-        LuaTypeAdapter lta = LuaTypeAdapter.get(genericReturnType);
-        return lta.java2lua(luaState, result);
-    }
-
     private static String toString(Throwable e) {
         StringWriter sw = new StringWriter();
         PrintWriter writer = new PrintWriter(sw);
@@ -158,7 +151,7 @@ public final class LuaJavaCaller {
     private static boolean convert(LuaState luaState, Type[] types, Object[] args, Object[] out) {
         for (int size = args.length, i = 0; i < size; i++) {
             Type type = types[i];
-            LuaTypeAdapter adapter = LuaTypeAdapter.get(type, getLuaTypeAdapterManager());
+            LuaTypeAdapter adapter = LuaTypeAdapter.get(type);
             if (adapter != null) {
                 if (args[i] instanceof Lua2JavaValue) {
                     out[i] = adapter.lua2java(luaState, (Lua2JavaValue) args[i]);
@@ -173,7 +166,7 @@ public final class LuaJavaCaller {
         //补全
         if (args.length < types.length) {
             for (int i = args.length, end = types.length; i < end; i++) {
-                LuaTypeAdapter adapter = LuaTypeAdapter.get(types[i], getLuaTypeAdapterManager());
+                LuaTypeAdapter adapter = LuaTypeAdapter.get(types[i]);
                 if (adapter != null) {
                     out[i] = adapter.defaultValue();
                 } else {

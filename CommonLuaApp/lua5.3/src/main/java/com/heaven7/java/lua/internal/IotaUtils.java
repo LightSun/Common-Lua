@@ -5,7 +5,7 @@ import android.support.annotation.RestrictTo;
 import com.heaven7.java.base.util.Predicates;
 import com.heaven7.java.lua.LuaTypeAdapter;
 import com.heaven7.java.lua.iota.LuaReflectyContext;
-import com.heaven7.java.lua.iota.LuaTypeAdapterManager;
+import com.heaven7.java.lua.iota.ILuaTypeAdapterManager;
 import com.heaven7.java.lua.iota.TypeNode;
 
 import java.util.Collection;
@@ -25,7 +25,7 @@ public final class IotaUtils {
      * @param delegate the type adapter manager delegate
      * @return the type adapter
      */
-    public static LuaTypeAdapter getTypeAdapter(TypeNode node, LuaTypeAdapterManager delegate){
+    public static LuaTypeAdapter getTypeAdapter(TypeNode node, ILuaTypeAdapterManager delegate){
         if(node.isArray()){
             TypeNode subNode = node.getSubNode(0);
             return delegate.createArrayTypeAdapter(subNode.getTypeClass(0),

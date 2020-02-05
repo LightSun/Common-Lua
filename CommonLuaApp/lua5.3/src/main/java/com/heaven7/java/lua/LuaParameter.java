@@ -1,8 +1,8 @@
 package com.heaven7.java.lua;
 
-import java.lang.reflect.Type;
+import com.heaven7.java.lua.internal.LuaUtils;
 
-import static com.heaven7.java.lua.LuaInitializer.getLuaTypeAdapterManager;
+import java.lang.reflect.Type;
 
 public final class LuaParameter {
 
@@ -20,7 +20,6 @@ public final class LuaParameter {
         return value;
     }
     public void java2lua(LuaState luaState){
-        LuaTypeAdapter.get(type, getLuaTypeAdapterManager())
-                .java2lua(luaState, value);
+        LuaUtils.java2lua(luaState, type, value);
     }
 }

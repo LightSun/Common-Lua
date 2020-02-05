@@ -2,23 +2,14 @@ package com.heaven7.java.lua;
 
 import com.heaven7.java.lua.internal.$ReflectyTypes;
 import com.heaven7.java.lua.internal.IotaUtils;
-import com.heaven7.java.lua.iota.LuaTypeAdapterManager;
 
 import java.lang.reflect.Type;
 
 public abstract class LuaTypeAdapter {
 
     public static LuaTypeAdapter get(Type type){
-        return get(type, LuaInitializer.getLuaTypeAdapterManager());
-    }
-    public static LuaTypeAdapter get(Type type, LuaTypeAdapterManager tam){
-        if(type instanceof Class){
-            LuaTypeAdapter lta = tam.getBasicTypeAdapter((Class<?>) type);
-            if(lta != null){
-                return lta;
-            }
-        }
-        return IotaUtils.getTypeAdapter($ReflectyTypes.getTypeNode(type), tam);
+        return IotaUtils.getTypeAdapter($ReflectyTypes.getTypeNode(type),
+                LuaInitializer.getLuaTypeAdapterManager());
     }
     public Object defaultValue(){
         return null;

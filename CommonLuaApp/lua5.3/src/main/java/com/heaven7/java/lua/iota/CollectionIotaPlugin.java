@@ -17,7 +17,11 @@ public abstract class CollectionIotaPlugin extends IotaPlugin {
      * @param type the collection type.
      */
     public CollectionIotaPlugin(Class<?> type) {
-        super(type);
+        super(TYPE_COLLECTION, type);
+    }
+
+    /*protected*/ CollectionIotaPlugin(int type, Class<?> typeClass) {
+        super(type, typeClass);
     }
 
     /**
@@ -29,17 +33,8 @@ public abstract class CollectionIotaPlugin extends IotaPlugin {
      */
     public abstract LuaTypeAdapter getElementAdapter(BasicTypeAdapterProvider provider, Class<?> type);
 
-    /**
-     * create collection by target object. that means wrap target object to collection.
-     * @param obj the object which will be wrap to collection.
-     * @return the collection
-     */
-    public abstract Collection<?> createCollection(Object obj);
+    public abstract Collection<?> create(Object obj);
 
-    /**
-     * create default collection for target collection class.
-     * @param clazz the similar collection class
-     * @return the collection
-     */
-    public abstract Collection<?> createCollection(Class<?> clazz);
+    public abstract Collection<?> create(Class<?> clazz);
+
 }

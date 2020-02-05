@@ -1,6 +1,8 @@
 package com.heaven7.java.lua.iota;
 
 import com.heaven7.java.base.util.Predicates;
+import com.heaven7.java.base.util.SparseArrayDelegate;
+import com.heaven7.java.base.util.SparseFactory;
 import com.heaven7.java.lua.LuaTypeAdapter;
 
 import java.util.ArrayList;
@@ -17,8 +19,7 @@ import java.util.Set;
 /*public*/ class IotaPluginManager implements LuaReflectyContext {
 
     private final BasicTypeAdapterProvider mProvider;
-    private List<CollectionIotaPlugin> mCollectionPlugins;
-    private List<MapIotaPlugin> mMapPlugins;
+    private final SparseArrayDelegate<List<IotaPlugin>> mPluginMap = SparseFactory.newSparseArray(5);
 
     public IotaPluginManager(BasicTypeAdapterProvider mProvider) {
         this.mProvider = mProvider;
@@ -29,70 +30,48 @@ import java.util.Set;
      * @param plugin the iota plugin
      */
     public void addIotaPlugin(IotaPlugin plugin){
-        if(plugin instanceof CollectionIotaPlugin){
-            if(mCollectionPlugins == null){
-                mCollectionPlugins = new ArrayList<>(5);
-            }
-            mCollectionPlugins.add((CollectionIotaPlugin) plugin);
-        }else if(plugin instanceof MapIotaPlugin){
-            if(mMapPlugins == null){
-                mMapPlugins = new ArrayList<>(5);
-            }
-            mMapPlugins.add((MapIotaPlugin) plugin);
-        }else {
-            throw new UnsupportedOperationException("only support collection and map iota-plugin.");
+        List<IotaPlugin> pluginList = mPluginMap.get(plugin.type);
+        if(pluginList == null){
+            pluginList = new ArrayList<>();
+            mPluginMap.put(plugin.type, pluginList);
         }
+        pluginList.add(plugin);
     }
+
     public LuaTypeAdapter getKeyAdapter(Class<?> type) {
+        List<IotaPlugin> mMapPlugins = mPluginMap.get(IotaPlugin.TYPE_MAP);
         if(Predicates.isEmpty(mMapPlugins)){
             return null;
         }
         //first  ==
-        for (MapIotaPlugin plugin : mMapPlugins){
-            if(plugin.type == type){
-                return plugin.getKeyAdapter(mProvider, type);
+        for (IotaPlugin p : mMapPlugins){
+            if(p.typeClass == type){
+                return ((MapIotaPlugin)p).getKeyAdapter(mProvider, type);
             }
         }
         //second. child
-        for (MapIotaPlugin plugin : mMapPlugins){
-            if(plugin.canProcessChild() && plugin.type.isAssignableFrom(type)){
-                return plugin.getKeyAdapter(mProvider, type);
+        for (IotaPlugin p : mMapPlugins){
+            if(p.canProcessChild() && p.typeClass.isAssignableFrom(type)){
+                return ((MapIotaPlugin)p).getKeyAdapter(mProvider, type);
             }
         }
         return null;
     }
     public LuaTypeAdapter getValueAdapter(Class<?> type) {
+        List<IotaPlugin> mMapPlugins = mPluginMap.get(IotaPlugin.TYPE_MAP);
         if(Predicates.isEmpty(mMapPlugins)){
             return null;
         }
         //first  ==
-        for (MapIotaPlugin plugin : mMapPlugins){
-            if(plugin.type == type){
-                return plugin.getValueAdapter(mProvider, type);
+        for (IotaPlugin p : mMapPlugins){
+            if(p.typeClass == type){
+                return ((MapIotaPlugin)p).getValueAdapter(mProvider, type);
             }
         }
         //second. child
-        for (MapIotaPlugin plugin : mMapPlugins){
-            if(plugin.canProcessChild() && plugin.type.isAssignableFrom(type)){
-                return plugin.getValueAdapter(mProvider, type);
-            }
-        }
-        return null;
-    }
-    public LuaTypeAdapter getElementAdapter(Class<?> type ) {
-        if(Predicates.isEmpty(mCollectionPlugins)){
-            return null;
-        }
-        //first ==
-        for (CollectionIotaPlugin plugin : mCollectionPlugins){
-            if(plugin.type == type){
-                return  plugin.getElementAdapter(mProvider, type);
-            }
-        }
-        //second. child
-        for (CollectionIotaPlugin plugin : mCollectionPlugins){
-            if(plugin.canProcessChild() && plugin.type.isAssignableFrom(type)){
-                return  plugin.getElementAdapter(mProvider, type);
+        for (IotaPlugin p : mMapPlugins){
+            if(p.canProcessChild() && p.typeClass.isAssignableFrom(type)){
+                return ((MapIotaPlugin)p).getValueAdapter(mProvider, type);
             }
         }
         return null;
@@ -102,118 +81,140 @@ import java.util.Set;
 
     @Override
     public boolean isSet(Class<?> type) {
-        return false;
+        return hasType(mPluginMap.get(IotaPlugin.TYPE_SET), type);
+    }
+    @Override
+    public boolean isList(Class<?> type) {
+        return hasType(mPluginMap.get(IotaPlugin.TYPE_LIST), type);
+    }
+    @Override
+    public boolean isCollection(Class<?> type) {
+        return hasType(mPluginMap.get(IotaPlugin.TYPE_COLLECTION), type);
     }
     @Override
     public boolean isMap(Class<?> type) {
-        if(Predicates.isEmpty(mMapPlugins)){
-            return false;
-        }
-        //first  ==
-        for (MapIotaPlugin plugin : mMapPlugins){
-            if(plugin.type == type){
-                return true;
-            }
-        }
-        //second. child
-        for (MapIotaPlugin plugin : mMapPlugins){
-            if(plugin.canProcessChild() && plugin.type.isAssignableFrom(type)){
-                return true;
-            }
-        }
-        return false;
+        return hasType(mPluginMap.get(IotaPlugin.TYPE_MAP), type);
     }
 
-    @Override
-    public boolean isList(Class<?> type) {
-        return false;
-    }
     @Override
     public Map getMap(Object obj) {
-        if(Predicates.isEmpty(mMapPlugins)){
-            return null;
-        }
-        Class<?> type = obj.getClass();
-        //first  ==
-        for (MapIotaPlugin plugin : mMapPlugins){
-            if(plugin.type == type){
-                return plugin.createMap(obj);
-            }
-        }
-        //second. child
-        for (MapIotaPlugin plugin : mMapPlugins){
-            if(plugin.canProcessChild() && plugin.type.isAssignableFrom(type)){
-                return plugin.createMap(obj);
-            }
-        }
-        return null;
+        return create(mPluginMap.get(IotaPlugin.TYPE_MAP), obj);
     }
-
-    @Override
-    public List createList(Class<?> clazz) {
-        return null;
-    }
-    @Override
-    public Set createSet(Class<?> clazz) {
-        return null;
-    }
-
-    @Override
-    public Collection createCollection(Class<?> clazz) {
-        return null;
-    }
-
-    @Override
-    public Map createMap(Class<?> clazz) {
-        return null;
-    }
-
-    @Override
-    public boolean isCollection(Class<?> type) {
-        if(Predicates.isEmpty(mCollectionPlugins)){
-            return false;
-        }
-        //first  ==
-        for (CollectionIotaPlugin plugin : mCollectionPlugins){
-            if(plugin.type == type){
-                return true;
-            }
-        }
-        //second. child
-        for (CollectionIotaPlugin plugin : mCollectionPlugins){
-            if(plugin.canProcessChild() && plugin.type.isAssignableFrom(type)){
-                return true;
-            }
-        }
-        return false;
-    }
-
     @Override
     public List getList(Object obj) {
-        return null;
+        return create(mPluginMap.get(IotaPlugin.TYPE_LIST), obj);
     }
 
     @Override
     public Set getSet(Object obj) {
-        return null;
+        return create(mPluginMap.get(IotaPlugin.TYPE_SET), obj);
     }
 
     @Override
     public Collection getCollection(Object obj) {
-        if(Predicates.isEmpty(mCollectionPlugins)){
+        return create(mPluginMap.get(IotaPlugin.TYPE_COLLECTION), obj);
+    }
+
+    @Override
+    public List createList(Class<?> clazz) {
+        return create(mPluginMap.get(IotaPlugin.TYPE_LIST), clazz);
+    }
+    @Override
+    public Set createSet(Class<?> clazz) {
+        return create(mPluginMap.get(IotaPlugin.TYPE_SET), clazz);
+    }
+    @Override
+    public Collection createCollection(Class<?> clazz) {
+        return create(mPluginMap.get(IotaPlugin.TYPE_COLLECTION), clazz);
+    }
+    @Override
+    public Map createMap(Class<?> clazz) {
+        return create(mPluginMap.get(IotaPlugin.TYPE_MAP), clazz);
+    }
+
+    public LuaTypeAdapter getSetElementAdapter(Class<?> type) {
+        return getElementAdapter(mPluginMap.get(IotaPlugin.TYPE_SET), type);
+    }
+    public LuaTypeAdapter getListElementAdapter(Class<?> type) {
+        return getElementAdapter(mPluginMap.get(IotaPlugin.TYPE_LIST), type);
+    }
+    public LuaTypeAdapter getCollectionElementAdapter(Class<?> type) {
+        return getElementAdapter(mPluginMap.get(IotaPlugin.TYPE_COLLECTION), type);
+    }
+
+    private LuaTypeAdapter getElementAdapter(List<IotaPlugin> plugins, Class<?> type) {
+        if(Predicates.isEmpty(plugins)){
+            return null;
+        }
+        final BasicTypeAdapterProvider mProvider = this.mProvider;
+        //first  ==
+        for (IotaPlugin plugin : plugins){
+            if(plugin.typeClass == type){
+                return ((CollectionIotaPlugin)plugin).getElementAdapter(mProvider, type);
+            }
+        }
+        //second. child
+        for (IotaPlugin plugin : plugins){
+            if(plugin.canProcessChild() && plugin.typeClass.isAssignableFrom(type)){
+                return ((CollectionIotaPlugin)plugin).getElementAdapter(mProvider, type);
+            }
+        }
+        return null;
+    }
+    private static boolean hasType(List<IotaPlugin> plugins, Class<?> type) {
+        if(Predicates.isEmpty(plugins)){
+            return false;
+        }
+        //first  ==
+        for (IotaPlugin plugin : plugins){
+            if(plugin.typeClass == type){
+                return true;
+            }
+        }
+        //second. child
+        for (IotaPlugin plugin : plugins){
+            if(plugin.canProcessChild() && plugin.typeClass.isAssignableFrom(type)){
+                return true;
+            }
+        }
+        return false;
+    }
+    @SuppressWarnings("unchecked")
+    private static <T> T create(List<IotaPlugin> plugins, Object obj){
+        if(Predicates.isEmpty(plugins)){
             return null;
         }
         Class<?> type = obj.getClass();
         //first  ==
-        for (CollectionIotaPlugin plugin : mCollectionPlugins){
-            if(plugin.type == type){
-                return plugin.createCollection(obj);
+        for (IotaPlugin plugin : plugins){
+            if(plugin.typeClass == type){
+                return (T) plugin.create(obj);
             }
         }
         //second. child
-        for (CollectionIotaPlugin plugin : mCollectionPlugins){
-            if(plugin.canProcessChild() && plugin.type.isAssignableFrom(type)){
-                return plugin.createCollection(obj);
+        for (IotaPlugin plugin : plugins){
+            if(plugin.canProcessChild() && plugin.typeClass.isAssignableFrom(type)){
+                return (T) plugin.create(obj);
+            }
+        }
+        return null;
+    }
+
+    @SuppressWarnings("unchecked")
+    private static <T> T create(List<IotaPlugin> plugins, Class<?> clazz){
+        if(Predicates.isEmpty(plugins)){
+            return null;
+        }
+        //first  ==
+        for (IotaPlugin plugin : plugins){
+            if(plugin.typeClass == clazz){
+                return (T) plugin.create(clazz);
+            }
+        }
+        //second. child
+        for (IotaPlugin plugin : plugins){
+            if(plugin.canProcessChild() && plugin.typeClass.isAssignableFrom(clazz)){
+                return (T) plugin.create(clazz);
             }
         }
         return null;

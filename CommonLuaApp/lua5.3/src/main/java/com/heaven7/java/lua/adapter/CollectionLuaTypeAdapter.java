@@ -31,7 +31,7 @@ public class CollectionLuaTypeAdapter extends LuaTypeAdapter {
     public int java2lua(LuaState luaState, Object result){
         luaState.newTable();
         int top = luaState.getTop();
-        final Collection<?> coll = (Collection) result;
+        final Collection<?> coll = mContext.getCollection(result);
         int i = 0;
         for (Iterator<?> it = coll.iterator(); it.hasNext() ; i++ ){
             Object ele = it.next();
