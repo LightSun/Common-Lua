@@ -11,6 +11,7 @@
 extern "C"{
 
     static int wc_getClass(lua_State *L){
+       // luaB_dumpStack(L);
         // 1 is tab, 2 is name
         lua_pushnumber(L, 0);
         lua_rawget(L, 1); // 3 is val
@@ -19,6 +20,7 @@ extern "C"{
         return call_getStaticClass(L, cn, lua_tostring(L, -1));
     }
     static int wc_getField(lua_State *L){
+       // luaB_dumpStack(L);
         // 1 is tab, 2 is name
         lua_pushnumber(L, 0);
         lua_rawget(L, 1); // 3 is val

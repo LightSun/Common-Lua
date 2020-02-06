@@ -2,6 +2,8 @@ package com.heaven7.androlua.bean;
 
 public class Person {
 
+    public static final int A1 = 100;
+
     private int age;
     private String name;
 

@@ -49,8 +49,8 @@ LuaBridgeCaller* LBCCreator_0(lua_State* L,const char* classname, LuaMediator* h
 
 int call_getStaticField(lua_State* L, const char* classname, const char* name){
     JNIEnv *const env = getJNIEnv();
-    auto mid = env->GetMethodID(__lua2JavaClass, MNAME_GET_STATIC_FIELD, SIG_GET_STATIC_FIELD);
-    auto result = env->CallStaticBooleanMethod(__lua2JavaClass, mid,(jlong)L,
+    auto mid = env->GetStaticMethodID(__callerClass, MNAME_GET_STATIC_FIELD, SIG_GET_STATIC_FIELD);
+    auto result = env->CallStaticBooleanMethod(__callerClass, mid,(jlong)L,
             env->NewStringUTF(classname),
             env->NewStringUTF(name));
     if(!result){
@@ -61,8 +61,8 @@ int call_getStaticField(lua_State* L, const char* classname, const char* name){
 
 int call_getStaticClass(lua_State* L, const char* classname, const char* name){
     JNIEnv *const env = getJNIEnv();
-    auto mid = env->GetMethodID(__lua2JavaClass, MNAME_GET_STATIC_CLASS, SIG_GET_STATIC_FIELD);
-    auto result = env->CallStaticBooleanMethod(__lua2JavaClass, mid,(jlong)L,
+    auto mid = env->GetStaticMethodID(__callerClass, MNAME_GET_STATIC_CLASS, SIG_GET_STATIC_FIELD);
+    auto result = env->CallStaticBooleanMethod(__callerClass, mid,(jlong)L,
                                                env->NewStringUTF(classname),
                                                env->NewStringUTF(name));
     if(!result){

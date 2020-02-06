@@ -5,10 +5,9 @@
     android:layout_height="match_parent"
     android:scrollbars="none"
     >
-
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
+        android:layout_height="wrap_content"
         android:layout_margin="10dp"
         android:orientation="vertical" >
         <Button
@@ -89,6 +88,14 @@
             android:layout_marginTop="15dp"
             android:onClick="onClickTestLuaTravel"
             android:text="test lua travel"
+            />
+
+        <Button
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="15dp"
+            android:onClick="onClickTestWrapClass"
+            android:text="test wrap class"
             />
     </LinearLayout>
 
