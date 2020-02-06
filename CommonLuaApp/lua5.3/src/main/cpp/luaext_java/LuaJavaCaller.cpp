@@ -25,10 +25,14 @@ extern "C" {
 
 #define MNAME_CREATE "create"
 #define MNAME_INVOKE "invoke"
+#define MNAME_GET_STATIC_CLASS  "getStaticClass"
+#define MNAME_GET_STATIC_FIELD  "getStaticField"
+#define SIG_GET_STATIC_FIELD "(J" STRING_NAME STRING_NAME ")Z"
 
 #define SIG_LUA2JAVA_CLASS "L" LUA2JAVA_CLASS ";"
 #define SIG_CREATE "(J" STRING_NAME STRING_NAME "[" OBJECT_NAME "[" OBJECT_NAME ")" OBJECT_NAME
 #define SIG_INVOKE "(J" OBJECT_NAME STRING_NAME STRING_NAME "[" OBJECT_NAME "[" OBJECT_NAME ")I"
+
 #define SIG_FUNC_EXECUTE "(J)I"
 #define SIG_TRAVEL "(J" SIG_LUA2JAVA_CLASS SIG_LUA2JAVA_CLASS ")I"
 
@@ -42,6 +46,30 @@ static jclass __luaTravelClass;
 
 jstring getStringValue(JNIEnv *env, jclass clazz, long ptr);
 LuaBridgeCaller* LBCCreator_0(lua_State* L,const char* classname, LuaMediator* holder);
+
+int call_getStaticField(lua_State* L, const char* classname, const char* name){
+    JNIEnv *const env = getJNIEnv();
+    auto mid = env->GetMethodID(__lua2JavaClass, MNAME_GET_STATIC_FIELD, SIG_GET_STATIC_FIELD);
+    auto result = env->CallStaticBooleanMethod(__lua2JavaClass, mid,(jlong)L,
+            env->NewStringUTF(classname),
+            env->NewStringUTF(name));
+    if(!result){
+        lua_pushnil(L);
+    }
+    return 1;
+}
+
+int call_getStaticClass(lua_State* L, const char* classname, const char* name){
+    JNIEnv *const env = getJNIEnv();
+    auto mid = env->GetMethodID(__lua2JavaClass, MNAME_GET_STATIC_CLASS, SIG_GET_STATIC_FIELD);
+    auto result = env->CallStaticBooleanMethod(__lua2JavaClass, mid,(jlong)L,
+                                               env->NewStringUTF(classname),
+                                               env->NewStringUTF(name));
+    if(!result){
+        lua_pushnil(L);
+    }
+    return 1;
+}
 
 void *newLua2JavaValue0(int type, long long ptrOrIndex) {
     JNIEnv *const env = getJNIEnv();

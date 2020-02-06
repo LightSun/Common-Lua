@@ -1,10 +1,15 @@
-package com.heaven7.java.lua;
+package com.heaven7.java.lua.internal;
+
+import com.heaven7.java.lua.anno.LuaField;
+import com.heaven7.java.lua.anno.LuaIgnore;
+import com.heaven7.java.lua.anno.LuaMethod;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Constructor;
+import java.lang.reflect.Field;
 import java.lang.reflect.Method;
+import java.lang.reflect.Modifier;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
@@ -25,9 +30,15 @@ public final class ClassInfo {
     };
 
     //private final String mClassName;
-    //lua_method_name, info
+    //object info
     private final Map<String, List<MethodInfo>> mMethodMap = new HashMap<>();
     private final Map<String, List<MethodInfo>> mConstructorMap = new HashMap<>();
+    private final List<FieldInfo> mFields = new ArrayList<>();
+    //static info for class
+    private final Map<String, List<MethodInfo>> mStaticMethodMap = new HashMap<>();
+    private final List<FieldInfo> mStaticFields = new ArrayList<>();
+
+    private final String mClassName;
 
     static {
         sBases.put(boolean.class, "Z");
@@ -42,7 +53,7 @@ public final class ClassInfo {
     }
 
     public ClassInfo(Class<?> clazz) {
-        //this.mClassName = clazz.getName();
+        this.mClassName = clazz.getName();
 
         StringBuilder sb = new StringBuilder();
         //constructors
@@ -62,6 +73,22 @@ public final class ClassInfo {
 
             getSigAndFill(sb, mConstructorMap, null, luaMethodName, info);
         }
+        //fields
+        Field[] fields = clazz.getFields();
+        for (Field f : fields){
+            LuaField lf = f.getAnnotation(LuaField.class);
+            String name = lf != null ? lf.value() : f.getName();
+
+            FieldInfo fi = new FieldInfo();
+            fi.setRawName(f.getName());
+            fi.setName(name);
+            fi.setRawType(f.getType());
+            fi.setType(f.getGenericType());
+
+            List<FieldInfo> fis =  (f.getModifiers() & Modifier.STATIC) != Modifier.STATIC
+                    ? mFields : mStaticFields;
+            fis.add(fi);
+        }
         //methods
         Method[] methods = clazz.getMethods();
         for (Method m : methods) {
@@ -69,37 +96,40 @@ public final class ClassInfo {
             String luaMethodName = lm != null ? lm.value() : m.getName();
 
             MethodInfo info = new MethodInfo();
-            info.setName(m.getName());
+            info.setName(luaMethodName);
+            info.setRawName(m.getName());
             info.setTypes(m.getGenericParameterTypes());
             info.setRawTypes(m.getParameterTypes());
-            getSigAndFill(sb, mMethodMap, m.getReturnType(), luaMethodName, info);
+
+            Map<String, List<MethodInfo>> map = (m.getModifiers() & Modifier.STATIC) != Modifier.STATIC
+                   ? mMethodMap : mStaticMethodMap ;
+            getSigAndFill(sb, map, m.getReturnType(), luaMethodName, info);
         }
         //sort param count. desc
         for (List<MethodInfo> list : mMethodMap.values()){
-            Collections.sort(list, COM_MethodInfo);
+            if(list.size() > 1){
+                Collections.sort(list, COM_MethodInfo);
+            }
+        }
+        for (List<MethodInfo> list : mStaticMethodMap.values()){
+            if(list.size() > 1){
+                Collections.sort(list, COM_MethodInfo);
+            }
         }
         for (List<MethodInfo> list : mConstructorMap.values()){
-            Collections.sort(list, COM_MethodInfo);
+            if(list.size() > 1){
+                Collections.sort(list, COM_MethodInfo);
+            }
         }
     }
 
-    //for constructor. returnType = null
-    private static void getSigAndFill(StringBuilder sb, Map<String, List<MethodInfo>> map, Class<?> returnType, String methodName, MethodInfo info) {
-        sb.append("(");
-        for (Class<?> cla : info.getRawTypes()) {
-            sb.append(typeToSig(cla));
+    public FieldInfo getStaticFieldInfo(String name) {
+        for (FieldInfo fi : mStaticFields){
+            if(fi.getName().equals(name)){
+                return fi;
+            }
         }
-        sb.append(")");
-        sb.append(returnType != null ? typeToSig(returnType) : "V");
-        info.setSig(sb.toString());
-        sb.delete(0, sb.length());
-
-        List<MethodInfo> methodInfos = map.get(methodName);
-        if(methodInfos == null){
-            methodInfos = new ArrayList<>();
-            map.put(methodName, methodInfos);
-        }
-        methodInfos.add(info);
+        return null;
     }
     //desc
     public List<MethodInfo> getMethodInfoes(String name, int expectParamCount){
@@ -132,6 +162,24 @@ public final class ClassInfo {
             }
         }
         return list;
+    }
+    //for constructor. returnType = null
+    private static void getSigAndFill(StringBuilder sb, Map<String, List<MethodInfo>> map, Class<?> returnType, String methodName, MethodInfo info) {
+        sb.append("(");
+        for (Class<?> cla : info.getRawTypes()) {
+            sb.append(typeToSig(cla));
+        }
+        sb.append(")");
+        sb.append(returnType != null ? typeToSig(returnType) : "V");
+        info.setSig(sb.toString());
+        sb.delete(0, sb.length());
+
+        List<MethodInfo> methodInfos = map.get(methodName);
+        if(methodInfos == null){
+            methodInfos = new ArrayList<>(3);
+            map.put(methodName, methodInfos);
+        }
+        methodInfos.add(info);
     }
     private static String typeToSig(Class<?> type) {
         if(type.isArray()){

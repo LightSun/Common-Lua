@@ -46,7 +46,7 @@ void pushFunc(JNIEnv *env, jclass clazz, jlong ptr, jobject func, jstring classn
     lua_newtable(L);
     jobject * ud = static_cast<jobject *>(lua_newuserdata(L, sizeof(jobject)));
     *ud = env->NewGlobalRef(func);
-    luaL_newmetatable(L, cn);
+    luaL_newmetatable(L, cn); //{tab, ud, meta}
 
     lua_pushstring(L, "__gc");
     lua_pushvalue(L, -2-2);

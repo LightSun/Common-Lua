@@ -92,6 +92,9 @@ void call_testLua(lua_State* L, char* luacontent){
 
 class LuaBridgeCallerImpl : public LuaBridgeCaller{
 public:
+    ~LuaBridgeCallerImpl(){
+    };
+
     LuaBridgeCallerImpl(const char *classname, LuaMediator *holder){
     }
     LuaBridgeCallerImpl(){}

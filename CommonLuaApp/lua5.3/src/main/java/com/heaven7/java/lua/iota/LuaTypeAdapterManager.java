@@ -22,6 +22,10 @@ import java.lang.reflect.Type;
 import java.util.HashMap;
 import java.util.Map;
 
+/**
+ * the lua type adapter manager
+ * @author heaven7
+ */
 public class LuaTypeAdapterManager implements ILuaTypeAdapterManager {
 
     private static final Map<TypeNode, LuaTypeAdapter> sBaseAdapters = new HashMap<>();
@@ -31,7 +35,7 @@ public class LuaTypeAdapterManager implements ILuaTypeAdapterManager {
     private final LuaReflectyContext mContext;
 
     public LuaTypeAdapterManager(LuaReflectyContext context) {
-        mContext = new GroupLuaReflectyContext(context);
+        mContext = new GroupLuaReflectyContext(mIotaPM, context);
     }
     public void addIotaPlugin(IotaPlugin plugin){
         mIotaPM.addIotaPlugin(plugin);

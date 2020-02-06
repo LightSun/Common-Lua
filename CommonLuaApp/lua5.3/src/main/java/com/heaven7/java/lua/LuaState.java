@@ -122,6 +122,9 @@ public final class LuaState extends INativeObject.BaseNativeObject {
             _pushJavaObject(getNativePointer(), obj, obj.getClass().getName(), name, pushToStack);
         }
     }
+    public void pushClass(Class<?> clazz, String globalK, boolean pushToStack){
+        _pushClass(getNativePointer(), clazz.getName(), globalK, pushToStack);
+    }
     public void pushFunction(LuaFunction func){
         push(func);
     }
@@ -236,6 +239,7 @@ public final class LuaState extends INativeObject.BaseNativeObject {
     //globalKey can be null, pushToStack only used for global
     private static synchronized native void _pushJavaObject(long ptr, Object obj, String classname, String globalKey, boolean pushToStack);
     private static synchronized native void _pushFunction(long ptr, Object func, String classname, String globalKey, boolean pushToStack);
+    private static synchronized native void _pushClass(long ptr, String classname, String globalKey, boolean pushToStack);
 
     private static synchronized native int _pcall(long ptr, int nArgs, int nResults, int errFunc);
     private static synchronized native void _call(long ptr, int nArgs, int nResults);

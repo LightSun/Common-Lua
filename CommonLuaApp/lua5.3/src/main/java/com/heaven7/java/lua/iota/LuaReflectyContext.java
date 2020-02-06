@@ -5,6 +5,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+/**
+ * the lua reflecty context
+ * @author heaven7
+ */
 public interface LuaReflectyContext {
 
     boolean isSet(Class<?> type);

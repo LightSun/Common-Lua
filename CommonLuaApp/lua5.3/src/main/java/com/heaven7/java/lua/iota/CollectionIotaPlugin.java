@@ -28,7 +28,7 @@ public abstract class CollectionIotaPlugin extends IotaPlugin {
      * get the element type adapter for collection class type. this often used when you want to use a self-type collection.
      * can non-extend {@linkplain Collection}. see {@linkplain LuaReflectyContext#isCollection(Class)} and {@linkplain LuaReflectyContext#createCollection(Class)}.
      * @param type the collection class. can be any similar collection. like {@linkplain Collection}
-     * @param provider the type adapter provider. used to get basic type {@linkplain TypeAdapter}.
+     * @param provider the type adapter provider. used to get basic type {@linkplain LuaTypeAdapter}.
      * @return the element type adapter. or null if you haven't use self-type collection.
      */
     public abstract LuaTypeAdapter getElementAdapter(BasicTypeAdapterProvider provider, Class<?> type);

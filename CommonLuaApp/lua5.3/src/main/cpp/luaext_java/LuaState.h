@@ -7,6 +7,8 @@
 
 #include "jni.h"
 #include "java_env.h"
+#include "class_wrapper.h"
+
 extern "C" {
 #include "../luaextra/lua_extra.h"
 

@@ -1,4 +1,4 @@
-package com.heaven7.java.lua;
+package com.heaven7.java.lua.anno;
 
 
 import java.lang.annotation.Documented;

@@ -2,16 +2,18 @@ package com.heaven7.java.lua;
 
 import android.support.annotation.Keep;
 
+import com.heaven7.java.lua.internal.ClassInfo;
+import com.heaven7.java.lua.internal.FieldInfo;
 import com.heaven7.java.lua.internal.LuaUtils;
+import com.heaven7.java.lua.internal.MethodInfo;
 
 import java.io.PrintWriter;
 import java.io.StringWriter;
+import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.lang.reflect.Type;
 import java.util.HashMap;
 import java.util.List;
-
-import static com.heaven7.java.lua.LuaInitializer.getLuaTypeAdapterManager;
 
 /**
  * Created by heaven7 on 2019/7/29.
@@ -38,6 +40,46 @@ public final class LuaJavaCaller {
         sInfos.remove(clazz.getName());
     }
 
+    @Keep
+    public static boolean getStaticClass(long luaStatePtr, String className, String name){
+        ClassInfo info = sInfos.get(className);
+        if(info == null){
+            return false;
+        }
+        Class<?> clazz;
+        try {
+            clazz = Class.forName(className + "$" + name);
+        } catch (ClassNotFoundException e) {
+            return false;
+        }
+        new LuaState(luaStatePtr).pushClass(clazz, null, true);
+        return true;
+    }
+    @Keep
+    public static boolean getStaticField(long luaStatePtr, String className, String name){
+        final LuaState luaState = new LuaState(luaStatePtr);
+        ClassInfo info = sInfos.get(className);
+        if(info == null){
+            return false;
+        }
+        Class<?> clazz;
+        try {
+            clazz = Class.forName(className);
+        } catch (ClassNotFoundException e) {
+            return false;
+        }
+        FieldInfo fi = info.getStaticFieldInfo(name);
+        if(fi == null){
+            return false;
+        }
+        try {
+            Field field = clazz.getField(fi.getRawName());
+            LuaUtils.java2lua(luaState, fi.getType(), field.get(null));
+            return true;
+        } catch (NoSuchFieldException | IllegalAccessException e) {
+            return false;
+        }
+    }
     /**
      * create object .this is called from lua.
      *
@@ -125,7 +167,7 @@ public final class LuaJavaCaller {
                 Object[] out = new Object[mi.getParameterCount()];
                 convert(luaState, mi.getTypes(), args, out);
                 try {
-                    Method m = clazz.getMethod(mi.getName(), mi.getRawTypes());
+                    Method m = clazz.getMethod(mi.getRawName(), mi.getRawTypes());
                     Object result = m.invoke(owner, out);
                     return LuaUtils.java2lua(luaState, m.getGenericReturnType(), result);
                 } catch (Exception e) {

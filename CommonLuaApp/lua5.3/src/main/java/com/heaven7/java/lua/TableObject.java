@@ -120,8 +120,8 @@ public final class TableObject {
     public void setField(String name, LuaParameter val){
         final LuaState luaState = getLuaState();
         final int idx = LuaUtils.adjustIdx(luaState, index);
-        val.java2lua(luaState);
         luaState.pushString(name);
+        val.java2lua(luaState);
         luaState.setTable(idx);
     }
 

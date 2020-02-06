@@ -9,6 +9,7 @@
 
 #define SIG_JSTRING "Ljava/lang/String;"
 #define SIG_OBJECT "Ljava/lang/Object;"
+#define SIG_CLASS "Ljava/lang/Class;"
 
 typedef struct Registration{
     char* clazz;

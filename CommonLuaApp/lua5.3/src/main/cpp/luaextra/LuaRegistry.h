@@ -24,7 +24,6 @@ extern "C"{
 #include "sstream"
 #include "lua_bridge.h"
 
-
 class LuaParam;
 class LuaBridgeCaller;
 class LuaMediator;
@@ -177,6 +176,8 @@ public:
 
 class LuaBridgeCaller{
 public:
+    ~LuaBridgeCaller(){};
+
     virtual int call(lua_State* L, const char *cn, const char *mName ,LuaMediator * holder) = 0;
 
     //opt impl. used for user data.

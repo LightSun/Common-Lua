@@ -7,6 +7,7 @@
 #include "LuaState.h"
 #include "LuaJavaCaller.h"
 #include "LuaFunc.h"
+#include "class_wrapper.h"
 
 #include "../luaextra/lua_lambda.h"
 
@@ -97,11 +98,11 @@ jint isNativeWrapper_(JNIEnv *env, jclass clazz, jlong ptr, int idx) {
     idx = ext_adjustIdx(L, idx);
     jint result = 0;
 
-    switch (lua_type(L, idx)){
-        case LUA_TFUNCTION:{
+    switch (lua_type(L, idx)) {
+        case LUA_TFUNCTION: {
             lua_pushvalue(L, idx);
             lua_pushstring(L, LIB_LUA_WRAPPER);
-            if(lua_pcall(L, 1, 1, 0)){
+            if (lua_pcall(L, 1, 1, 0)) {
                 return 0;
             }
         }
@@ -141,6 +142,15 @@ void travel_(JNIEnv *env, jclass clazz, jlong ptr, jint idx, jobject traveller) 
         return result;
     };
     travelTable(L, idx, luaTransform(tt));
+}
+void wrapClass(JNIEnv *env, jclass clazz, jlong ptr, jstring cn, jstring gk, jboolean toStack) {
+    lua_State *L = reinterpret_cast<lua_State *>(ptr);
+    auto str_cn = env->GetStringUTFChars(cn, nullptr);
+    auto str_gk = env->GetStringUTFChars(gk, nullptr);
+    lua_wrapClass(L, str_cn, str_gk, toStack ? 1 : 0);
+
+    env->ReleaseStringUTFChars(cn, str_cn);
+    env->ReleaseStringUTFChars(gk, str_gk);
 }
 
 //------------------ stack ---------------------
@@ -468,6 +478,7 @@ static JNINativeMethod lua_state_methods[] = {
         {"_pushBoolean",             "(JZ)V",                                       (void *) lua_pushBoolean_},
         {"_pushJavaObject",          "(J" SIG_OBJECT SIG_JSTRING SIG_JSTRING "Z)V", (void *) pushJavaObject},
         {"_pushFunction",            "(J" SIG_OBJECT SIG_JSTRING SIG_JSTRING "Z)V", (void *) pushFunc},
+        {"_pushClass",               "(J" SIG_JSTRING SIG_JSTRING "Z)V",            (void *) wrapClass},
 
         {"_toString",                "(JI)" SIG_JSTRING,                            (void *) lua_tostring_},
         {"_toInt",                   "(JI)I",                                       (void *) toInt_},

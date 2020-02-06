@@ -1,4 +1,4 @@
-package com.heaven7.java.lua;
+package com.heaven7.java.lua.internal;
 
 import java.lang.reflect.Type;
 
@@ -7,6 +7,7 @@ public final class MethodInfo{
     private String sig;  //"(Ljava/lang/String;Z)V"
     private Type[] types;
     private Class<?>[] rawTypes;
+    private String rawName;
 
     public Class<?>[] getRawTypes() {
         return rawTypes;
@@ -38,5 +39,12 @@ public final class MethodInfo{
     }
     public void setTypes(Type[] types) {
         this.types = types;
+    }
+
+    public void setRawName(String rawName) {
+        this.rawName = rawName;
+    }
+    public String getRawName() {
+        return rawName;
     }
 }
