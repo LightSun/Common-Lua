@@ -4,6 +4,7 @@ import android.support.annotation.Keep;
 
 import com.heaven7.java.lua.internal.ClassInfo;
 import com.heaven7.java.lua.internal.FieldInfo;
+import com.heaven7.java.lua.internal.CallJavaMethodFunction;
 import com.heaven7.java.lua.internal.LuaUtils;
 import com.heaven7.java.lua.internal.MethodInfo;
 
@@ -39,7 +40,26 @@ public final class LuaJavaCaller {
     public static void unregisterJavaClass(Class<?> clazz) {
         sInfos.remove(clazz.getName());
     }
+    @Keep
+    public static boolean getStaticMethod(long luaStatePtr, String className, String name, int pCount){
+        ClassInfo info = sInfos.get(className);
+        if(info == null){
+            return false;
+        }
+        Class<?> clazz;
+        try {
+            clazz = Class.forName(className);
+        } catch (ClassNotFoundException e) {
+            return false;
+        }
+        List<MethodInfo> list = info.getStaticMethods(name, pCount);
 
+        if(list == null){
+            return false;
+        }
+        new LuaState(luaStatePtr).pushFunction(new CallJavaMethodFunction(clazz, list));
+        return true;
+    }
     @Keep
     public static boolean getStaticClass(long luaStatePtr, String className, String name){
         ClassInfo info = sInfos.get(className);
@@ -107,7 +127,7 @@ public final class LuaJavaCaller {
             if (args == null || args.length == 0) {
                 return clazz.newInstance();
             }
-            List<MethodInfo> list = info.getConstructorInfoes(name, args.length);
+            List<MethodInfo> list = info.getConstructors(name, args.length);
             if(list == null){
                 errorMsg[0] = "can't find constructor for class("+ className + "), constructor name = "
                         + name  + ", args.length = " + args.length;
@@ -155,7 +175,7 @@ public final class LuaJavaCaller {
             }
             Class<?> clazz = Class.forName(className);
 
-            List<MethodInfo> list = info.getMethodInfoes(method, args.length);
+            List<MethodInfo> list = info.getMethods(method, args.length);
             if(list == null){
                 errorMsg[0] = "can't find method for class("+ className + "), method name = "
                         + method  + ", args.length = " + args.length;
@@ -190,7 +210,7 @@ public final class LuaJavaCaller {
         return sw.toString();
     }
 
-    private static boolean convert(LuaState luaState, Type[] types, Object[] args, Object[] out) {
+    public static boolean convert(LuaState luaState, Type[] types, Object[] args, Object[] out) {
         for (int size = args.length, i = 0; i < size; i++) {
             Type type = types[i];
             LuaTypeAdapter adapter = LuaTypeAdapter.get(type);

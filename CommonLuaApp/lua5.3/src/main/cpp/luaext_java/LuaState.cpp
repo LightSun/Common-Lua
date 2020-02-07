@@ -497,6 +497,7 @@ static JNINativeMethod lua_state_methods[] = {
         {"_error",                   "(J" SIG_JSTRING ")V",                         (void *) luaL_error_},
         {"_setCollectionTypeAsMeta", "(JII)V",                                      (void *) setCollectionTypeAsMeta_},
         {"_getCollectionType",       "(JI)I",                                       (void *) getCollectionType_},
+        {"_isJavaClass",             "(JI)Z",                                       (void *) isJavaClass_},
 };
 
 Registration getLuaStateRegistration() {

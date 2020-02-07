@@ -4,10 +4,10 @@ import java.lang.reflect.Type;
 
 public final class MethodInfo{
     private String name;
+    private String rawName;
     private String sig;  //"(Ljava/lang/String;Z)V"
     private Type[] types;
     private Class<?>[] rawTypes;
-    private String rawName;
 
     public Class<?>[] getRawTypes() {
         return rawTypes;
@@ -46,5 +46,14 @@ public final class MethodInfo{
     }
     public String getRawName() {
         return rawName;
+    }
+
+    @Override
+    public String toString() {
+        return "MethodInfo{" +
+                "name='" + name + '\'' +
+                ", rawName='" + rawName + '\'' +
+                ", sig='" + sig + '\'' +
+                '}';
     }
 }

@@ -27,7 +27,9 @@ extern "C" {
 #define MNAME_INVOKE "invoke"
 #define MNAME_GET_STATIC_CLASS  "getStaticClass"
 #define MNAME_GET_STATIC_FIELD  "getStaticField"
+#define MNAME_GET_STATIC_METHOD  "getStaticMethod"
 #define SIG_GET_STATIC_FIELD "(J" STRING_NAME STRING_NAME ")Z"
+#define SIG_GET_STATIC_METHOD "(J" STRING_NAME STRING_NAME "I)Z"
 
 #define SIG_LUA2JAVA_CLASS "L" LUA2JAVA_CLASS ";"
 #define SIG_CREATE "(J" STRING_NAME STRING_NAME "[" OBJECT_NAME "[" OBJECT_NAME ")" OBJECT_NAME
@@ -65,6 +67,17 @@ int call_getStaticClass(lua_State* L, const char* classname, const char* name){
     auto result = env->CallStaticBooleanMethod(__callerClass, mid,(jlong)L,
                                                env->NewStringUTF(classname),
                                                env->NewStringUTF(name));
+    if(!result){
+        lua_pushnil(L);
+    }
+    return 1;
+}
+int call_getStaticMethod(lua_State* L, const char* classname, const char* name, int pCount){
+    JNIEnv *const env = getJNIEnv();
+    auto mid = env->GetStaticMethodID(__callerClass, MNAME_GET_STATIC_METHOD, SIG_GET_STATIC_METHOD);
+    auto result = env->CallStaticBooleanMethod(__callerClass, mid,(jlong)L,
+                                               env->NewStringUTF(classname),
+                                               env->NewStringUTF(name), pCount);
     if(!result){
         lua_pushnil(L);
     }

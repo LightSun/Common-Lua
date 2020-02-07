@@ -211,7 +211,11 @@ public final class LuaState extends INativeObject.BaseNativeObject {
     public int getCollectionType(int idx){
        return _getCollectionType(getNativePointer(), idx);
     }
+    public boolean isJavaClass(int idx) {
+        return _isJavaClass(getNativePointer(), idx);
+    }
     //=============================== native methods ========================================
+    private static synchronized native boolean _isJavaClass(long ptr, int idx);
     private static synchronized native void  _setCollectionTypeAsMeta(long ptr, int idx, int collType);
     private static synchronized native int  _getCollectionType(long ptr, int idx);
     private static synchronized native void  _error(long ptr, String msg);
@@ -252,4 +256,6 @@ public final class LuaState extends INativeObject.BaseNativeObject {
     private static synchronized native void _dumpLuaStack(long ptr);
     private static synchronized native long _nCreate();
     private static synchronized native void _nRelease(long ptr);
+
+
 }

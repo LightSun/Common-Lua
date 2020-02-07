@@ -38,7 +38,7 @@ public final class ClassInfo {
     private final Map<String, List<MethodInfo>> mStaticMethodMap = new HashMap<>();
     private final List<FieldInfo> mStaticFields = new ArrayList<>();
 
-    private final String mClassName;
+    //private final String mClassName;
 
     static {
         sBases.put(boolean.class, "Z");
@@ -53,7 +53,7 @@ public final class ClassInfo {
     }
 
     public ClassInfo(Class<?> clazz) {
-        this.mClassName = clazz.getName();
+       // this.mClassName = clazz.getName();
 
         StringBuilder sb = new StringBuilder();
         //constructors
@@ -131,37 +131,16 @@ public final class ClassInfo {
         }
         return null;
     }
-    //desc
-    public List<MethodInfo> getMethodInfoes(String name, int expectParamCount){
-        List<MethodInfo> infos = mMethodMap.get(name);
-        if(infos == null){
-            return null;
-        }
-        List<MethodInfo> list = new ArrayList<>();
-        for (MethodInfo mi : infos){
-            if(mi.getParameterCount() >= expectParamCount){
-                list.add(mi);
-            }else {
-                break;
-            }
-        }
-        return list;
+    public List<MethodInfo> getStaticMethods(String name, int expectParamCount) {
+        return getMethods(mStaticMethodMap, name, expectParamCount);
     }
     //desc
-    public List<MethodInfo> getConstructorInfoes(String name, int expectParamCount){
-        List<MethodInfo> infos = mConstructorMap.get(name);
-        if(infos == null){
-            return null;
-        }
-        List<MethodInfo> list = new ArrayList<>();
-        for (MethodInfo mi : infos){
-            if(mi.getParameterCount() >= expectParamCount){
-                list.add(mi);
-            }else {
-                break;
-            }
-        }
-        return list;
+    public List<MethodInfo> getMethods(String name, int expectParamCount){
+        return getMethods(mMethodMap, name, expectParamCount);
+    }
+    //desc
+    public List<MethodInfo> getConstructors(String name, int expectParamCount){
+        return getMethods(mConstructorMap, name, expectParamCount);
     }
     //for constructor. returnType = null
     private static void getSigAndFill(StringBuilder sb, Map<String, List<MethodInfo>> map, Class<?> returnType, String methodName, MethodInfo info) {
@@ -200,5 +179,24 @@ public final class ClassInfo {
         }
         sb.append(";");
         return sb.toString();
+    }
+
+    private static List<MethodInfo> getMethods(Map<String, List<MethodInfo>> mMethodMap, String name, int expectParamCount){
+        List<MethodInfo> infos = mMethodMap.get(name);
+        if(infos == null){
+            return null;
+        }
+        if(expectParamCount < 0){
+            return infos;
+        }
+        List<MethodInfo> list = new ArrayList<>();
+        for (MethodInfo mi : infos){
+            if(mi.getParameterCount() >= expectParamCount){
+                list.add(mi);
+            }else {
+                break;
+            }
+        }
+        return list;
     }
 }
