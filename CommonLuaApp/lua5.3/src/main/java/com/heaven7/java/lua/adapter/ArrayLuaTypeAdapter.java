@@ -19,20 +19,20 @@ public class ArrayLuaTypeAdapter extends LuaTypeAdapter {
         this.mComponentAdapter = mComponentAdapter;
     }
 
-    public Object lua2java(LuaState luaState, Lua2JavaValue arg){
+    public Object readFromLua(LuaState luaState, Lua2JavaValue arg){
         List list = new ArrayList();
         arg.toTableValue(luaState).travel(new CollectionTraveller(mComponentAdapter, list));
         return list.toArray((Object[]) Array.newInstance(mComponentClass, list.size()));
     }
 
-    public int java2lua(LuaState luaState, Object result){
+    public int writeToLua(LuaState luaState, Object result){
         luaState.newTable();
         int top = luaState.getTop();
         int length = Array.getLength(result);
         for (int i = 0 ; i < length ; i ++){
             Object ele = Array.get(result, i);
             //must only add one to lua stack
-            mComponentAdapter.java2lua(luaState, ele);
+            mComponentAdapter.writeToLua(luaState, ele);
             LuaUtils.checkTopDelta(luaState, top + 1);
             luaState.rawSeti(-2, i + 1); //lua array from 1
         }

@@ -6,7 +6,7 @@ import com.heaven7.java.lua.LuaState;
 public class IntLuaTypeAdapter extends NumberAdapterLua{
 
     @Override
-    public Object lua2java(LuaState luaState, Lua2JavaValue arg) {
+    public Object readFromLua(LuaState luaState, Lua2JavaValue arg) {
         return arg.toIntValue();
     }
     @Override

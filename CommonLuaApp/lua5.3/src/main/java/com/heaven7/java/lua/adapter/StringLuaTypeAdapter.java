@@ -6,7 +6,7 @@ import com.heaven7.java.lua.LuaTypeAdapter;
 
 public class StringLuaTypeAdapter extends LuaTypeAdapter {
     @Override
-    public Object lua2java(LuaState luaState, Lua2JavaValue arg) {
+    public Object readFromLua(LuaState luaState, Lua2JavaValue arg) {
         return arg.toStringValue();
     }
     @Override
@@ -14,7 +14,7 @@ public class StringLuaTypeAdapter extends LuaTypeAdapter {
         return null;
     }
     @Override
-    public int java2lua(LuaState luaState, Object result) {
+    public int writeToLua(LuaState luaState, Object result) {
         luaState.pushString((String) result);
         return 1;
     }

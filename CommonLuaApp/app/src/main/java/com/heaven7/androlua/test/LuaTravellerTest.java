@@ -12,7 +12,7 @@ public final class LuaTravellerTest {
     public static void testBase(LuaState luaState){
         int k = luaState.saveLightly();
         int[] arr = {11,22,33};
-        int i = LuaUtils.simpleJava2lua(luaState, arr);
+        int i = LuaUtils.writeToLua(luaState, arr);
         if(i != 1){
             throw new IllegalStateException();
         }

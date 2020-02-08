@@ -11,13 +11,13 @@ public class CharLuaTypeAdapter extends LuaTypeAdapter {
         throw new RuntimeException("char type must be initialize.");
     }
     @Override
-    public int java2lua(LuaState luaState, Object result) {
+    public int writeToLua(LuaState luaState, Object result) {
         char ch = (Character) result;
         luaState.pushString(new String(new char[]{ ch }));
         return 1;
     }
     @Override
-    public Object lua2java(LuaState luaState, Lua2JavaValue arg) {
+    public Object readFromLua(LuaState luaState, Lua2JavaValue arg) {
         return arg.toCharValue();
     }
 }

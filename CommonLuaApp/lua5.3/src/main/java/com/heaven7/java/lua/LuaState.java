@@ -179,7 +179,6 @@ public final class LuaState extends INativeObject.BaseNativeObject {
     public int getType(int idx) {
         return _getType(getNativePointer(), idx);
     }
-
     /**
      * report a error msg to lua
      * @param msg the error msg
@@ -214,6 +213,16 @@ public final class LuaState extends INativeObject.BaseNativeObject {
     public boolean isJavaClass(int idx) {
         return _isJavaClass(getNativePointer(), idx);
     }
+
+    /**
+     * get the java object from native. unless you confirm the idx object is lua table and is java object wrapper table. you can call this
+     * or else return null.
+     * @param idx the lua idx
+     * @return the java object
+     */
+    public Object getJavaObject(int idx) {
+        return _getJavaObject(getNativePointer(), idx);
+    }
     //=============================== native methods ========================================
     private static synchronized native boolean _isJavaClass(long ptr, int idx);
     private static synchronized native void  _setCollectionTypeAsMeta(long ptr, int idx, int collType);
@@ -221,6 +230,7 @@ public final class LuaState extends INativeObject.BaseNativeObject {
     private static synchronized native void  _error(long ptr, String msg);
     private static synchronized native void _travel(long ptr, int idx, Object traveller);
     private static synchronized native int _isNativeWrapper(long ptr, int idx);
+    private static synchronized native Object _getJavaObject(long ptr, int idx);
 
     private static synchronized native int _evaluateScript(long ptr, String script);
     private static synchronized native Object _getLuaValue(long ptr, int idx);
@@ -256,6 +266,5 @@ public final class LuaState extends INativeObject.BaseNativeObject {
     private static synchronized native void _dumpLuaStack(long ptr);
     private static synchronized native long _nCreate();
     private static synchronized native void _nRelease(long ptr);
-
 
 }

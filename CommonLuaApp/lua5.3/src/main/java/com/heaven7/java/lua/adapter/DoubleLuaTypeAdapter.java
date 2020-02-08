@@ -11,7 +11,7 @@ public class DoubleLuaTypeAdapter extends NumberAdapterLua {
     }
 
     @Override
-    public Object lua2java(LuaState luaState, Lua2JavaValue arg) {
+    public Object readFromLua(LuaState luaState, Lua2JavaValue arg) {
         return arg.toDoubleValue();
     }
 }

@@ -20,6 +20,6 @@ public final class LuaParameter {
         return value;
     }
     public void java2lua(LuaState luaState){
-        LuaUtils.java2lua(luaState, type, value);
+        LuaUtils.writeToLua(luaState, type, value);
     }
 }

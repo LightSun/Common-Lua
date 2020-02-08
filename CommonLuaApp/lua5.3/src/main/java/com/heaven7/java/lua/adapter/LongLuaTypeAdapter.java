@@ -5,7 +5,7 @@ import com.heaven7.java.lua.LuaState;
 
 public class LongLuaTypeAdapter extends IntLuaTypeAdapter {
     @Override
-    public Object lua2java(LuaState luaState, Lua2JavaValue arg) {
+    public Object readFromLua(LuaState luaState, Lua2JavaValue arg) {
         return arg.toLongValue();
     }
 }

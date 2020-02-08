@@ -303,6 +303,9 @@ public:
         }
         return result;
     }
+    void* getCObject(){
+        return jobj;
+    }
 };
 LuaBridgeCaller* newJavaLBC(jobject jobj, jstring classname){
     return reinterpret_cast<LuaBridgeCaller *>(new LuaJavaCaller(jobj, classname));

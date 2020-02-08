@@ -7,7 +7,7 @@ import java.lang.reflect.Method;
 import java.util.List;
 
 import static com.heaven7.java.lua.LuaJavaCaller.convert;
-import static com.heaven7.java.lua.internal.LuaUtils.java2lua;
+import static com.heaven7.java.lua.internal.LuaUtils.writeToLua;
 
 /**
  * a lua function which invoke java methods
@@ -36,7 +36,7 @@ public final class CallJavaMethodFunction extends LuaFunction {
             try {
                 Method m = clazz.getMethod(mi.getRawName(), mi.getRawTypes());
                 Object result = m.invoke(null, out);
-                return java2lua(luaState, m.getGenericReturnType(), result);
+                return writeToLua(luaState, m.getGenericReturnType(), result);
             } catch (Exception e) {
                 if (i == 0) {
                     //last. still error.

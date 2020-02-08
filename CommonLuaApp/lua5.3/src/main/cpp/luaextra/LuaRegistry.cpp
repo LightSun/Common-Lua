@@ -155,6 +155,11 @@ static int hasMethod(lua_State *L) {
     lua_pushboolean(L, result ? 1 : 0);
     return 1;
 }
+static int getCppObject(lua_State *L) {
+    LuaBridgeCaller *ud = getLBC(L);
+    lua_pushlightuserdata(L, ud->getCObject());
+    return 1;
+}
 static int recycle(lua_State *L) {
     delete (getLBC(L));
     //ext_println("java object is recycled by lua gc.");
@@ -207,6 +212,12 @@ void lua_wrapObject(lua_State *L, LuaBridgeCaller *caller, const char *classname
     lua_pushvalue(L, -2); //push table to up index
     lua_pushstring(L, classname);
     lua_pushcclosure(L, &call, 2);
+    lua_rawset(L, -3);
+
+    lua_pushstring(L, NAME_GET_CPP);
+    lua_pushvalue(L, -2); //push table to up index
+    lua_pushstring(L, classname);
+    lua_pushcclosure(L, &getCppObject, 2);
     lua_rawset(L, -3);
 
     lua_pushstring(L, LIB_LUA_WRAPPER);

@@ -94,7 +94,7 @@ public final class LuaJavaCaller {
         }
         try {
             Field field = clazz.getField(fi.getRawName());
-            LuaUtils.java2lua(luaState, fi.getType(), field.get(null));
+            LuaUtils.writeToLua(luaState, fi.getType(), field.get(null));
             return true;
         } catch (NoSuchFieldException | IllegalAccessException e) {
             return false;
@@ -189,7 +189,7 @@ public final class LuaJavaCaller {
                 try {
                     Method m = clazz.getMethod(mi.getRawName(), mi.getRawTypes());
                     Object result = m.invoke(owner, out);
-                    return LuaUtils.java2lua(luaState, m.getGenericReturnType(), result);
+                    return LuaUtils.writeToLua(luaState, m.getGenericReturnType(), result);
                 } catch (Exception e) {
                     if (i == 0) {
                         //last. still error.
@@ -218,7 +218,7 @@ public final class LuaJavaCaller {
             if (adapter != null) {
                 if (args[i] instanceof Lua2JavaValue) {
                     value = (Lua2JavaValue) args[i];
-                    out[i] = adapter.lua2java(luaState, value);
+                    out[i] = adapter.readFromLua(luaState, value);
                     value.recycle();
                 } else {
                     throw new IllegalStateException("args must be Lua2JavaValue.");

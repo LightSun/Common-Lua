@@ -21,20 +21,20 @@ public class ListLuaTypeAdapter extends LuaTypeAdapter {
         this.mComponentAdapter = mComponentAdapter;
     }
 
-    public Object lua2java(LuaState luaState, Lua2JavaValue arg){
+    public Object readFromLua(LuaState luaState, Lua2JavaValue arg){
         List list = mContext.createList(mListClass);
         arg.toTableValue(luaState).travel(new CollectionTraveller(mComponentAdapter, list));
         return list instanceof Wrapper ? ((Wrapper) list).unwrap(): list;
     }
 
-    public int java2lua(LuaState luaState, Object result){
+    public int writeToLua(LuaState luaState, Object result){
         luaState.newTable();
         final int top = luaState.getTop();
         final List list = mContext.getList(result);
         for (int i = 0, size = list.size() ; i < size ; i ++){
             Object ele = list.get(i);
             //must only add one to lua stack
-            mComponentAdapter.java2lua(luaState, ele);
+            mComponentAdapter.writeToLua(luaState, ele);
             //LuaUtils.java2lua(luaState, ele);
             LuaUtils.checkTopDelta(luaState, top + 1);
             luaState.rawSeti(-2, i + 1); //lua array from 1

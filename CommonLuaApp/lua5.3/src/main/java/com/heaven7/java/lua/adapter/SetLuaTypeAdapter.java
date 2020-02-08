@@ -22,19 +22,19 @@ public class SetLuaTypeAdapter extends LuaTypeAdapter {
         this.mComponentAdapter = mComponentAdapter;
     }
 
-    public Object lua2java(LuaState luaState, Lua2JavaValue arg){
+    public Object readFromLua(LuaState luaState, Lua2JavaValue arg){
         Set list = mContext.createSet(mClass);
         arg.toTableValue(luaState).travel(new CollectionTraveller(mComponentAdapter, list));
         return list instanceof Wrapper ? ((Wrapper) list).unwrap(): list;
     }
 
-    public int java2lua(LuaState luaState, Object result){
+    public int writeToLua(LuaState luaState, Object result){
         luaState.newTable();
         final int top = luaState.getTop();
         final Set<?> set = mContext.getSet(result);
         for (Iterator<?> it = set.iterator(); it.hasNext() ; ){
             Object ele = it.next();
-            mComponentAdapter.java2lua(luaState, ele);
+            mComponentAdapter.writeToLua(luaState, ele);
             LuaUtils.checkTopDelta(luaState, top + 1);
             luaState.pushBoolean(true);
             luaState.rawSet(-3);

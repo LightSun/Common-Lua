@@ -24,12 +24,18 @@ import java.util.Collection;
             luaState = new LuaState(luaStatePte);
         }
         switch (getCollectionType()) {
-            case LuaState.COLLECTION_TYPE_LIST:
-                coll.add(componentAdapter.lua2java(luaState, value));
-                break;
+            case LuaState.COLLECTION_TYPE_LIST: {
+                Object o = componentAdapter.readFromLua(luaState, value);
+                if (o != null) {
+                    coll.add(o);
+                }
+            }break;
 
             case LuaState.COLLECTION_TYPE_SET:
-                coll.add(componentAdapter.lua2java(luaState, key));
+                Object o = componentAdapter.readFromLua(luaState, key);
+                if (o != null) {
+                    coll.add(o);
+                }
                 break;
 
             case LuaState.COLLECTION_TYPE_MAP:

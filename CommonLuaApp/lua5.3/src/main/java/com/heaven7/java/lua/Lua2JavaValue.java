@@ -37,18 +37,7 @@ public final class Lua2JavaValue {
 
     @Override
     protected void finalize() throws Throwable {
-        if (ptr != 0) {
-            switch (type) {
-                case TYPE_NUMBER:
-                    releaseNumber_(ptr);
-                    ptr = 0;
-                    break;
-                case TYPE_BOOLEAN:
-                    releaseBoolean_(ptr);
-                    ptr = 0;
-                    break;
-            }
-        }
+        recycleNative();
         super.finalize();
     }
 
@@ -213,6 +202,13 @@ public final class Lua2JavaValue {
         }
     }
 
+    private static native String getString_(long ptr);
+    private static native boolean getBoolean_(long ptr);
+    private static native double getNumber_(long ptr);
+    private static native void releaseNumber_(long ptr);
+    private static native void releaseBoolean_(long ptr);
+
+    //-------------------------------------- help methods ----------------------------
     public void recycle() {
         if (used) {
             System.err.println("This Lua2JavaValue cannot be recycled because it "
@@ -220,6 +216,7 @@ public final class Lua2JavaValue {
             return;
         }
         used = true;
+        recycleNative();
         synchronized (sPoolSync) {
             if (sPoolSize < MAX_POOL_SIZE) {
                 next = sPool;
@@ -228,13 +225,6 @@ public final class Lua2JavaValue {
             }
         }
     }
-
-    private static native String getString_(long ptr);
-    private static native boolean getBoolean_(long ptr);
-    private static native double getNumber_(long ptr);
-    private static native void releaseNumber_(long ptr);
-    private static native void releaseBoolean_(long ptr);
-
     private static Lua2JavaValue obtain() {
         synchronized (sPoolSync) {
             if (sPool != null) {
@@ -248,7 +238,20 @@ public final class Lua2JavaValue {
         }
         return new Lua2JavaValue();
     }
-
+    private void recycleNative(){
+        if (ptr != 0) {
+            switch (type) {
+                case TYPE_NUMBER:
+                    releaseNumber_(ptr);
+                    ptr = 0;
+                    break;
+                case TYPE_BOOLEAN:
+                    releaseBoolean_(ptr);
+                    ptr = 0;
+                    break;
+            }
+        }
+    }
     private Lua2JavaValue next;
     private static final Object sPoolSync = new Object();
     private static Lua2JavaValue sPool;

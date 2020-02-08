@@ -123,6 +123,19 @@ jint isNativeWrapper_(JNIEnv *env, jclass clazz, jlong ptr, int idx) {
     lua_pop(L, 1);
     return result;
 }
+jobject getJavaObject_(JNIEnv *env, jclass clazz, jlong ptr, int idx) {
+    lua_State *L = reinterpret_cast<lua_State *>(ptr);
+    idx = ext_adjustIdx(L, idx);
+    lua_pushstring(L, NAME_GET_CPP);
+    lua_gettable(L, idx);
+    if(lua_type(L, -1) == LUA_TLIGHTUSERDATA){
+        jobject jobj = static_cast<jobject>(lua_touserdata(L, -1));
+        lua_pop(L, 1);
+        return jobj;
+    }
+    lua_pop(L, 1);
+    return nullptr;
+}
 void travel_(JNIEnv *env, jclass clazz, jlong ptr, jint idx, jobject traveller) {
     lua_State *L = reinterpret_cast<lua_State *>(ptr);
     // 1, can't direct access jobject in func callback. or else may cause bug
@@ -493,6 +506,7 @@ static JNINativeMethod lua_state_methods[] = {
         {"_dumpLuaStack",            "(J)V",                                        (void *) dumpLuaStack_},
         {"_pop",                     "(JI)V",                                       (void *) lua_pop_},
         {"_isNativeWrapper",         "(JI)I",                                       (void *) isNativeWrapper_},
+        {"_getJavaObject",           "(JI)" SIG_OBJECT,                             (void *) getJavaObject_},
         {"_travel",                  "(JI" SIG_OBJECT ")V",                         (void *) travel_},
         {"_error",                   "(J" SIG_JSTRING ")V",                         (void *) luaL_error_},
         {"_setCollectionTypeAsMeta", "(JII)V",                                      (void *) setCollectionTypeAsMeta_},

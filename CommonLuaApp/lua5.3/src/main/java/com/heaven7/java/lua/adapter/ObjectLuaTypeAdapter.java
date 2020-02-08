@@ -30,10 +30,10 @@ public final class ObjectLuaTypeAdapter<PR extends LuaTypeAdapter,
         this.mClazz = mClazz;
     }
 
-    public Object lua2java(LuaState luaState, Lua2JavaValue arg){
+    public Object readFromLua(LuaState luaState, Lua2JavaValue arg){
         PR ta = mReflecty.performReflectClass(mClazz);
         if(ta != null) {
-            return ta.lua2java(luaState, arg);
+            return ta.readFromLua(luaState, arg);
         }
         TableObject tab = arg.toTableValue(luaState);
         final Object obj = mTAM.getReflectyContext().newInstance(mClazz);
@@ -49,7 +49,7 @@ public final class ObjectLuaTypeAdapter<PR extends LuaTypeAdapter,
                 }
                 if(tempVal != null){
                     LuaTypeAdapter lta = getTypeAdapter(proxy.getTypeNode(), mTAM);
-                    proxy.setValue(obj, lta.lua2java(luaState, tempVal));
+                    proxy.setValue(obj, lta.readFromLua(luaState, tempVal));
                     tempVal.recycle();
                 }
             }
@@ -59,11 +59,11 @@ public final class ObjectLuaTypeAdapter<PR extends LuaTypeAdapter,
         return obj;
     }
     @Override
-    public int java2lua(LuaState luaState, Object result) {
+    public int writeToLua(LuaState luaState, Object result) {
         //luaState.push(result);
         PR ta = mReflecty.performReflectClass(mClazz);
         if(ta != null){
-            return ta.java2lua(luaState, result);
+            return ta.writeToLua(luaState, result);
         }else {
             luaState.newTable();
             final int top = luaState.getTop();
@@ -72,7 +72,7 @@ public final class ObjectLuaTypeAdapter<PR extends LuaTypeAdapter,
             try {
                 for (MemberProxy proxy : proxies){
                     luaState.pushString(proxy.getPropertyName());
-                    getTypeAdapter(proxy.getTypeNode(), mTAM).java2lua(luaState, proxy.getValue(result));
+                    getTypeAdapter(proxy.getTypeNode(), mTAM).writeToLua(luaState, proxy.getValue(result));
                     LuaUtils.checkTopDelta(luaState, top + 2);
                     luaState.rawSet(-3);
                 }

@@ -24,7 +24,7 @@ public class MapLuaTypeAdapter extends LuaTypeAdapter {
         this.mValueAdapter = mValueAdapter;
     }
 
-    public Object lua2java(LuaState luaState, Lua2JavaValue arg) {
+    public Object readFromLua(LuaState luaState, Lua2JavaValue arg) {
         Map map = mContext.createMap(mMapClass);
         arg.toTableValue(luaState)
                 .travel(new MapTraveller(mKeyAdapter, mValueAdapter, map));
@@ -32,7 +32,7 @@ public class MapLuaTypeAdapter extends LuaTypeAdapter {
     }
 
     @Override
-    public int java2lua(LuaState luaState, Object result) {
+    public int writeToLua(LuaState luaState, Object result) {
         luaState.newTable();
         Map<?, ?> map = mContext.getMap(result);
         final int top = luaState.getTop();
@@ -40,8 +40,8 @@ public class MapLuaTypeAdapter extends LuaTypeAdapter {
         for (Map.Entry<?, ?> en : map.entrySet()) {
             Object key = en.getKey();
             Object value = en.getValue();
-            mKeyAdapter.java2lua(luaState, key);
-            mValueAdapter.java2lua(luaState, value);
+            mKeyAdapter.writeToLua(luaState, key);
+            mValueAdapter.writeToLua(luaState, value);
             LuaUtils.checkTopDelta(luaState, top + 2);
             luaState.rawSet(-3);
         }
@@ -73,8 +73,11 @@ public class MapLuaTypeAdapter extends LuaTypeAdapter {
                     throw new UnsupportedOperationException("list/set can't cast list to map.");
 
                 case LuaState.COLLECTION_TYPE_MAP:
-                    Object k = mKeyAdapter.lua2java(luaState, key);
-                    Object v = mValueAdapter.lua2java(luaState, value);
+                    Object k = mKeyAdapter.readFromLua(luaState, key);
+                    Object v = mValueAdapter.readFromLua(luaState, value);
+                    if(k == null || v == null){
+                        return 0;
+                    }
                     map.put(k, v);
                     break;
 

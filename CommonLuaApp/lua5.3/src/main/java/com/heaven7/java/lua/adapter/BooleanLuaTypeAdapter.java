@@ -13,12 +13,12 @@ public class BooleanLuaTypeAdapter extends LuaTypeAdapter {
     }
 
     @Override
-    public int java2lua(LuaState luaState, Object result) {
+    public int writeToLua(LuaState luaState, Object result) {
         luaState.pushBoolean((Boolean)result);
         return 1;
     }
     @Override
-    public Object lua2java(LuaState luaState, Lua2JavaValue arg) {
+    public Object readFromLua(LuaState luaState, Lua2JavaValue arg) {
         return arg.toBooleanValue();
     }
 }

@@ -22,20 +22,20 @@ public class CollectionLuaTypeAdapter extends LuaTypeAdapter {
         this.mComponentAdapter = mComponentAdapter;
     }
 
-    public Object lua2java(LuaState luaState, Lua2JavaValue arg){
+    public Object readFromLua(LuaState luaState, Lua2JavaValue arg){
         Collection list = mContext.createCollection(mClass);
         arg.toTableValue(luaState).travel(new CollectionTraveller(mComponentAdapter, list));
         return list instanceof Wrapper ? ((Wrapper) list).unwrap(): list;
     }
 
-    public int java2lua(LuaState luaState, Object result){
+    public int writeToLua(LuaState luaState, Object result){
         luaState.newTable();
         int top = luaState.getTop();
         final Collection<?> coll = mContext.getCollection(result);
         int i = 0;
         for (Iterator<?> it = coll.iterator(); it.hasNext() ; i++ ){
             Object ele = it.next();
-            mComponentAdapter.java2lua(luaState, ele);
+            mComponentAdapter.writeToLua(luaState, ele);
             LuaUtils.checkTopDelta(luaState, top + 1);
             luaState.rawSeti(-2, i + 1); //lua array from 1
         }

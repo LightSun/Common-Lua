@@ -9,10 +9,8 @@
 
 #define LIB_LUA_WRAPPER "__LIB_common_lua_WRAP__"
 #define NAME_COLLECTION_TYPE  "__GetCollectionType"
+#define NAME_GET_CPP "getCppObject"
 
-#define COLLECTION_TYPE_LIST 1;
-#define COLLECTION_TYPE_SET 2;
-#define COLLECTION_TYPE_MAP 3;
 #define COLLECTION_TYPE_UNKNOWN -1;
 
 #define DTYPE_NULL 1
@@ -21,10 +19,6 @@
 #define DTYPE_BOOLEAN 4
 #define DTYPE_TABLE 5
 #define DTYPE_FUNC 6
-
-#define DTYPE_SET 8
-#define DTYPE_LIST 9
-#define DTYPE_MAP 10
 #define DTYPE_LUA2JAVA_VALUE 12
 
 /*

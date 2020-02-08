@@ -15,18 +15,18 @@ public abstract class LuaTypeAdapter {
         return null;
     }
     /**
-     * convert lua data to java
+     * read data from lua
      * @param luaState the lua state
      * @param arg the argument
      * @return the java value which represent lua data
      */
-    public abstract Object lua2java(LuaState luaState, Lua2JavaValue arg);
+    public abstract Object readFromLua(LuaState luaState, Lua2JavaValue arg);
 
     /**
-     * convert java object to lua
+     * write java object to lua
      * @param luaState the lua stack
      * @param result the java object
      * @return the push result count of lua stack
      */
-    public abstract int java2lua(LuaState luaState, Object result);
+    public abstract int writeToLua(LuaState luaState, Object result);
 }

@@ -22,21 +22,20 @@ public final class LuaUtils {
         return idx < 0 ? ls.getTop() + idx + 1 : idx;
     }
 
-    public static int java2lua(LuaState state, Type type, Object val){
+    public static int writeToLua(LuaState state, Type type, Object val){
         if(val == null){
             state.pushNil();
             return 1;
         }else {
-            return LuaTypeAdapter.get(type != null ? type : val.getClass()).java2lua(state, val);
+            return LuaTypeAdapter.get(type != null ? type : val.getClass()).writeToLua(state, val);
         }
     }
-
-    public static int simpleJava2lua(LuaState state, Object val){
+    public static int writeToLua(LuaState state, Object val){
         if(val == null){
             state.pushNil();
             return 1;
         }else {
-            return LuaTypeAdapter.get(val.getClass()).java2lua(state, val);
+            return LuaTypeAdapter.get(val.getClass()).writeToLua(state, val);
         }
     }
 }
