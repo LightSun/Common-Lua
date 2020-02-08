@@ -140,4 +140,12 @@ public class SimpleLuaReflectyContext implements LuaReflectyContext {
         }
         return null;
     }
+    @Override
+    public Object newInstance(Class<?> clazz) {
+        try {
+            return clazz.newInstance();
+        } catch (Exception e) {
+            return null;
+        }
+    }
 }

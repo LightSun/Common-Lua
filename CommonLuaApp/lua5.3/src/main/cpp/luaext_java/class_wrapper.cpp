@@ -32,7 +32,7 @@ extern "C"{
     static int wc_getStaticMethod(lua_State* L){
         auto cn = getClassName(L);
         int pCount = -1;
-        auto name;
+        const char* name;
         //check if have a parameter indicate parameter-count
         if(lua_type(L, -1)== LUA_TNUMBER){
             pCount = static_cast<int>(lua_tonumber(L, -1));
@@ -78,7 +78,7 @@ void lua_wrapClass(lua_State *L, const char *classname, const char *globalKey,
         lua_pushcclosure(L, &wc_getField, 0);
         lua_rawset(L, -3);
 
-        lua_pushstring(L, "getStaticMethod");
+        lua_pushstring(L, "getMethod");
         lua_pushcclosure(L, &wc_getStaticMethod, 0);
         lua_rawset(L, -3);
 

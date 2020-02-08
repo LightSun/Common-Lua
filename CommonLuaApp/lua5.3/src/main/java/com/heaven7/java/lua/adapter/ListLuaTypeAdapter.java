@@ -29,7 +29,7 @@ public class ListLuaTypeAdapter extends LuaTypeAdapter {
 
     public int java2lua(LuaState luaState, Object result){
         luaState.newTable();
-        int top = luaState.getTop();
+        final int top = luaState.getTop();
         final List list = mContext.getList(result);
         for (int i = 0, size = list.size() ; i < size ; i ++){
             Object ele = list.get(i);

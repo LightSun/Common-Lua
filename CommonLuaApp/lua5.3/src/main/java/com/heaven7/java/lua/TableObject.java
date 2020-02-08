@@ -143,7 +143,14 @@ public final class TableObject {
         protected int execute(LuaState state) {
             Lua2JavaValue key = state.getLuaValue(-2);
             Lua2JavaValue value = state.getLuaValue(-1);
-            return lt.travel(state.getNativePointer(), key, value);
+            int result = lt.travel(state.getNativePointer(), key, value);
+            if(key != null){
+                key.recycle();
+            }
+            if(value != null){
+                value.recycle();
+            }
+            return result;
         }
     }
 }

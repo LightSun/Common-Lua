@@ -25,4 +25,6 @@ public interface LuaReflectyContext {
     Set createSet(Class<?> clazz);
     Collection createCollection(Class<?> clazz);
     Map createMap(Class<?> clazz);
+
+    Object newInstance(Class<?> clazz);
 }

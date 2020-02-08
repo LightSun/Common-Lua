@@ -6,33 +6,39 @@ public final class Lua2JavaValue {
 
     public static final Lua2JavaValue NULL = new Lua2JavaValue(Lua2JavaValue.TYPE_NULL, 0);
 
-    public static final int TYPE_NULL        = 1;
-    public static final int TYPE_NUMBER      = 2;
-    public static final int TYPE_STRING      = 3;
-    public static final int TYPE_BOOLEAN     = 4;
-    public static final int TYPE_TABLE_LIKE  = 5;
-    public static final int TYPE_FUNCTION    = 6;
+    public static final int TYPE_NULL = 1;
+    public static final int TYPE_NUMBER = 2;
+    public static final int TYPE_STRING = 3;
+    public static final int TYPE_BOOLEAN = 4;
+    public static final int TYPE_TABLE_LIKE = 5;
+    public static final int TYPE_FUNCTION = 6;
 
     private long ptr; //value ptr or stack index
     private int type;
+    private boolean used;
 
-    private Lua2JavaValue(int type, long ptrOrIndex){
+    private Lua2JavaValue(int type, long ptrOrIndex) {
         this.type = type;
         this.ptr = ptrOrIndex;
     }
+    private Lua2JavaValue() {
+    }
 
     @Keep
-    public static Lua2JavaValue of(int type, long ptrOrIndex){
-        if(type == TYPE_NULL){
+    public static Lua2JavaValue of(int type, long ptrOrIndex) {
+        if (type == TYPE_NULL) {
             return NULL;
         }
-        return new Lua2JavaValue(type, ptrOrIndex);
+        Lua2JavaValue value = obtain();
+        value.type = type;
+        value.ptr = ptrOrIndex;
+        return value;
     }
 
     @Override
     protected void finalize() throws Throwable {
-        if(ptr != 0){
-            switch (type){
+        if (ptr != 0) {
+            switch (type) {
                 case TYPE_NUMBER:
                     releaseNumber_(ptr);
                     ptr = 0;
@@ -45,43 +51,53 @@ public final class Lua2JavaValue {
         }
         super.finalize();
     }
+
     @Keep
-    public final int getType(){
+    public final int getType() {
         return type;
     }
+
     @Keep
-    public final long getValuePtr(){
+    public final long getValuePtr() {
         return ptr;
     }
-    public LuaFunctionProxy toFunction(LuaState state){
-        if(getType() != TYPE_FUNCTION){
+
+    public LuaFunctionProxy toFunction(LuaState state) {
+        if (getType() != TYPE_FUNCTION) {
             throw new IllegalStateException("toFunction(). can only called by function type.");
         }
         return new LuaFunctionProxy(state, (int) ptr);
     }
-    public TableObject toTableValue(LuaState state){
-        if(getType() == TYPE_TABLE_LIKE){
+
+    public TableObject toTableValue(LuaState state) {
+        if (getType() == TYPE_TABLE_LIKE) {
             return TableObject.from(state, (int) ptr);
         }
         throw new IllegalStateException("type" + (getType()) + " can't cast to table.");
     }
-    public int toByteValue(){
+
+    public int toByteValue() {
         return Double.valueOf(toDoubleValue()).byteValue();
     }
-    public int toIntValue(){
+
+    public int toIntValue() {
         return Double.valueOf(toDoubleValue()).intValue();
     }
-    public short toShortValue(){
+
+    public short toShortValue() {
         return Double.valueOf(toDoubleValue()).shortValue();
     }
-    public long toLongValue(){
+
+    public long toLongValue() {
         return Double.valueOf(toDoubleValue()).longValue();
     }
-    public float toFloatValue(){
+
+    public float toFloatValue() {
         return Double.valueOf(toDoubleValue()).floatValue();
     }
-    public double toDoubleValue(){
-        switch (getType()){
+
+    public double toDoubleValue() {
+        switch (getType()) {
             case TYPE_STRING:
                 return Double.valueOf(getString_(ptr));
             case TYPE_NUMBER:
@@ -89,9 +105,10 @@ public final class Lua2JavaValue {
         }
         throw new IllegalStateException("type must be number");
     }
-    public String toStringValue(){
+
+    public String toStringValue() {
         String prefix;
-        switch (getType()){
+        switch (getType()) {
             case TYPE_NULL:
                 return null;
 
@@ -106,7 +123,7 @@ public final class Lua2JavaValue {
                     return String.valueOf(Double.valueOf(v));
                 }
             }
-            case TYPE_STRING:{
+            case TYPE_STRING: {
                 return getString_(ptr);
             }
             case TYPE_TABLE_LIKE:
@@ -120,9 +137,10 @@ public final class Lua2JavaValue {
         }
         throw new IllegalStateException(prefix + " value can't cast to char.");
     }
-    public char toCharValue(){
+
+    public char toCharValue() {
         String prefix = null;
-        switch (getType()){
+        switch (getType()) {
             case TYPE_NULL:
                 prefix = "null";
                 break;
@@ -141,9 +159,9 @@ public final class Lua2JavaValue {
                     break;
                 }
             }
-            case TYPE_STRING:{
+            case TYPE_STRING: {
                 String va = getString_(ptr);
-                if(va != null && va.length() == 1){
+                if (va != null && va.length() == 1) {
                     return va.charAt(0);
                 }
                 prefix = "string";
@@ -162,8 +180,9 @@ public final class Lua2JavaValue {
         }
         throw new IllegalStateException(prefix + " value can't cast to char.");
     }
-    public boolean toBooleanValue(){
-        switch (getType()){
+
+    public boolean toBooleanValue() {
+        switch (getType()) {
             case TYPE_NULL:
                 return false;
 
@@ -172,13 +191,13 @@ public final class Lua2JavaValue {
 
             case TYPE_NUMBER:
                 double v = getNumber_(ptr);
-                if(((long)v) == v){
+                if (((long) v) == v) {
                     return Double.valueOf(v).longValue() == 1;
-                }else {
+                } else {
                     return false;
                 }
 
-            case TYPE_STRING:{
+            case TYPE_STRING: {
                 String va = getString_(ptr);
                 return Boolean.valueOf(va);
             }
@@ -194,20 +213,45 @@ public final class Lua2JavaValue {
         }
     }
 
+    public void recycle() {
+        if (used) {
+            System.err.println("This Lua2JavaValue cannot be recycled because it "
+                    + "is still in use.");
+            return;
+        }
+        used = true;
+        synchronized (sPoolSync) {
+            if (sPoolSize < MAX_POOL_SIZE) {
+                next = sPool;
+                sPool = this;
+                sPoolSize++;
+            }
+        }
+    }
+
     private static native String getString_(long ptr);
     private static native boolean getBoolean_(long ptr);
     private static native double getNumber_(long ptr);
     private static native void releaseNumber_(long ptr);
     private static native void releaseBoolean_(long ptr);
 
-   /* private static class LuaFunctionWrapper extends LuaFunction{
-        private final int funcIndex;
-        LuaFunctionWrapper(int funcIndex) {
-            this.funcIndex = funcIndex;
-        }/
-        @Override
-        protected int execute(LuaState state, int parameterCount, int resultCount) {
-            return state.executeFunction(funcIndex);
+    private static Lua2JavaValue obtain() {
+        synchronized (sPoolSync) {
+            if (sPool != null) {
+                Lua2JavaValue m = sPool;
+                sPool = m.next;
+                m.next = null;
+                m.used = false; // clear in-use flag
+                sPoolSize--;
+                return m;
+            }
         }
-    }*/
+        return new Lua2JavaValue();
+    }
+
+    private Lua2JavaValue next;
+    private static final Object sPoolSync = new Object();
+    private static Lua2JavaValue sPool;
+    private static int sPoolSize = 0;
+    private static final int MAX_POOL_SIZE = 50;
 }

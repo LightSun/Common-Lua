@@ -33,9 +33,10 @@ public class MapLuaTypeAdapter extends LuaTypeAdapter {
 
     @Override
     public int java2lua(LuaState luaState, Object result) {
+        luaState.newTable();
         Map<?, ?> map = mContext.getMap(result);
         final int top = luaState.getTop();
-        luaState.newTable();
+
         for (Map.Entry<?, ?> en : map.entrySet()) {
             Object key = en.getKey();
             Object value = en.getValue();

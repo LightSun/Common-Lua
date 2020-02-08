@@ -37,7 +37,11 @@ import java.util.Set;
         }
         pluginList.add(plugin);
     }
-
+    //not set use default
+    @Override
+    public Object newInstance(Class<?> clazz) {
+        return null;
+    }
     public LuaTypeAdapter getKeyAdapter(Class<?> type) {
         List<IotaPlugin> mMapPlugins = mPluginMap.get(IotaPlugin.TYPE_MAP);
         if(Predicates.isEmpty(mMapPlugins)){

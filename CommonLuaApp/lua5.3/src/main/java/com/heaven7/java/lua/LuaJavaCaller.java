@@ -211,12 +211,15 @@ public final class LuaJavaCaller {
     }
 
     public static boolean convert(LuaState luaState, Type[] types, Object[] args, Object[] out) {
+        Lua2JavaValue value;
         for (int size = args.length, i = 0; i < size; i++) {
             Type type = types[i];
             LuaTypeAdapter adapter = LuaTypeAdapter.get(type);
             if (adapter != null) {
                 if (args[i] instanceof Lua2JavaValue) {
-                    out[i] = adapter.lua2java(luaState, (Lua2JavaValue) args[i]);
+                    value = (Lua2JavaValue) args[i];
+                    out[i] = adapter.lua2java(luaState, value);
+                    value.recycle();
                 } else {
                     throw new IllegalStateException("args must be Lua2JavaValue.");
                 }

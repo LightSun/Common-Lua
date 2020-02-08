@@ -30,7 +30,7 @@ public class SetLuaTypeAdapter extends LuaTypeAdapter {
 
     public int java2lua(LuaState luaState, Object result){
         luaState.newTable();
-        int top = luaState.getTop();
+        final int top = luaState.getTop();
         final Set<?> set = mContext.getSet(result);
         for (Iterator<?> it = set.iterator(); it.hasNext() ; ){
             Object ele = it.next();

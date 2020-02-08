@@ -17,7 +17,9 @@ import com.heaven7.java.lua.adapter.SetLuaTypeAdapter;
 import com.heaven7.java.lua.adapter.ShortLuaTypeAdapter;
 import com.heaven7.java.lua.adapter.StringLuaTypeAdapter;
 import com.heaven7.java.lua.internal.$ReflectyTypes;
+import com.heaven7.java.lua.iota.obj.Reflecty;
 
+import java.lang.annotation.Annotation;
 import java.lang.reflect.Type;
 import java.util.HashMap;
 import java.util.Map;
@@ -34,8 +36,13 @@ public class LuaTypeAdapterManager implements ILuaTypeAdapterManager {
     private final IotaPluginManager mIotaPM = new IotaPluginManager(this);
     private final LuaReflectyContext mContext;
 
-    public LuaTypeAdapterManager(LuaReflectyContext context) {
-        mContext = new GroupLuaReflectyContext(mIotaPM, context);
+    private final Reflecty<?, ?, ?, ?, ?> mReflecty;
+
+    public LuaTypeAdapterManager(LuaReflectyContext context,
+                                 Reflecty<? extends LuaTypeAdapter, ? extends Annotation, ? extends Annotation, ? extends Annotation, ? extends Annotation> reflecty
+    ) {
+        this.mContext = new GroupLuaReflectyContext(mIotaPM, context);
+        this.mReflecty = reflecty;
     }
     public void addIotaPlugin(IotaPlugin plugin){
         mIotaPM.addIotaPlugin(plugin);
@@ -105,10 +112,9 @@ public class LuaTypeAdapterManager implements ILuaTypeAdapterManager {
     public LuaTypeAdapter createMapTypeAdapter(Class<?> mapClazz, LuaTypeAdapter keyAdapter, LuaTypeAdapter valueAdapter) {
         return new MapLuaTypeAdapter(mContext, mapClazz, keyAdapter, valueAdapter);
     }
-    @Override
+    @Override @SuppressWarnings("unchecked")
     public LuaTypeAdapter createObjectTypeAdapter(Class<?> objectClazz) {
-        //TODO
-        return new ObjectLuaTypeAdapter();
+        return new ObjectLuaTypeAdapter(mReflecty, this, objectClazz);
     }
 
     private static void putBaseTypeAdapter(Class<?> clazz, LuaTypeAdapter ta){

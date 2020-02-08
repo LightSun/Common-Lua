@@ -1,8 +1,15 @@
 package com.heaven7.androlua.bean;
 
-public class Person {
+import com.heaven7.java.lua.anno.LuaMethod;
+
+public final class Person {
 
     public static final int A1 = 100;
+
+    @LuaMethod("getH")
+    public static String getA(String name){
+        return "Person_" + name;
+    }
 
     private int age;
     private String name;

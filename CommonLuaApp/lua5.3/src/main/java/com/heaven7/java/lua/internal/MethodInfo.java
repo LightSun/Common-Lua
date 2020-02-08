@@ -1,11 +1,13 @@
 package com.heaven7.java.lua.internal;
 
 import java.lang.reflect.Type;
+import java.util.Arrays;
+import java.util.Objects;
 
 public final class MethodInfo{
     private String name;
     private String rawName;
-    private String sig;  //"(Ljava/lang/String;Z)V"
+    //private String sig;  //"(Ljava/lang/String;Z)V"
     private Type[] types;
     private Class<?>[] rawTypes;
 
@@ -22,14 +24,6 @@ public final class MethodInfo{
     public void setName(String name) {
         this.name = name;
     }
-
-    public String getSig() {
-        return sig;
-    }
-    public void setSig(String sig) {
-        this.sig = sig;
-    }
-
     public int getParameterCount(){
         return types != null ? types.length : 0;
     }
@@ -47,13 +41,26 @@ public final class MethodInfo{
     public String getRawName() {
         return rawName;
     }
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        MethodInfo that = (MethodInfo) o;
+        return Objects.equals(name, that.name) &&
+                Objects.equals(rawName, that.rawName) &&
+                Arrays.equals(types, that.types);
+    }
 
+    @Override
+    public int hashCode() {
+        return Objects.hash(rawName, name, types);
+    }
     @Override
     public String toString() {
         return "MethodInfo{" +
                 "name='" + name + '\'' +
                 ", rawName='" + rawName + '\'' +
-                ", sig='" + sig + '\'' +
+                ", types=" + Arrays.toString(types) +
                 '}';
     }
 }

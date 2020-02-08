@@ -108,7 +108,8 @@ public class MainActivity extends Activity {
         LuaTravellerTest.testBase(mLuaer.getLuaState());
     }
     public void onClickTestWrapClass(View view){
-        WrapClassTest.testBase(mLuaer.getLuaState());
+        //WrapClassTest.testBase(mLuaer.getLuaState());
+        WrapClassTest.testMethod(mLuaer.getLuaState());
     }
 
     private void initLua() {

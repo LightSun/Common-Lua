@@ -21,7 +21,6 @@ import java.util.Map;
  */
 public final class ClassInfo {
 
-    private static final Map<Class<?>, String> sBases = new HashMap<>();
     private static final Comparator<MethodInfo> COM_MethodInfo = new Comparator<MethodInfo>() {
         @Override
         public int compare(MethodInfo o1, MethodInfo o2) {
@@ -33,29 +32,15 @@ public final class ClassInfo {
     //object info
     private final Map<String, List<MethodInfo>> mMethodMap = new HashMap<>();
     private final Map<String, List<MethodInfo>> mConstructorMap = new HashMap<>();
-    private final List<FieldInfo> mFields = new ArrayList<>();
     //static info for class
     private final Map<String, List<MethodInfo>> mStaticMethodMap = new HashMap<>();
     private final List<FieldInfo> mStaticFields = new ArrayList<>();
 
     //private final String mClassName;
 
-    static {
-        sBases.put(boolean.class, "Z");
-        sBases.put(byte.class, "B");
-        sBases.put(char.class, "C");
-        sBases.put(short.class, "S");
-        sBases.put(int.class, "I");
-        sBases.put(long.class, "J");
-        sBases.put(float.class, "F");
-        sBases.put(double.class, "D");
-        sBases.put(void.class, "V");
-    }
-
     public ClassInfo(Class<?> clazz) {
        // this.mClassName = clazz.getName();
 
-        StringBuilder sb = new StringBuilder();
         //constructors
         Constructor[] cons = clazz.getConstructors();
         for (Constructor con : cons) {
@@ -66,28 +51,21 @@ public final class ClassInfo {
             LuaMethod lm = (LuaMethod) con.getAnnotation(LuaMethod.class);
             String luaMethodName = lm != null ? lm.value() : "<init>";
 
-            MethodInfo info = new MethodInfo();
-            info.setName("<init>");
-            info.setTypes(con.getGenericParameterTypes());
-            info.setRawTypes(con.getParameterTypes());
-
-            getSigAndFill(sb, mConstructorMap, null, luaMethodName, info);
+            MethodInfo info = Pools.obtainMethod("<init>", luaMethodName, con.getGenericParameterTypes(), con.getParameterTypes());
+            fillMap(mConstructorMap, luaMethodName, info);
         }
         //fields
         Field[] fields = clazz.getFields();
         for (Field f : fields){
+            //only permit static public
+            if((f.getModifiers() & Modifier.STATIC) != Modifier.STATIC){
+                continue;
+            }
             LuaField lf = f.getAnnotation(LuaField.class);
             String name = lf != null ? lf.value() : f.getName();
+            FieldInfo fi = Pools.obtainField(f.getName(), name, f.getGenericType());
 
-            FieldInfo fi = new FieldInfo();
-            fi.setRawName(f.getName());
-            fi.setName(name);
-            fi.setRawType(f.getType());
-            fi.setType(f.getGenericType());
-
-            List<FieldInfo> fis =  (f.getModifiers() & Modifier.STATIC) != Modifier.STATIC
-                    ? mFields : mStaticFields;
-            fis.add(fi);
+            mStaticFields.add(fi);
         }
         //methods
         Method[] methods = clazz.getMethods();
@@ -95,15 +73,10 @@ public final class ClassInfo {
             LuaMethod lm = m.getAnnotation(LuaMethod.class);
             String luaMethodName = lm != null ? lm.value() : m.getName();
 
-            MethodInfo info = new MethodInfo();
-            info.setName(luaMethodName);
-            info.setRawName(m.getName());
-            info.setTypes(m.getGenericParameterTypes());
-            info.setRawTypes(m.getParameterTypes());
-
+            MethodInfo info = Pools.obtainMethod(m.getName(), luaMethodName, m.getGenericParameterTypes(), m.getParameterTypes());
             Map<String, List<MethodInfo>> map = (m.getModifiers() & Modifier.STATIC) != Modifier.STATIC
                    ? mMethodMap : mStaticMethodMap ;
-            getSigAndFill(sb, map, m.getReturnType(), luaMethodName, info);
+            fillMap(map, luaMethodName, info);
         }
         //sort param count. desc
         for (List<MethodInfo> list : mMethodMap.values()){
@@ -143,42 +116,13 @@ public final class ClassInfo {
         return getMethods(mConstructorMap, name, expectParamCount);
     }
     //for constructor. returnType = null
-    private static void getSigAndFill(StringBuilder sb, Map<String, List<MethodInfo>> map, Class<?> returnType, String methodName, MethodInfo info) {
-        sb.append("(");
-        for (Class<?> cla : info.getRawTypes()) {
-            sb.append(typeToSig(cla));
-        }
-        sb.append(")");
-        sb.append(returnType != null ? typeToSig(returnType) : "V");
-        info.setSig(sb.toString());
-        sb.delete(0, sb.length());
-
+    private static void fillMap(Map<String, List<MethodInfo>> map, String methodName, MethodInfo info) {
         List<MethodInfo> methodInfos = map.get(methodName);
         if(methodInfos == null){
             methodInfos = new ArrayList<>(3);
             map.put(methodName, methodInfos);
         }
         methodInfos.add(info);
-    }
-    private static String typeToSig(Class<?> type) {
-        if(type.isArray()){
-            return "["+ typeToSig(type.getComponentType());
-        }
-        String sig = sBases.get(type);
-        if(sig != null){
-            return sig;
-        }
-        String[] strs = type.getName().split("\\.");
-        StringBuilder sb = new StringBuilder();
-        sb.append("L");
-        for (int i = 0; i < strs.length ; i++) {
-            sb.append(strs[i]);
-            if(i != strs.length - 1){
-                sb.append("/");
-            }
-        }
-        sb.append(";");
-        return sb.toString();
     }
 
     private static List<MethodInfo> getMethods(Map<String, List<MethodInfo>> mMethodMap, String name, int expectParamCount){
