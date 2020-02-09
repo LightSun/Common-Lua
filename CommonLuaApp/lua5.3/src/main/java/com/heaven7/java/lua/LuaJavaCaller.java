@@ -16,6 +16,8 @@ import java.lang.reflect.Type;
 import java.util.HashMap;
 import java.util.List;
 
+import static com.heaven7.java.lua.internal.LuaUtils.recycleValues;
+
 /**
  * Created by heaven7 on 2019/7/29.
  */
@@ -150,7 +152,7 @@ public final class LuaJavaCaller {
         } catch (Exception e) {
             errorMsg[0] = toString(e);
         }finally {
-            LuaUtils.recycleValues(args);
+            recycleValues(args);
         }
         return null;
     }
@@ -201,6 +203,8 @@ public final class LuaJavaCaller {
             }
         } catch (Exception e) {
             errorMsg[0] = toString(e);
+        }finally {
+            recycleValues(args);
         }
         return 0;
     }
@@ -213,7 +217,6 @@ public final class LuaJavaCaller {
     }
 
     public static boolean convert(LuaState luaState, Type[] types, Object[] args, Object[] out) {
-        LuaValue value;
         for (int size = args.length, i = 0; i < size; i++) {
             Type type = types[i];
             LuaTypeAdapter adapter = LuaTypeAdapter.get(type);
