@@ -18,6 +18,7 @@ import com.heaven7.java.lua.adapter.ShortLuaTypeAdapter;
 import com.heaven7.java.lua.adapter.StringLuaTypeAdapter;
 import com.heaven7.java.lua.internal.$ReflectyTypes;
 import com.heaven7.java.lua.iota.obj.Reflecty;
+import com.heaven7.java.lua.iota.plugins.SparseArrayIotaPlugin;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Type;
@@ -43,6 +44,10 @@ public class LuaTypeAdapterManager implements ILuaTypeAdapterManager {
     ) {
         this.mContext = new GroupLuaReflectyContext(mIotaPM, context);
         this.mReflecty = reflecty;
+        registerCoreIotaPlugins();
+    }
+    protected void registerCoreIotaPlugins(){
+        mIotaPM.addIotaPlugin(new SparseArrayIotaPlugin());
     }
     public void addIotaPlugin(IotaPlugin plugin){
         mIotaPM.addIotaPlugin(plugin);
