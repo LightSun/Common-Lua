@@ -83,6 +83,9 @@ void pushFunc(JNIEnv *env, jclass clazz, jlong ptr, jobject func, jstring classn
         }
         lua_setglobal(L, gk);
         env->ReleaseStringUTFChars(globalKey, gk);
+    } else if(!toStack){
+        //pop if need
+        lua_pop(L, 1);
     }
     env->ReleaseStringUTFChars(classname, cn);
     //luaB_dumpStack(L);

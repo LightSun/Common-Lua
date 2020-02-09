@@ -33,7 +33,7 @@ public final class WrapJavaTest {
         LuaJavaCaller.registerJavaClass(Person.class);
 
         int k = luaState.saveLightly();
-        luaState.pushGlobal(p, "test");
+        luaState.push(p, "test");
         luaState.restoreLightly(k);
 
         k = luaState.saveLightly();

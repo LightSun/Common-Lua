@@ -98,5 +98,8 @@ void lua_wrapClass(lua_State *L, const char *classname, const char *globalKey,
             lua_pushvalue(L, -1);
         }
         lua_setglobal(L, globalKey);
+    } else if(!toStack){
+        //pop if need
+        lua_pop(L, 1);
     }
 }

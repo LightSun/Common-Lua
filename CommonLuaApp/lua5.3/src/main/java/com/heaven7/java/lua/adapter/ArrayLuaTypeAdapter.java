@@ -1,20 +1,27 @@
 package com.heaven7.java.lua.adapter;
 
-import com.heaven7.java.lua.LuaValue;
 import com.heaven7.java.lua.LuaState;
 import com.heaven7.java.lua.LuaTypeAdapter;
+import com.heaven7.java.lua.LuaValue;
 import com.heaven7.java.lua.internal.LuaUtils;
 
 import java.lang.reflect.Array;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
-import java.util.WeakHashMap;
 
-import static com.heaven7.java.base.util.ArrayUtils.*;
+import static com.heaven7.java.base.util.ArrayUtils.toBooleanArray;
+import static com.heaven7.java.base.util.ArrayUtils.toByteArray;
+import static com.heaven7.java.base.util.ArrayUtils.toCharArray;
+import static com.heaven7.java.base.util.ArrayUtils.toDoubleArray;
+import static com.heaven7.java.base.util.ArrayUtils.toFloatArray;
+import static com.heaven7.java.base.util.ArrayUtils.toIntArray;
+import static com.heaven7.java.base.util.ArrayUtils.toLongArray;
+import static com.heaven7.java.base.util.ArrayUtils.toShortArray;
 
 public class ArrayLuaTypeAdapter extends LuaTypeAdapter {
 
-    private static final WeakHashMap<Class<?>, PrimitiveArrayConvertor> sArrayConvertors = new WeakHashMap<>();
+    private static final HashMap<Class<?>, PrimitiveArrayConvertor> sArrayConvertors = new HashMap<>();
 
     static {
         sArrayConvertors.put(byte.class, new ByteArrayConvertor());

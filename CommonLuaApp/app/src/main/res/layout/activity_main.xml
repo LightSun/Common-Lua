@@ -104,6 +104,14 @@
             android:onClick="onClickTestAdapters"
             android:text="test adapters"
             />
+
+        <Button
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="15dp"
+            android:onClick="onClickTestEnv"
+            android:text="test lua android env"
+            />
     </LinearLayout>
 
 </ScrollView>

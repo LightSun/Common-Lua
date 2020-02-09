@@ -64,11 +64,14 @@ public final class LuaState extends INativeObject.BaseNativeObject {
     public int LdoString(String script) {
         return _evaluateScript(getNativePointer(), script);
     }
-
-    public int evaluateScript(String script) {
+    //do return a table
+    public int execScript(String script) {
         return _evaluateScript(getNativePointer(), script);
     }
-
+    //load return a function
+    public int loadScript(String script){
+        return _loadScript(getNativePointer(), script);
+    }
     public int getGlobal(String var) {
         return _getGlobal(getNativePointer(), var);
     }
@@ -90,31 +93,21 @@ public final class LuaState extends INativeObject.BaseNativeObject {
     }
 
     public void push(Object obj) {
-        if(obj == null){
-            throw new NullPointerException();
-        }
-        if(obj instanceof LuaFunction){
-            _pushFunction(getNativePointer(), obj, LuaFunction.class.getName(), null, false);
-        }else {
-            _pushJavaObject(getNativePointer(), obj, obj.getClass().getName(), null, false);
-        }
+        push(obj, null, true);
     }
 
-    public void pushGlobal(Object obj, String name){
-        pushGlobal(obj, name, true);
+    public void push(Object obj, String name){
+        push(obj, name, true);
     }
     /**
-     * push a object to global.
+     * push a object .
      * @param obj the object
-     * @param name the global name
+     * @param name the global name if need
      * @param pushToStack true as also push it to current lua stack.
      */
-    public void pushGlobal(Object obj, String name, boolean pushToStack){
+    public void push(Object obj, String name, boolean pushToStack){
         if(obj == null){
             throw new NullPointerException();
-        }
-        if(name == null){
-            throw new NullPointerException("push to global need set a name for it.");
         }
         if(obj instanceof LuaFunction){
             _pushFunction(getNativePointer(), obj, LuaFunction.class.getName(), name, pushToStack);
@@ -123,16 +116,16 @@ public final class LuaState extends INativeObject.BaseNativeObject {
         }
     }
     public void pushClass(Class<?> clazz, String globalK, boolean pushToStack){
-        _pushClass(getNativePointer(), clazz.getName(), globalK, pushToStack);
+        _pushClass(getNativePointer(), clazz.getName(), globalK,  pushToStack);
     }
     public void pushFunction(LuaFunction func){
         push(func);
     }
     public void pushFunctionGlobal(LuaFunction func, String name){
-        pushGlobal(func, name, true);
+        push(func, name, true);
     }
     public void pushFunctionGlobal(LuaFunction func, String name, boolean pushToStack){
-        pushGlobal(func, name, pushToStack);
+        push(func, name, pushToStack);
     }
 
     public void pushValue(int idx) {
@@ -233,6 +226,7 @@ public final class LuaState extends INativeObject.BaseNativeObject {
     private static synchronized native Object _getJavaObject(long ptr, int idx);
 
     private static synchronized native int _evaluateScript(long ptr, String script);
+    private static synchronized native int _loadScript(long ptr, String script);
     private static synchronized native Object _getLuaValue(long ptr, int idx);
     private static synchronized native int _getTop(long ptr);
     private static synchronized native int _getType(long ptr, int idx);

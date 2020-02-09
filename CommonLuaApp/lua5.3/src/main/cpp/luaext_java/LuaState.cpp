@@ -60,7 +60,7 @@ void pushJavaObject(JNIEnv *env, jclass clazz, jlong ptr, jobject obj, jstring c
 
     auto lbc = newJavaLBC(obj, classname);
     if (globalKey == nullptr) {
-        lua_wrapObject(L, lbc, nullptr, nullptr, 0);
+        lua_wrapObject(L, lbc, nullptr, nullptr, toStack ? 1 : 0);
     } else {
         const char *key = env->GetStringUTFChars(globalKey, nullptr);
         lua_wrapObject(L, lbc, nullptr, key, toStack ? 1 : 0);
@@ -126,7 +126,7 @@ jobject getJavaObject_(JNIEnv *env, jclass clazz, jlong ptr, int idx) {
     idx = ext_adjustIdx(L, idx);
     lua_pushstring(L, NAME_GET_CPP);
     lua_gettable(L, idx);
-    if(lua_type(L, -1) == LUA_TLIGHTUSERDATA){
+    if (lua_type(L, -1) == LUA_TLIGHTUSERDATA) {
         jobject jobj = static_cast<jobject>(lua_touserdata(L, -1));
         lua_pop(L, 1);
         return jobj;
@@ -474,6 +474,7 @@ static JNINativeMethod lua_state_methods[] = {
         {"_nCreate",                 "()J",                                         (void *) nCreate_},
         {"_nRelease",                "(J)V",                                        (void *) nRelease_},
         {"_evaluateScript",          "(J" SIG_JSTRING ")I",                         (void *) luaL_dostring_},
+        {"_loadScript",              "(J" SIG_JSTRING ")I",                         (void *) luaL_loadstring_},
         {"_getGlobal",               "(J" SIG_JSTRING ")I",                         (void *) lua_getglobal_},
         {"_getTable",                "(JI)I",                                       (void *) lua_gettable_},
         {"_setTable",                "(JI)V",                                       (void *) lua_settable_},

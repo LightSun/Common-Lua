@@ -7,6 +7,7 @@ import android.os.Environment;
 import android.view.View;
 
 import com.heaven7.android.lua.app.R;
+import com.heaven7.lua.test.AndroidEnv;
 import com.heaven7.lua.test.LuaTravellerTest;
 import com.heaven7.lua.test.LuaTypeAdapterTests;
 import com.heaven7.lua.test.WrapClassTest;
@@ -42,7 +43,8 @@ public class MainActivity extends Activity {
         setContentView(R.layout.activity_main);
 
         mLuaer = new Luaer(this);
-        mHelper.startRequestPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE, 1, new PermissionHelper.ICallback() {
+        mHelper.startRequestPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE,
+                1, new PermissionHelper.ICallback() {
             @Override
             public void onRequestPermissionResult(String s, int i, boolean b) {
                 if(b){
@@ -115,6 +117,9 @@ public class MainActivity extends Activity {
     }
     public void onClickTestAdapters(View view){
         new LuaTypeAdapterTests(mLuaer.getLuaState()).testAll();
+    }
+    public void onClickTestEnv(View view){
+        AndroidEnv.initialize(this, mLuaer);
     }
 
     private void initLua() {

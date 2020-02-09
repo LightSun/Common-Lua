@@ -231,7 +231,10 @@ void lua_wrapObject(lua_State *L, LuaBridgeCaller *caller, const char *classname
             lua_pushvalue(L, -1);
         }
         lua_setglobal(L, globalKey);
+    } else if(!toStack){
+        lua_pop(L, 1);
     }
+    //luaB_dumpStack(L);
 }
 
 

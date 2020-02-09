@@ -1,5 +1,6 @@
 package com.heaven7.java.lua.iota;
 
+import com.heaven7.java.lua.LuaFunction;
 import com.heaven7.java.lua.LuaTypeAdapter;
 import com.heaven7.java.lua.adapter.ArrayLuaTypeAdapter;
 import com.heaven7.java.lua.adapter.BooleanLuaTypeAdapter;
@@ -8,6 +9,7 @@ import com.heaven7.java.lua.adapter.CharLuaTypeAdapter;
 import com.heaven7.java.lua.adapter.CollectionLuaTypeAdapter;
 import com.heaven7.java.lua.adapter.DoubleLuaTypeAdapter;
 import com.heaven7.java.lua.adapter.FloatLuaTypeAdapter;
+import com.heaven7.java.lua.adapter.FunctionLuaTypeAdapter;
 import com.heaven7.java.lua.adapter.IntLuaTypeAdapter;
 import com.heaven7.java.lua.adapter.ListLuaTypeAdapter;
 import com.heaven7.java.lua.adapter.LongLuaTypeAdapter;
@@ -44,10 +46,11 @@ public class LuaTypeAdapterManager implements ILuaTypeAdapterManager {
     ) {
         this.mContext = new GroupLuaReflectyContext(mIotaPM, context);
         this.mReflecty = reflecty;
-        registerCoreIotaPlugins();
+        registerCore();
     }
-    protected void registerCoreIotaPlugins(){
+    protected void registerCore(){
         mIotaPM.addIotaPlugin(new SparseArrayIotaPlugin());
+        mAdapterMap.put($ReflectyTypes.getTypeNode(LuaFunction.class), new FunctionLuaTypeAdapter());
     }
     public void addIotaPlugin(IotaPlugin plugin){
         mIotaPM.addIotaPlugin(plugin);

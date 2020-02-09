@@ -57,10 +57,8 @@ public final class TableObject {
             luaState.pushFunction(new LuaTravelFunction(lt));
             //start travel
             int result = luaState.pcall(1, 0, 0);
-            if(result == 0){
-                System.out.println("travel ok");
-            }else {
-                System.err.println("travel failed. " + luaState.toString(-1));
+            if(result != 0){
+                System.err.println("travel failed for idx = " + idx + " ," + luaState.toString(-1));
             }
             luaState.restoreLightly(k);
         }
