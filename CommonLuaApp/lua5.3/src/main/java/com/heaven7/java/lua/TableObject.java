@@ -63,7 +63,7 @@ public final class TableObject {
                 System.err.println("travel failed. " + luaState.toString(-1));
             }
         }
-        luaState.restoreLightly(k);
+        //luaState.restoreLightly(k);
         return true;
     }
     public Lua2JavaValue call1(String name, LuaParameter... params){

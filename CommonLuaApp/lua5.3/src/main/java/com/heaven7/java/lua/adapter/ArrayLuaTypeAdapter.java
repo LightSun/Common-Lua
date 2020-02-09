@@ -8,8 +8,24 @@ import com.heaven7.java.lua.internal.LuaUtils;
 import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.WeakHashMap;
+
+import static com.heaven7.java.base.util.ArrayUtils.*;
 
 public class ArrayLuaTypeAdapter extends LuaTypeAdapter {
+
+    private static final WeakHashMap<Class<?>, PrimitiveArrayConvertor> sArrayConvertors = new WeakHashMap<>();
+
+    static {
+        sArrayConvertors.put(byte.class, new ByteArrayConvertor());
+        sArrayConvertors.put(short.class, new ShortArrayConvertor());
+        sArrayConvertors.put(int.class, new IntArrayConvertor());
+        sArrayConvertors.put(long.class, new LongArrayConvertor());
+        sArrayConvertors.put(float.class, new FloatArrayConvertor());
+        sArrayConvertors.put(double.class, new DoubleArrayConvertor());
+        sArrayConvertors.put(boolean.class, new BoolArrayConvertor());
+        sArrayConvertors.put(char.class, new CharArrayConvertor());
+    }
 
     private final Class<?> mComponentClass;
     private final LuaTypeAdapter mComponentAdapter;
@@ -22,6 +38,9 @@ public class ArrayLuaTypeAdapter extends LuaTypeAdapter {
     public Object readFromLua(LuaState luaState, Lua2JavaValue arg){
         List list = new ArrayList();
         arg.toTableValue(luaState).travel(new CollectionTraveller(mComponentAdapter, list));
+        if(mComponentClass.isPrimitive()){
+             return sArrayConvertors.get(mComponentClass).convert(list);
+        }
         return list.toArray((Object[]) Array.newInstance(mComponentClass, list.size()));
     }
 
@@ -40,4 +59,55 @@ public class ArrayLuaTypeAdapter extends LuaTypeAdapter {
         return 1;
     }
 
+    private interface PrimitiveArrayConvertor{
+        Object convert(List list);
+    }
+    private static class ByteArrayConvertor implements PrimitiveArrayConvertor{
+        @Override
+        public Object convert(List list) {
+            return toByteArray(list);
+        }
+    }
+    private static class ShortArrayConvertor implements PrimitiveArrayConvertor{
+        @Override
+        public Object convert(List list) {
+            return toShortArray(list);
+        }
+    }
+    private static class IntArrayConvertor implements PrimitiveArrayConvertor{
+        @Override
+        public Object convert(List list) {
+            return toIntArray(list);
+        }
+    }
+    private static class LongArrayConvertor implements PrimitiveArrayConvertor{
+        @Override
+        public Object convert(List list) {
+            return toLongArray(list);
+        }
+    }
+    private static class FloatArrayConvertor implements PrimitiveArrayConvertor{
+        @Override
+        public Object convert(List list) {
+            return toFloatArray(list);
+        }
+    }
+    private static class DoubleArrayConvertor implements PrimitiveArrayConvertor{
+        @Override
+        public Object convert(List list) {
+            return toDoubleArray(list);
+        }
+    }
+    private static class BoolArrayConvertor implements PrimitiveArrayConvertor{
+        @Override
+        public Object convert(List list) {
+            return toBooleanArray(list);
+        }
+    }
+    private static class CharArrayConvertor implements PrimitiveArrayConvertor{
+        @Override
+        public Object convert(List list) {
+            return toCharArray(list);
+        }
+    }
 }

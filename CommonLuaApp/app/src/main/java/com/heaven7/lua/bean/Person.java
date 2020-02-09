@@ -1,4 +1,4 @@
-package com.heaven7.androlua.bean;
+package com.heaven7.lua.bean;
 
 import com.heaven7.java.lua.anno.LuaMethod;
 

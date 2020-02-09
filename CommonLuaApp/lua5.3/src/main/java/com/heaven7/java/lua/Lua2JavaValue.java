@@ -65,7 +65,7 @@ public final class Lua2JavaValue {
         throw new IllegalStateException("type" + (getType()) + " can't cast to table.");
     }
 
-    public int toByteValue() {
+    public byte toByteValue() {
         return Double.valueOf(toDoubleValue()).byteValue();
     }
 
@@ -210,6 +210,10 @@ public final class Lua2JavaValue {
 
     //-------------------------------------- help methods ----------------------------
     public void recycle() {
+        //null no need recycle
+        if(type == TYPE_NULL){
+            return;
+        }
         if (used) {
             System.err.println("This Lua2JavaValue cannot be recycled because it "
                     + "is still in use.");

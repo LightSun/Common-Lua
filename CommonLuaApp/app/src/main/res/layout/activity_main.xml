@@ -97,6 +97,13 @@
             android:onClick="onClickTestWrapClass"
             android:text="test wrap class"
             />
+        <Button
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="15dp"
+            android:onClick="onClickTestAdapters"
+            android:text="test adapters"
+            />
     </LinearLayout>
 
 </ScrollView>

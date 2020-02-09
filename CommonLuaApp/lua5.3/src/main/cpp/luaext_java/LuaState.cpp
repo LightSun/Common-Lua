@@ -9,8 +9,6 @@
 #include "LuaFunc.h"
 #include "class_wrapper.h"
 
-#include "../luaextra/lua_lambda.h"
-
 extern "C" {
 #include "../luaextra/lua_extra.h"
 }
@@ -154,7 +152,7 @@ void travel_(JNIEnv *env, jclass clazz, jlong ptr, jint idx, jobject traveller) 
         env->DeleteLocalRef(pobj);
         return result;
     };
-    travelTable(L, idx, luaTransform(tt));
+    travelTable(L, idx, tt);
 }
 void wrapClass(JNIEnv *env, jclass clazz, jlong ptr, jstring cn, jstring gk, jboolean toStack) {
     lua_State *L = reinterpret_cast<lua_State *>(ptr);

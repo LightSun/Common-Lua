@@ -1,4 +1,4 @@
-package com.heaven7.androlua;
+package com.heaven7.lua;
 
 import android.Manifest;
 import android.app.Activity;
@@ -6,9 +6,11 @@ import android.os.Bundle;
 import android.os.Environment;
 import android.view.View;
 
-import com.heaven7.androlua.test.LuaTravellerTest;
-import com.heaven7.androlua.test.WrapClassTest;
-import com.heaven7.androlua.test.WrapJavaTest;
+import com.heaven7.android.lua.app.R;
+import com.heaven7.lua.test.LuaTravellerTest;
+import com.heaven7.lua.test.LuaTypeAdapterTests;
+import com.heaven7.lua.test.WrapClassTest;
+import com.heaven7.lua.test.WrapJavaTest;
 import com.heaven7.core.util.Logger;
 import com.heaven7.core.util.PermissionHelper;
 import com.heaven7.java.lua.LuaTest;
@@ -110,6 +112,9 @@ public class MainActivity extends Activity {
     public void onClickTestWrapClass(View view){
         //WrapClassTest.testBase(mLuaer.getLuaState());
         WrapClassTest.testMethod(mLuaer.getLuaState());
+    }
+    public void onClickTestAdapters(View view){
+        new LuaTypeAdapterTests(mLuaer.getLuaState()).testAll();
     }
 
     private void initLua() {

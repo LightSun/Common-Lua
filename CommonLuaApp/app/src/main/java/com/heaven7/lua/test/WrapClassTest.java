@@ -1,7 +1,7 @@
-package com.heaven7.androlua.test;
+package com.heaven7.lua.test;
 
-import com.heaven7.androlua.R;
-import com.heaven7.androlua.bean.Person;
+import com.heaven7.android.lua.app.R;
+import com.heaven7.lua.bean.Person;
 import com.heaven7.java.lua.LuaJavaCaller;
 import com.heaven7.java.lua.LuaState;
 

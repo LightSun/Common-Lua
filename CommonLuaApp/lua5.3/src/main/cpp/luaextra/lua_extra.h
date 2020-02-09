@@ -80,14 +80,6 @@ void ext_setLuaPath(lua_State* L,const char* fieldName , const char* path);
  */
 const char* getFieldAsString(lua_State* L, int idx, const char* name);
 
-/**
- * travel the lua table.
- * @param L  he lua state
- * @param idx the table idx
- * @param tt the traveller to travel table. return true means need break travel.
- */
-void travelTable(lua_State* L, int idx, LuaStdFunc tt);
-
 int ext_adjustIdx(lua_State* L, int idx);
 
 #endif //COMMONLUAAPP_LUA_EXTRA_H

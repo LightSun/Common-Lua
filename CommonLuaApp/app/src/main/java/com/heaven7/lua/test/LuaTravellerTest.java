@@ -1,4 +1,4 @@
-package com.heaven7.androlua.test;
+package com.heaven7.lua.test;
 
 import com.heaven7.java.lua.Lua2JavaValue;
 import com.heaven7.java.lua.LuaState;

@@ -2,6 +2,7 @@ package com.heaven7.java.lua.internal;
 
 import android.support.annotation.RestrictTo;
 
+import com.heaven7.java.lua.Lua2JavaValue;
 import com.heaven7.java.lua.LuaState;
 import com.heaven7.java.lua.LuaTypeAdapter;
 
@@ -17,11 +18,9 @@ public final class LuaUtils {
             throw new IllegalStateException("wrong top = " + cTop + ",expect top = " + (expect));
         }
     }
-
     public static int adjustIdx(LuaState ls, int idx){
         return idx < 0 ? ls.getTop() + idx + 1 : idx;
     }
-
     public static int writeToLua(LuaState state, Type type, Object val){
         if(val == null){
             state.pushNil();
@@ -37,5 +36,14 @@ public final class LuaUtils {
         }else {
             return LuaTypeAdapter.get(val.getClass()).writeToLua(state, val);
         }
+    }
+    public static void recycleValues(Object[] args) {
+         if(args != null){
+             for (Object val : args){
+                 if(val instanceof Lua2JavaValue){
+                     ((Lua2JavaValue) val).recycle();
+                 }
+             }
+         }
     }
 }

@@ -71,3 +71,23 @@ void* getLuaValue(lua_State *L, int id_value) {
 
     return nullptr;
 }
+
+void travelTable(lua_State* L, int idx, std::function<int(lua_State*)> func){
+    if(lua_istable(L, idx) || lua_isuserdata(L, idx)){
+        lua_pushnil(L);                            /* first key */
+        const int tIdx = idx < 0 ? idx - 1 : idx;  //idx changed now by first key
+        // luaB_dumpStack(L);
+        while (lua_next(L, tIdx) != 0) {
+            //-2 is key, -1(top) is value
+            //if return 1 means need break
+            if(func(L)){
+                lua_pop(L, 2);
+                break;
+            }
+            /* remove value, keep key for next iterate */
+            lua_pop(L, 1);
+        }
+    } else{
+        luaL_error(L, "can't travel table for idx = %d", idx);
+    }
+}

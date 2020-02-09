@@ -250,7 +250,7 @@ public final class LuaState extends INativeObject.BaseNativeObject {
     private static synchronized native void _pushValue(long ptr, int idx);
     private static synchronized native void _pushnil(long ptr);
     private static synchronized native void _pushBoolean(long ptr, boolean val);
-    //globalKey can be null, pushToStack only used for global
+    //globalKey can be null
     private static synchronized native void _pushJavaObject(long ptr, Object obj, String classname, String globalKey, boolean pushToStack);
     private static synchronized native void _pushFunction(long ptr, Object func, String classname, String globalKey, boolean pushToStack);
     private static synchronized native void _pushClass(long ptr, String classname, String globalKey, boolean pushToStack);

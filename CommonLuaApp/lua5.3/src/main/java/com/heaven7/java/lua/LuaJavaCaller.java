@@ -149,6 +149,8 @@ public final class LuaJavaCaller {
             }
         } catch (Exception e) {
             errorMsg[0] = toString(e);
+        }finally {
+            LuaUtils.recycleValues(args);
         }
         return null;
     }
@@ -217,9 +219,7 @@ public final class LuaJavaCaller {
             LuaTypeAdapter adapter = LuaTypeAdapter.get(type);
             if (adapter != null) {
                 if (args[i] instanceof Lua2JavaValue) {
-                    value = (Lua2JavaValue) args[i];
-                    out[i] = adapter.readFromLua(luaState, value);
-                    value.recycle();
+                    out[i] = adapter.readFromLua(luaState, (Lua2JavaValue) args[i]);
                 } else {
                     throw new IllegalStateException("args must be Lua2JavaValue.");
                 }

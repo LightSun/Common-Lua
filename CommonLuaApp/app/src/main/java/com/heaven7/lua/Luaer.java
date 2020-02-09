@@ -1,4 +1,4 @@
-package com.heaven7.androlua;
+package com.heaven7.lua;
 
 import android.content.Context;
 import android.content.res.AssetManager;

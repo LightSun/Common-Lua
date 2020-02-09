@@ -5,6 +5,7 @@
 #ifndef COMMONLUAAPP_LUA_BRIDGE_H
 #define COMMONLUAAPP_LUA_BRIDGE_H
 
+#include <functional>
 #include "lua.hpp"
 
 #define LIB_LUA_WRAPPER "__LIB_common_lua_WRAP__"
@@ -55,4 +56,14 @@ void* newLua2JavaValue(int type, long long ptrOrIndex);
 void releaseJavaObject(void * obj);
 
 void* getLuaValue(lua_State *L, int id_value);
+
+
+/**
+ * travel the lua table.
+ * @param L  he lua state
+ * @param idx the table idx
+ * @param tt the traveller to travel table. return true means need break travel.
+ */
+void travelTable(lua_State* L, int idx, std::function<int(lua_State*)> func);
+
 #endif //COMMONLUAAPP_LUA_BRIDGE_H

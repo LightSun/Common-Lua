@@ -131,26 +131,6 @@ const char* getFieldAsString(lua_State* L, int idx, const char* name){
     lua_pop(L, -1);
     return value;
 }
-
-void travelTable(lua_State* L, int idx, LuaStdFunc tt){
-    if(lua_istable(L, idx) || lua_isuserdata(L, idx)){
-        lua_pushnil(L);                            /* first key */
-        const int tIdx = idx < 0 ? idx - 1 : idx;  //idx changed now by first key
-       // luaB_dumpStack(L);
-        while (lua_next(L, tIdx) != 0) {
-            //-2 is key, -1(top) is value
-            //if return 1 means need break
-            if(tt(L)){
-                lua_pop(L, 2);
-                break;
-            }
-            /* remove value, keep key for next iterate */
-            lua_pop(L, 1);
-        }
-    } else{
-        luaL_error(L, "can't travel table for idx = %d", idx);
-    }
-}
 int ext_adjustIdx(lua_State* L, int idx){
     return idx < 0 ? lua_gettop(L) + 1 + idx : idx;
 }
