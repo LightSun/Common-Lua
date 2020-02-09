@@ -36,7 +36,7 @@ public final class TableObject {
             collType = LuaState.COLLECTION_TYPE_LIST;
         }
         lt.setCollectionType(collType);
-        int k = luaState.saveLightly();
+        final int k = luaState.saveLightly();
 
         //get travel method
         luaState.pushString(M_TRAVEL);
@@ -62,8 +62,8 @@ public final class TableObject {
             }else {
                 System.err.println("travel failed. " + luaState.toString(-1));
             }
+            luaState.restoreLightly(k);
         }
-        //luaState.restoreLightly(k);
         return true;
     }
     public Lua2JavaValue call1(String name, LuaParameter... params){

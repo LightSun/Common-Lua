@@ -19,6 +19,7 @@ package com.heaven7.java.lua.iota.obj;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
+import java.lang.reflect.Modifier;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.WeakHashMap;
@@ -145,6 +146,10 @@ public final class Reflecty<PR, CD extends Annotation,F extends Annotation,
             //handle fields
             for (Field f: fields) {
                 f.setAccessible(true);
+                //ignore static
+                if((f.getModifiers() & Modifier.STATIC) == Modifier.STATIC){
+                    continue;
+                }
                 F fieldDesc = f.getAnnotation(mClazzField);
                 // allow inherit
                 if (mDelegate.shouldIncludeField(f, fieldDesc, isInherit)) {
@@ -168,6 +173,10 @@ public final class Reflecty<PR, CD extends Annotation,F extends Annotation,
                 Method[] methods = clazz.getDeclaredMethods();
                 for (Method method : methods) {
                     method.setAccessible(true);
+                    //ignore static
+                    if((method.getModifiers() & Modifier.STATIC) == Modifier.STATIC){
+                        continue;
+                    }
 
                     M mm = method.getAnnotation(mClazzMethod);
                     if(!mDelegate.shouldIncludeMethod(method, mm, isInherit)){

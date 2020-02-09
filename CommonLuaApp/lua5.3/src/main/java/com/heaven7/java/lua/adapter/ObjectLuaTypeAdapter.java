@@ -36,7 +36,7 @@ public final class ObjectLuaTypeAdapter<PR extends LuaTypeAdapter,
             return ta.readFromLua(luaState, arg);
         }
         TableObject tab = arg.toTableValue(luaState);
-        final Object obj = mTAM.getReflectyContext().newInstance(mClazz);
+        final Object obj = mTAM.getReflectyContext().createObject(mClazz);
 
         List<MemberProxy> proxies = mReflecty.getMemberProxies(mClazz);
         Lua2JavaValue tempVal;

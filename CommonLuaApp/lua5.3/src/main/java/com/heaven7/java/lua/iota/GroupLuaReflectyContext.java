@@ -153,10 +153,10 @@ import java.util.Set;
         return null;
     }
     @Override
-    public Object newInstance(Class<?> clazz) {
+    public Object createObject(Class<?> clazz) {
         Object bj;
         for (LuaReflectyContext context : contexts){
-            bj = context.newInstance(clazz);
+            bj = context.createObject(clazz);
             if(bj != null){
                 return bj;
             }

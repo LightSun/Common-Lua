@@ -26,5 +26,10 @@ public interface LuaReflectyContext {
     Collection createCollection(Class<?> clazz);
     Map createMap(Class<?> clazz);
 
-    Object newInstance(Class<?> clazz);
+    /**
+     * create object for target class
+     * @param clazz the object class. this class is not from collection family. eg: 'Person.class'
+     * @return the object.
+     */
+    Object createObject(Class<?> clazz);
 }

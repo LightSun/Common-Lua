@@ -39,7 +39,7 @@ import java.util.Set;
     }
     //not set use default
     @Override
-    public Object newInstance(Class<?> clazz) {
+    public Object createObject(Class<?> clazz) {
         return null;
     }
     public LuaTypeAdapter getKeyAdapter(Class<?> type) {
