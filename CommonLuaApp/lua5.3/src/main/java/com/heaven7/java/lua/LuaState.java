@@ -186,8 +186,8 @@ public final class LuaState extends INativeObject.BaseNativeObject {
     public void error(String msg){
         _error(getNativePointer(), msg);
     }
-    public Lua2JavaValue getLuaValue(int idx){
-        return (Lua2JavaValue) _getLuaValue(getNativePointer(), idx);
+    public LuaValue getLuaValue(int idx){
+        return (LuaValue) _getLuaValue(getNativePointer(), idx);
     }
     public boolean removeGlobal(String key){
         if(key == null){

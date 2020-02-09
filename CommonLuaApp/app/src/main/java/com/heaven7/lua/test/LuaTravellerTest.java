@@ -1,6 +1,6 @@
 package com.heaven7.lua.test;
 
-import com.heaven7.java.lua.Lua2JavaValue;
+import com.heaven7.java.lua.LuaValue;
 import com.heaven7.java.lua.LuaState;
 import com.heaven7.java.lua.LuaTraveller;
 import com.heaven7.java.lua.internal.LuaUtils;
@@ -24,9 +24,9 @@ public final class LuaTravellerTest {
                 this.ls = ls;
             }
             @Override
-            public int travel(long luaStatePte, Lua2JavaValue key, Lua2JavaValue value) {
-                if(checkLuaValueType(ls, key, Lua2JavaValue.TYPE_NUMBER)){
-                    checkLuaValueType(ls, value, Lua2JavaValue.TYPE_NUMBER);
+            public int travel(long luaStatePte, LuaValue key, LuaValue value) {
+                if(checkLuaValueType(ls, key, LuaValue.TYPE_NUMBER)){
+                    checkLuaValueType(ls, value, LuaValue.TYPE_NUMBER);
                 }
                 System.out.println("Traveller from >>> LuaTravellerTest__testBase(): key = "
                         + key.toIntValue() + " ,value = " + value.toIntValue());
@@ -38,7 +38,7 @@ public final class LuaTravellerTest {
         luaState.restoreLightly(k);
     }
 
-    private static boolean checkLuaValueType(LuaState luaState, Lua2JavaValue lv, int expectType){
+    private static boolean checkLuaValueType(LuaState luaState, LuaValue lv, int expectType){
         if(lv.getType() != expectType){
             String msg = String.format(Locale.getDefault(),
                     "wrong lua value type. expect is %d, but is %d.", expectType, lv.getType());

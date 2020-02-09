@@ -22,25 +22,25 @@ void getLuaParam(lua_State *L, int id_value, LuaParam *lp) {
         case LUA_TNUMBER: {
             auto *a = new lua_Number();
             *a = lua_tonumber(L, id_value);
-            lp->value = newLua2JavaValue(DTYPE_NUMBER, reinterpret_cast<long long int>(a));
+            lp->value = newLuaValue(DTYPE_NUMBER, reinterpret_cast<long long int>(a));
             lp->type = DTYPE_LUA2JAVA_VALUE;
             break;
         }
         case LUA_TBOOLEAN: {
             auto *a = new int();
             *a = lua_toboolean(L, id_value);
-            lp->value = newLua2JavaValue(DTYPE_BOOLEAN, reinterpret_cast<long long int>(a));
+            lp->value = newLuaValue(DTYPE_BOOLEAN, reinterpret_cast<long long int>(a));
             lp->type = DTYPE_LUA2JAVA_VALUE;
             break;
         }
         case LUA_TSTRING: {
             const char *str = lua_tostring(L, id_value);
-            lp->value = newLua2JavaValue(DTYPE_STRING, reinterpret_cast<long long int> (str));
+            lp->value = newLuaValue(DTYPE_STRING, reinterpret_cast<long long int> (str));
             lp->type = DTYPE_LUA2JAVA_VALUE;
             break;
         }
         case LUA_TNIL: {
-            lp->value = newLua2JavaValue(DTYPE_NULL, 0);;
+            lp->value = newLuaValue(DTYPE_NULL, 0);;
             lp->type = DTYPE_LUA2JAVA_VALUE;
             break;
         }
@@ -49,7 +49,7 @@ void getLuaParam(lua_State *L, int id_value, LuaParam *lp) {
             break;
         }
         case LUA_TFUNCTION: {
-            lp->value = newLua2JavaValue(DTYPE_FUNC, id_value);;
+            lp->value = newLuaValue(DTYPE_FUNC, id_value);;
             lp->type = DTYPE_LUA2JAVA_VALUE;
             break;
         }
@@ -60,12 +60,12 @@ void getLuaParam(lua_State *L, int id_value, LuaParam *lp) {
         case LUA_TUSERDATA: {
             luaL_error(L, "Currently, lua param not support for 'userdata'.");
             //RECEIVE_USERDATA(id_value);
-            lp->value = newLua2JavaValue(DTYPE_TABLE, id_value);;
+            lp->value = newLuaValue(DTYPE_TABLE, id_value);;
             lp->type = DTYPE_LUA2JAVA_VALUE;
             break;
         }
         case LUA_TTABLE: {
-            lp->value = newLua2JavaValue(DTYPE_TABLE, id_value);;
+            lp->value = newLuaValue(DTYPE_TABLE, id_value);;
             lp->type = DTYPE_LUA2JAVA_VALUE;
             break;
         }

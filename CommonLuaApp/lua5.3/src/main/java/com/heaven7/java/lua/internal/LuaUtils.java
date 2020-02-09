@@ -2,7 +2,7 @@ package com.heaven7.java.lua.internal;
 
 import android.support.annotation.RestrictTo;
 
-import com.heaven7.java.lua.Lua2JavaValue;
+import com.heaven7.java.lua.LuaValue;
 import com.heaven7.java.lua.LuaState;
 import com.heaven7.java.lua.LuaTypeAdapter;
 
@@ -40,8 +40,8 @@ public final class LuaUtils {
     public static void recycleValues(Object[] args) {
          if(args != null){
              for (Object val : args){
-                 if(val instanceof Lua2JavaValue){
-                     ((Lua2JavaValue) val).recycle();
+                 if(val instanceof LuaValue){
+                     ((LuaValue) val).recycle();
                  }
              }
          }

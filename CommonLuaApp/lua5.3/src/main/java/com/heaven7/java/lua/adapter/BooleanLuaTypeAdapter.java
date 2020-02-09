@@ -1,7 +1,7 @@
 package com.heaven7.java.lua.adapter;
 
 
-import com.heaven7.java.lua.Lua2JavaValue;
+import com.heaven7.java.lua.LuaValue;
 import com.heaven7.java.lua.LuaState;
 import com.heaven7.java.lua.LuaTypeAdapter;
 
@@ -18,7 +18,7 @@ public class BooleanLuaTypeAdapter extends LuaTypeAdapter {
         return 1;
     }
     @Override
-    public Object readFromLua(LuaState luaState, Lua2JavaValue arg) {
+    public Object readFromLua(LuaState luaState, LuaValue arg) {
         return arg.toBooleanValue();
     }
 }

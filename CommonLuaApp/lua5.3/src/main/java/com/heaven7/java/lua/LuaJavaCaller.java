@@ -213,15 +213,15 @@ public final class LuaJavaCaller {
     }
 
     public static boolean convert(LuaState luaState, Type[] types, Object[] args, Object[] out) {
-        Lua2JavaValue value;
+        LuaValue value;
         for (int size = args.length, i = 0; i < size; i++) {
             Type type = types[i];
             LuaTypeAdapter adapter = LuaTypeAdapter.get(type);
             if (adapter != null) {
-                if (args[i] instanceof Lua2JavaValue) {
-                    out[i] = adapter.readFromLua(luaState, (Lua2JavaValue) args[i]);
+                if (args[i] instanceof LuaValue) {
+                    out[i] = adapter.readFromLua(luaState, (LuaValue) args[i]);
                 } else {
-                    throw new IllegalStateException("args must be Lua2JavaValue.");
+                    throw new IllegalStateException("args must be LuaValue.");
                 }
             } else {
                 //change nothing

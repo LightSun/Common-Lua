@@ -46,13 +46,13 @@ extern "C"{
  * @param ptrOrIndex the pointer or stack index
  * @return  the java object
  */
-typedef void* (*Lua2JavaValue_Creator)(int type, long long ptrOrIndex);
+typedef void* (*LuaValue_Creator)(int type, long long ptrOrIndex);
 typedef void (*Java_Object_Releaser)(void *obj);
 
-void setLua2JavaValue_Creator(Lua2JavaValue_Creator creator);
+void setLuaValue_Creator(LuaValue_Creator creator);
 void setJava_Object_Releaser(Java_Object_Releaser releaser);
 
-void* newLua2JavaValue(int type, long long ptrOrIndex);
+void* newLuaValue(int type, long long ptrOrIndex);
 void releaseJavaObject(void * obj);
 
 void* getLuaValue(lua_State *L, int id_value);

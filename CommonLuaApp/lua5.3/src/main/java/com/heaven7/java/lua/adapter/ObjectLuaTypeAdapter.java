@@ -1,6 +1,6 @@
 package com.heaven7.java.lua.adapter;
 
-import com.heaven7.java.lua.Lua2JavaValue;
+import com.heaven7.java.lua.LuaValue;
 import com.heaven7.java.lua.LuaState;
 import com.heaven7.java.lua.LuaTypeAdapter;
 import com.heaven7.java.lua.TableObject;
@@ -30,7 +30,7 @@ public final class ObjectLuaTypeAdapter<PR extends LuaTypeAdapter,
         this.mClazz = mClazz;
     }
 
-    public Object readFromLua(LuaState luaState, Lua2JavaValue arg){
+    public Object readFromLua(LuaState luaState, LuaValue arg){
         PR ta = mReflecty.performReflectClass(mClazz);
         if(ta != null) {
             return ta.readFromLua(luaState, arg);
@@ -39,7 +39,7 @@ public final class ObjectLuaTypeAdapter<PR extends LuaTypeAdapter,
         final Object obj = mTAM.getReflectyContext().createObject(mClazz);
 
         List<MemberProxy> proxies = mReflecty.getMemberProxies(mClazz);
-        Lua2JavaValue tempVal;
+        LuaValue tempVal;
         try {
             for (MemberProxy proxy : proxies){
                 if(proxy instanceof FieldProxy){

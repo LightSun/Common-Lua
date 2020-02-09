@@ -1,17 +1,17 @@
 package com.heaven7.java.lua.adapter;
 
-import com.heaven7.java.lua.Lua2JavaValue;
+import com.heaven7.java.lua.LuaValue;
 import com.heaven7.java.lua.LuaState;
 import com.heaven7.java.lua.LuaTypeAdapter;
 
 public final class LightObjectLuaTypeAdapter extends LuaTypeAdapter {
 
     @Override
-    public Object readFromLua(LuaState luaState, Lua2JavaValue arg) {
+    public Object readFromLua(LuaState luaState, LuaValue arg) {
         switch (arg.getType()){
-            case Lua2JavaValue.TYPE_NULL:
+            case LuaValue.TYPE_NULL:
                 return null;
-            case Lua2JavaValue.TYPE_TABLE_LIKE:
+            case LuaValue.TYPE_TABLE_LIKE:
                 int index = (int) arg.getValuePtr();
                 if(luaState.isNativeWrapper(index)){
                     return luaState.getJavaObject(index);

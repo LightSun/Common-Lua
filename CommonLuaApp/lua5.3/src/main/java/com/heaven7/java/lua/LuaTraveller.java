@@ -22,6 +22,6 @@ public abstract class LuaTraveller {
      * @return 0 if ok. or 1 if should break next travel.
      */
     @Keep
-    public abstract int travel(long luaStatePte, Lua2JavaValue key, Lua2JavaValue value);
+    public abstract int travel(long luaStatePte, LuaValue key, LuaValue value);
 
 }

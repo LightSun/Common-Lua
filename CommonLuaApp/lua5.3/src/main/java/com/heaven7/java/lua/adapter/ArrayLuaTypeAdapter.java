@@ -1,6 +1,6 @@
 package com.heaven7.java.lua.adapter;
 
-import com.heaven7.java.lua.Lua2JavaValue;
+import com.heaven7.java.lua.LuaValue;
 import com.heaven7.java.lua.LuaState;
 import com.heaven7.java.lua.LuaTypeAdapter;
 import com.heaven7.java.lua.internal.LuaUtils;
@@ -35,7 +35,7 @@ public class ArrayLuaTypeAdapter extends LuaTypeAdapter {
         this.mComponentAdapter = mComponentAdapter;
     }
 
-    public Object readFromLua(LuaState luaState, Lua2JavaValue arg){
+    public Object readFromLua(LuaState luaState, LuaValue arg){
         List list = new ArrayList();
         arg.toTableValue(luaState).travel(new CollectionTraveller(mComponentAdapter, list));
         if(mComponentClass.isPrimitive()){

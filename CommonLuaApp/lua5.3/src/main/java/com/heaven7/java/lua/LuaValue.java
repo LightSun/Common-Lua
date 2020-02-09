@@ -2,9 +2,9 @@ package com.heaven7.java.lua;
 
 import android.support.annotation.Keep;
 
-public final class Lua2JavaValue {
+public final class LuaValue {
 
-    public static final Lua2JavaValue NULL = new Lua2JavaValue(Lua2JavaValue.TYPE_NULL, 0);
+    public static final LuaValue NULL = new LuaValue(LuaValue.TYPE_NULL, 0);
 
     public static final int TYPE_NULL = 1;
     public static final int TYPE_NUMBER = 2;
@@ -17,19 +17,19 @@ public final class Lua2JavaValue {
     private int type;
     private boolean used;
 
-    private Lua2JavaValue(int type, long ptrOrIndex) {
+    private LuaValue(int type, long ptrOrIndex) {
         this.type = type;
         this.ptr = ptrOrIndex;
     }
-    private Lua2JavaValue() {
+    private LuaValue() {
     }
 
     @Keep
-    public static Lua2JavaValue of(int type, long ptrOrIndex) {
+    public static LuaValue of(int type, long ptrOrIndex) {
         if (type == TYPE_NULL) {
             return NULL;
         }
-        Lua2JavaValue value = obtain();
+        LuaValue value = obtain();
         value.type = type;
         value.ptr = ptrOrIndex;
         return value;
@@ -215,7 +215,7 @@ public final class Lua2JavaValue {
             return;
         }
         if (used) {
-            System.err.println("This Lua2JavaValue cannot be recycled because it "
+            System.err.println("This LuaValue cannot be recycled because it "
                     + "is still in use.");
             return;
         }
@@ -229,10 +229,10 @@ public final class Lua2JavaValue {
             }
         }
     }
-    private static Lua2JavaValue obtain() {
+    private static LuaValue obtain() {
         synchronized (sPoolSync) {
             if (sPool != null) {
-                Lua2JavaValue m = sPool;
+                LuaValue m = sPool;
                 sPool = m.next;
                 m.next = null;
                 m.used = false; // clear in-use flag
@@ -240,7 +240,7 @@ public final class Lua2JavaValue {
                 return m;
             }
         }
-        return new Lua2JavaValue();
+        return new LuaValue();
     }
     private void recycleNative(){
         if (ptr != 0) {
@@ -256,9 +256,9 @@ public final class Lua2JavaValue {
             }
         }
     }
-    private Lua2JavaValue next;
+    private LuaValue next;
     private static final Object sPoolSync = new Object();
-    private static Lua2JavaValue sPool;
+    private static LuaValue sPool;
     private static int sPoolSize = 0;
     private static final int MAX_POOL_SIZE = 50;
 }

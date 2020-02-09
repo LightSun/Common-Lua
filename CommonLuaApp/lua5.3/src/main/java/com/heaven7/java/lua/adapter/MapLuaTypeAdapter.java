@@ -1,6 +1,6 @@
 package com.heaven7.java.lua.adapter;
 
-import com.heaven7.java.lua.Lua2JavaValue;
+import com.heaven7.java.lua.LuaValue;
 import com.heaven7.java.lua.LuaState;
 import com.heaven7.java.lua.LuaTraveller;
 import com.heaven7.java.lua.LuaTypeAdapter;
@@ -24,7 +24,7 @@ public class MapLuaTypeAdapter extends LuaTypeAdapter {
         this.mValueAdapter = mValueAdapter;
     }
 
-    public Object readFromLua(LuaState luaState, Lua2JavaValue arg) {
+    public Object readFromLua(LuaState luaState, LuaValue arg) {
         Map map = mContext.createMap(mMapClass);
         arg.toTableValue(luaState)
                 .travel(new MapTraveller(mKeyAdapter, mValueAdapter, map));
@@ -63,7 +63,7 @@ public class MapLuaTypeAdapter extends LuaTypeAdapter {
         }
 
         @Override
-        public int travel(long luaStatePte, Lua2JavaValue key, Lua2JavaValue value) {
+        public int travel(long luaStatePte, LuaValue key, LuaValue value) {
             if (luaState == null) {
                 luaState = new LuaState(luaStatePte);
             }

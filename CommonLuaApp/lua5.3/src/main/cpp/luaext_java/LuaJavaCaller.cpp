@@ -19,7 +19,7 @@ extern "C" {
 #define OBJECT_NAME "Ljava/lang/Object;"
 
 #define CALLER_CLASS    "com/heaven7/java/lua/LuaJavaCaller"
-#define LUA2JAVA_CLASS  "com/heaven7/java/lua/Lua2JavaValue"
+#define LUA2JAVA_CLASS  "com/heaven7/java/lua/LuaValue"
 #define FUNC_CLASS      "com/heaven7/java/lua/LuaFunction"
 #define TRAVELLER_CLASS "com/heaven7/java/lua/LuaTraveller"
 
@@ -155,7 +155,7 @@ void initLuaJavaCaller() {
     __luaFuncClass = getGlobalClass(env, FUNC_CLASS);
     __luaTravelClass = getGlobalClass(env, TRAVELLER_CLASS);
     //set callback
-    setLua2JavaValue_Creator(&newLua2JavaValue0);
+    setLuaValue_Creator(&newLua2JavaValue0);
     setJava_Object_Releaser(&releaseJavaObject0);
     setLuaBridgeCallerCreator(&LBCCreator_0);
 }

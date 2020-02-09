@@ -20,7 +20,7 @@ public abstract class LuaTypeAdapter {
      * @param arg the argument
      * @return the java value which represent lua data
      */
-    public abstract Object readFromLua(LuaState luaState, Lua2JavaValue arg);
+    public abstract Object readFromLua(LuaState luaState, LuaValue arg);
 
     /**
      * write java object to lua

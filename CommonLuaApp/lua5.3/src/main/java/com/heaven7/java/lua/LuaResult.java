@@ -4,11 +4,11 @@ public final class LuaResult {
 
     public static final int MAX_RESULT_COUNT = 5;
 
-    private Lua2JavaValue value1;
-    private Lua2JavaValue value2;
-    private Lua2JavaValue value3;
-    private Lua2JavaValue value4;
-    private Lua2JavaValue value5;
+    private LuaValue value1;
+    private LuaValue value2;
+    private LuaValue value3;
+    private LuaValue value4;
+    private LuaValue value5;
 
     private LuaResult(){}
 
@@ -51,37 +51,37 @@ public final class LuaResult {
         return result;
     }
 
-    public Lua2JavaValue getValue1() {
+    public LuaValue getValue1() {
         return value1;
     }
-    public void setValue1(Lua2JavaValue value1) {
+    public void setValue1(LuaValue value1) {
         this.value1 = value1;
     }
-    public Lua2JavaValue getValue2() {
+    public LuaValue getValue2() {
         return value2;
     }
-    public void setValue2(Lua2JavaValue value2) {
+    public void setValue2(LuaValue value2) {
         this.value2 = value2;
     }
 
-    public Lua2JavaValue getValue3() {
+    public LuaValue getValue3() {
         return value3;
     }
-    public void setValue3(Lua2JavaValue value3) {
+    public void setValue3(LuaValue value3) {
         this.value3 = value3;
     }
 
-    public Lua2JavaValue getValue4() {
+    public LuaValue getValue4() {
         return value4;
     }
-    public void setValue4(Lua2JavaValue value4) {
+    public void setValue4(LuaValue value4) {
         this.value4 = value4;
     }
 
-    public Lua2JavaValue getValue5() {
+    public LuaValue getValue5() {
         return value5;
     }
-    public void setValue5(Lua2JavaValue value5) {
+    public void setValue5(LuaValue value5) {
         this.value5 = value5;
     }
 }

@@ -66,7 +66,7 @@ public final class TableObject {
         }
         return true;
     }
-    public Lua2JavaValue call1(String name, LuaParameter... params){
+    public LuaValue call1(String name, LuaParameter... params){
         LuaResult result = call(name, 1, params);
         if(result != null){
             return result.getValue1();
@@ -108,12 +108,12 @@ public final class TableObject {
         }
         return null;
     }
-    public Lua2JavaValue getField(String name){
+    public LuaValue getField(String name){
         final LuaState luaState = getLuaState();
         final int idx = LuaUtils.adjustIdx(luaState, index);
         luaState.pushString(name);
         luaState.getTable(idx);
-        Lua2JavaValue result = luaState.getLuaValue(-1);
+        LuaValue result = luaState.getLuaValue(-1);
         luaState.pop(1);
         return result;
     }
@@ -141,8 +141,8 @@ public final class TableObject {
         }
         @Override
         protected int execute(LuaState state) {
-            Lua2JavaValue key = state.getLuaValue(-2);
-            Lua2JavaValue value = state.getLuaValue(-1);
+            LuaValue key = state.getLuaValue(-2);
+            LuaValue value = state.getLuaValue(-1);
             int result = lt.travel(state.getNativePointer(), key, value);
             if(key != null){
                 key.recycle();
