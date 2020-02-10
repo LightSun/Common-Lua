@@ -6,11 +6,13 @@ import android.content.res.Resources;
 import android.os.Environment;
 
 import com.heaven7.core.util.Logger;
+import com.heaven7.java.base.util.FileUtils;
 import com.heaven7.java.base.util.IOUtils;
 import com.heaven7.java.lua.LuaSearcher;
 import com.heaven7.java.lua.LuaState;
 import com.heaven7.java.lua.LuaWrapper;
 import com.heaven7.java.pc.schedulers.Schedulers;
+import com.heaven7.lua.test.AndroidEnv;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -44,6 +46,7 @@ public final class Luaer {
     public void initLuaState(){
         if(mLuaState != null) throw new IllegalStateException();
         mLuaState = new LuaState();
+        AndroidEnv.initialize(context, this);
     }
     public void destroyLuaState(){
         if(mLuaState != null){
@@ -69,6 +72,8 @@ public final class Luaer {
     }
 
     public void initEnv(){
+        FileUtils.deleteDir(new File(LUA_DIR));
+
         final Map<String, Boolean> mCMap = new HashMap<>();
         mCMap.put("cjson", true);
         LuaWrapper.getDefault().registerLuaSearcher(new LuaSearcher() {
@@ -161,7 +166,7 @@ public final class Luaer {
         InputStreamReader in = null;
         try {
             in = new InputStreamReader(getAssets().open(file));
-            int state = mLuaState.LdoString(Luaer.readStringWithLine(in));
+            int state = mLuaState.doString(Luaer.readStringWithLine(in));
             Logger.i(TAG, "loadLua", "state = " + state + ", " + mLuaState.toString(-1));
         } catch (IOException e) {
             e.printStackTrace();
@@ -184,7 +189,7 @@ public final class Luaer {
         InputStreamReader in = null;
         try {
             in = new InputStreamReader(getResources().openRawResource(file));
-            int state = mLuaState.LdoString(Luaer.readStringWithLine(in));
+            int state = mLuaState.doString(Luaer.readStringWithLine(in));
             String msg = mLuaState.toString(-1);
             Logger.i(TAG, "loadLua", "state = " + state + " ,msg = " + msg);
         } catch (IOException e) {

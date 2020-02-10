@@ -50,21 +50,21 @@ function m.endsWidth(str, substr)
     end
 end
 
-function m.split(str, separator)
-    local nFindStartIndex = 1
-    local nSplitIndex = 1
-    local nSplitArray = {}
+
+function m.split(str, ch)
+    local find, sub, insert = string.find, string.sub, table.insert
+    local res = {}
+    local start, start_pos, end_pos = 1, 1, 1
     while true do
-        local nFindLastIndex = string.find(str, separator, nFindStartIndex)
-        if not nFindLastIndex then
-            nSplitArray[nSplitIndex] = string.sub(str, nFindStartIndex, string.len(str))
+        start_pos, end_pos = find(str, ch, start, true)
+        if not start_pos then
             break
         end
-        nSplitArray[nSplitIndex] = string.sub(str, nFindStartIndex, nFindLastIndex - 1)
-        nFindStartIndex = nFindLastIndex + string.len(separator)
-        nSplitIndex = nSplitIndex + 1
+        insert(res, sub(str, start, start_pos - 1))
+        start = end_pos + 1
     end
-    return nSplitArray
+    insert(res, sub(str,start))
+    return res
 end
 
 function m.bytes2Str(bytes)

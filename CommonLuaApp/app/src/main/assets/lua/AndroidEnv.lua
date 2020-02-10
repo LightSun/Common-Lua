@@ -1,5 +1,11 @@
 
-local m = {};
+local m;
+if(_G.ANDROID_ENV == nil) then
+    m = {}
+    _G.ANDROID_ENV = m;
+else
+   m = _G.ANDROID_ENV
+end
 
 function m.SET_ANDROID_ENV(map)
     -- br.call(method, args..., size)

@@ -61,25 +61,20 @@ public final class LuaState extends INativeObject.BaseNativeObject {
         _pop(getNativePointer(), n);
     }
 
-    public int LdoString(String script) {
-        return _evaluateScript(getNativePointer(), script);
-    }
     //do return a table
-    public int execScript(String script) {
+    public int doString(String script) {
         return _evaluateScript(getNativePointer(), script);
     }
     //load return a function
-    public int loadScript(String script){
+    public int loadString(String script){
         return _loadScript(getNativePointer(), script);
     }
     public int getGlobal(String var) {
         return _getGlobal(getNativePointer(), var);
     }
-
     public String pushString(String var) {
         return _pushString(getNativePointer(), var);
     }
-
     public void pushNumber(double var) {
         _pushNumber(getNativePointer(), var);
     }
@@ -121,10 +116,10 @@ public final class LuaState extends INativeObject.BaseNativeObject {
     public void pushFunction(LuaFunction func){
         push(func);
     }
-    public void pushFunctionGlobal(LuaFunction func, String name){
+    public void pushFunction(LuaFunction func, String name){
         push(func, name, true);
     }
-    public void pushFunctionGlobal(LuaFunction func, String name, boolean pushToStack){
+    public void pushFunction(LuaFunction func, String name, boolean pushToStack){
         push(func, name, pushToStack);
     }
 

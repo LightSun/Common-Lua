@@ -10,13 +10,13 @@ public final class WrapClassTest {
     public static void testBase(LuaState state){
         LuaJavaCaller.registerJavaClass(R.layout.class);
         state.pushClass(R.layout.class, "P", false);
-        state.execScript("local id = P.getField(P, 'main'); print('id =', id)");
+        state.doString("local id = P.getField(P, 'main'); print('id =', id)");
         state.dumpLuaStack();
     }
 
     public static void testMethod(LuaState state){
         LuaJavaCaller.registerJavaClass(Person.class);
         state.pushClass(Person.class, "P", false);
-        state.execScript("local m = P.getMethod(P, 'getH'); print(m('heaven7'))");
+        state.doString("local m = P.getMethod(P, 'getH'); print(m('heaven7'))");
     }
 }

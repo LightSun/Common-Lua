@@ -4,6 +4,7 @@ import android.content.Context;
 import android.util.ArrayMap;
 
 import com.heaven7.java.lua.LuaFunction;
+import com.heaven7.java.lua.LuaJavaCaller;
 import com.heaven7.java.lua.LuaState;
 
 import java.util.Map;
@@ -47,7 +48,9 @@ public final class AndroidEnvResolver {
                 return 1;
             }
             try {
-                state.pushClass(Class.forName(str), str, true);
+                Class<?> clazz = Class.forName(str);
+                LuaJavaCaller.registerJavaClass(clazz);
+                state.pushClass(clazz, str, true);
             } catch (ClassNotFoundException e) {
                 throw new RuntimeException(e);
             }

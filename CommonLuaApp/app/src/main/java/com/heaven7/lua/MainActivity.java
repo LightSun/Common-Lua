@@ -8,6 +8,7 @@ import android.view.View;
 
 import com.heaven7.android.lua.app.R;
 import com.heaven7.lua.test.AndroidEnv;
+import com.heaven7.lua.test.AndroidEnvTest;
 import com.heaven7.lua.test.LuaTravellerTest;
 import com.heaven7.lua.test.LuaTypeAdapterTests;
 import com.heaven7.lua.test.WrapClassTest;
@@ -119,7 +120,7 @@ public class MainActivity extends Activity {
         new LuaTypeAdapterTests(mLuaer.getLuaState()).testAll();
     }
     public void onClickTestEnv(View view){
-        AndroidEnv.initialize(this, mLuaer);
+        AndroidEnvTest.testR(mLuaer);
     }
 
     private void initLua() {

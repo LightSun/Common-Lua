@@ -14,7 +14,7 @@ public final class AndroidEnv {
 
         LuaState state = luaer.getLuaState();
         String str = luaer.loadLuaAssetsAsString("lua/AndroidEnv.lua");
-        state.execScript(str);
+        state.doString(str);
         //state.dumpLuaStack();
 
         state.pushString("SET_ANDROID_ENV");
