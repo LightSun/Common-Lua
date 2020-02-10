@@ -2,6 +2,8 @@ package com.heaven7.java.lua;
 
 import android.support.annotation.Keep;
 
+import static com.heaven7.java.lua.LuaJavaCaller.registerJavaClass;
+
 /**
  * Created by heaven7 on 2019/7/1.
  */
@@ -60,7 +62,12 @@ public final class LuaState extends INativeObject.BaseNativeObject {
     public void pop(int n){
         _pop(getNativePointer(), n);
     }
-
+    public int doFile(String filename) {
+        return _doFile(getNativePointer(), filename);
+    }
+    public int loadFile(String filename) {
+        return _loadFile(getNativePointer(), filename);
+    }
     //do return a table
     public int doString(String script) {
         return _evaluateScript(getNativePointer(), script);
@@ -107,10 +114,12 @@ public final class LuaState extends INativeObject.BaseNativeObject {
         if(obj instanceof LuaFunction){
             _pushFunction(getNativePointer(), obj, LuaFunction.class.getName(), name, pushToStack);
         }else {
+            registerJavaClass(obj.getClass());
             _pushJavaObject(getNativePointer(), obj, obj.getClass().getName(), name, pushToStack);
         }
     }
     public void pushClass(Class<?> clazz, String globalK, boolean pushToStack){
+        registerJavaClass(clazz);
         _pushClass(getNativePointer(), clazz.getName(), globalK,  pushToStack);
     }
     public void pushFunction(LuaFunction func){
@@ -134,6 +143,15 @@ public final class LuaState extends INativeObject.BaseNativeObject {
     }
     public int pcall(int nArgs, int nResults, int errFunc) {
         return _pcall(getNativePointer(), nArgs, nResults, errFunc);
+    }
+    public String pcallm(int nArgs, int nResults, int errFunc){
+        int state = _pcall(getNativePointer(), nArgs, nResults, errFunc);
+        if(state != 0){
+            String msg = toString(-1);
+            pop(1);
+            return msg;
+        }
+        return null;
     }
 
     public void call(int nArgs, int nResults) {
@@ -176,6 +194,9 @@ public final class LuaState extends INativeObject.BaseNativeObject {
     }
     public LuaValue getLuaValue(int idx){
         return (LuaValue) _getLuaValue(getNativePointer(), idx);
+    }
+    public void setGlobal(String name){
+        _setGlobal(getNativePointer(), name);
     }
     public boolean removeGlobal(String key){
         if(key == null){
@@ -220,14 +241,18 @@ public final class LuaState extends INativeObject.BaseNativeObject {
     private static synchronized native int _isNativeWrapper(long ptr, int idx);
     private static synchronized native Object _getJavaObject(long ptr, int idx);
 
+    private static synchronized native int _doFile(long ptr, String script);
+    private static synchronized native int _loadFile(long ptr, String script);
     private static synchronized native int _evaluateScript(long ptr, String script);
     private static synchronized native int _loadScript(long ptr, String script);
     private static synchronized native Object _getLuaValue(long ptr, int idx);
     private static synchronized native int _getTop(long ptr);
     private static synchronized native int _getType(long ptr, int idx);
-    private static synchronized native int _getGlobal(long ptr, String var);
+
     private static synchronized native int _getTable(long ptr, int idx);
     private static synchronized native void  _setTable(long ptr, int idx);
+    private static synchronized native void _setGlobal(long ptr, String name);
+    private static synchronized native int _getGlobal(long ptr, String var);
     private static synchronized native boolean _removeGlobal(long ptr, String var);
     private static synchronized native boolean _hasGlobal(long ptr, String var);
 

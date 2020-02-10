@@ -71,6 +71,31 @@ public final class Luaer {
         return context.getResources();
     }
 
+    public String doFile(String relativePath){
+        String path = LUA_DIR + "/" + relativePath;
+        if(!new File(path).exists()){
+            return "can't find lua file,  path = " + path;
+        }
+        if(mLuaState.doFile(path) != 0){
+            String msg = mLuaState.toString(-1);
+            mLuaState.pop(1);
+            return msg;
+        }
+        return null;
+    }
+    public String loadFile(String relativePath){
+        String path = LUA_DIR + "/" + relativePath;
+        if(!new File(path).exists()){
+            return "can't find lua file,  path = " + path;
+        }
+        if(mLuaState.loadFile(path) != 0){
+            String msg = mLuaState.toString(-1);
+            mLuaState.pop(1);
+            return msg;
+        }
+        return null;
+    }
+
     public void initEnv(){
         FileUtils.deleteDir(new File(LUA_DIR));
 

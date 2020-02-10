@@ -49,8 +49,8 @@ public final class AndroidEnvResolver {
             }
             try {
                 Class<?> clazz = Class.forName(str);
-                LuaJavaCaller.registerJavaClass(clazz);
                 state.pushClass(clazz, str, true);
+                LuaJavaCaller.registerJavaClass(clazz);
             } catch (ClassNotFoundException e) {
                 throw new RuntimeException(e);
             }

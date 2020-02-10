@@ -473,6 +473,9 @@ JNIEnv *getEnvFromState(lua_State *L) {
 static JNINativeMethod lua_state_methods[] = {
         {"_nCreate",                 "()J",                                         (void *) nCreate_},
         {"_nRelease",                "(J)V",                                        (void *) nRelease_},
+        {"_setGlobal",               "(J" SIG_JSTRING ")V",                         (void *) lua_setglobal_},
+        {"_doFile",                  "(J" SIG_JSTRING ")I",                         (void *) luaL_dofile_},
+        {"_loadFile",                "(J" SIG_JSTRING ")I",                         (void *) luaL_loadfile_},
         {"_evaluateScript",          "(J" SIG_JSTRING ")I",                         (void *) luaL_dostring_},
         {"_loadScript",              "(J" SIG_JSTRING ")I",                         (void *) luaL_loadstring_},
         {"_getGlobal",               "(J" SIG_JSTRING ")I",                         (void *) lua_getglobal_},

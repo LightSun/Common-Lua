@@ -15,7 +15,7 @@ function m.ref(str)
     if lib.isUpper(arr[1]) then
         classname = andEnv.getClassName(arr[1])
     else
-        classname = arr[1];
+        classname = arr[1];--todo should fix
     end
 
     for i = 2, #arr - 1, 1
