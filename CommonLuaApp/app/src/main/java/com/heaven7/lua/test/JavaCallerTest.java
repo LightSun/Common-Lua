@@ -26,6 +26,7 @@ public final class JavaCallerTest {
 
         Person p = new Person();
         p.setName("heaven7");
+
         luaState.push(p);
         String msg = luaState.pcallm(1, 1, 0);
         if(msg != null){
@@ -33,6 +34,7 @@ public final class JavaCallerTest {
             return;
         }
         luaState.setGlobal("P");
+        //1, call person.getName  2, call person.setName 3, call person.getName
         int result = luaState.doString("print(P.getName()); P.setName('google'); print( P.getName());");
         try {
             if(result != 0){

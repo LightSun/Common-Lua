@@ -62,6 +62,42 @@ public final class LuaState extends INativeObject.BaseNativeObject {
     public void pop(int n){
         _pop(getNativePointer(), n);
     }
+    public String doFilem(String filename){
+        int state = _doFile(getNativePointer(), filename);
+        if(state != 0){
+            String msg = toString(-1);
+            pop(1);
+            return msg;
+        }
+        return null;
+    }
+    public String loadFilem(String filename){
+        int state = _loadFile(getNativePointer(), filename);
+        if(state != 0){
+            String msg = toString(-1);
+            pop(1);
+            return msg;
+        }
+        return null;
+    }
+    public String doStringm(String filename){
+        int state = _evaluateScript(getNativePointer(), filename);
+        if(state != 0){
+            String msg = toString(-1);
+            pop(1);
+            return msg;
+        }
+        return null;
+    }
+    public String loadStringm(String filename){
+        int state = _loadScript(getNativePointer(), filename);
+        if(state != 0){
+            String msg = toString(-1);
+            pop(1);
+            return msg;
+        }
+        return null;
+    }
     public int doFile(String filename) {
         return _doFile(getNativePointer(), filename);
     }
