@@ -68,6 +68,7 @@ public final class $ReflectyTypes {
             parseNode(ownerClass, componentType,  node);
             parent.addNode(node);
         }else if(type instanceof WildcardType){
+            //We only support what the Java 6 language needs - at most one bound
             Type[] lowerBounds = ((WildcardType) type).getLowerBounds();
             Type[] upperBounds = ((WildcardType) type).getUpperBounds();
             if(Predicates.isEmpty(lowerBounds)){
@@ -136,13 +137,13 @@ public final class $ReflectyTypes {
 
         public void addNode(GenericNode node) {
             if(subType == null){
-                subType = new ArrayList<>();
+                subType = new ArrayList<>(3);
             }
             subType.add(node);
         }
         public void addVariableNode(GenericNode varNode){
             if(varNodes == null){
-                varNodes = new ArrayList<>();
+                varNodes = new ArrayList<>(3);
             }
             varNodes.add(varNode);
         }

@@ -13,7 +13,6 @@ extern "C" {
 #include "../luaextra/lua_extra.h"
 
 void pushJNIEnv(JNIEnv *env, lua_State *L);
-
 JNIEnv *getEnvFromState(lua_State *L);
 
 //=============== push to stack ================

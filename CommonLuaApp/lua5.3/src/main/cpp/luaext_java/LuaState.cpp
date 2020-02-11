@@ -269,10 +269,6 @@ jstring luaL_typename_(JNIEnv *env, jclass clazz, jlong ptr, int i) {
     const char *tn = luaL_typename(L, i);
     return (env)->NewStringUTF(tn);
 }
-jdouble toNumber_(JNIEnv *env, jclass clazz, jlong ptr, int idx) {
-    lua_State *L = reinterpret_cast<lua_State *>(ptr);
-    return lua_tonumber(L, idx);
-}
 
 //--------------------- table op -------------------------
 jint lua_getglobal_(JNIEnv *env, jclass clazz, jlong ptr, jstring str) {
@@ -496,7 +492,8 @@ static JNINativeMethod lua_state_methods[] = {
         {"_pushClass",               "(J" SIG_JSTRING SIG_JSTRING "Z)V",            (void *) wrapClass},
 
         {"_toString",                "(JI)" SIG_JSTRING,                            (void *) lua_tostring_},
-        {"_toNumber",                "(JI)D",                                       (void *) toNumber_},
+        {"_toNumber",                "(JI)D",                                       (void *) lua_tonumber_},
+        {"_toBoolean",               "(JI)I",                                       (void *) lua_toboolean_},
         {"_pcall",                   "(JIII)I",                                     (void *) lua_pcall_},
         {"_call",                    "(JII)V",                                      (void *) lua_call_},
         {"_getTop",                  "(J)I",                                        (void *) lua_gettop_},
@@ -504,6 +501,10 @@ static JNINativeMethod lua_state_methods[] = {
         {"_newTable",                "(J)V",                                        (void *) lua_newtable_},
         {"_rawseti",                 "(JIJ)V",                                      (void *) lua_rawseti_},
         {"_rawset",                  "(JI)V",                                       (void *) lua_rawset_},
+        {"_rawGet",                  "(JI)I",                                       (void *) lua_rawget_},
+        {"_rawGeti",                 "(JIJ)I",                                      (void *) lua_rawgeti_},
+        {"_setField",                "(JI" SIG_JSTRING ")V",                        (void *) lua_setfield_},
+        {"_getField",                "(JI" SIG_JSTRING ")I",                        (void *) lua_getfield_},
 
         {"_dumpLuaStack",            "(J)V",                                        (void *) dumpLuaStack_},
         {"_pop",                     "(JI)V",                                       (void *) lua_pop_},

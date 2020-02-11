@@ -6,13 +6,28 @@ import static com.heaven7.java.lua.LuaJavaCaller.registerJavaClass;
 
 /**
  * Created by heaven7 on 2019/7/1.
- * the state/stack manager. wrap large methods for lua.
+ * the state/stack manager. wrap large methods for lua. for example:
+ * <ul> you can
+ *     <li>load script. by {@linkplain #loadFile(String)}, {@linkplain #loadString(String)}, {@linkplain #loadFileM(String)}, {@linkplain #loadStringM(String)}</li>
+ *     <li>execute script. by {@linkplain #doFile(String)}, {@linkplain #doString(String)}, {@linkplain #doFileM(String)}, {@linkplain #doStringM(String)}</li>
+ *     <li>push base values. by {@linkplain #pushBoolean(boolean)}, {@linkplain #pushNumber(double)},
+ *     {@linkplain #pushString(String)}, {@linkplain #pushValue(int)}, {@linkplain #pushNil()}</li>
+ *     <li>push extra java objects. {@linkplain #push(Object)}, {@linkplain #pushFunction(LuaFunction)}, {@linkplain #pushClass(Class, String, boolean)}</li>
+ *     <li>get values. by {@linkplain #toString(int)}, {@linkplain #toBoolean(int)}, {@linkplain #toNumber(int)}, {@linkplain #getLuaValue(int)}</li>
+ *     <li>call lua method. by{@linkplain #call(int, int)}, {@linkplain #pcall(int, int, int)}, {@linkplain #pcallM(int, int, int)}</li>
+ *     <li>get/set global. by {@linkplain #setGlobal(String)}, {@linkplain #getGlobal(String)}</li>
+ *     <li>get/set table. by {@linkplain #setTable(int)}, {@linkplain #rawSet(int)}, {@linkplain #rawSeti(int, int)}, {@linkplain #getTable(int)}
+ *          {@linkplain #setField(int, String)}, {@linkplain #getField(int, String)}, {@linkplain #rawGet(int)}, {@linkplain #rawGeti(int, int)} </li>
+ *       <li>travel table. {@linkplain #travel(int, LuaTraveller)}</li>
+ *     <li>debug and report lua error. {@linkplain #dumpLuaStack()},{@linkplain #error(String)}</li>
+ *     <li>... and etc.</li>
+ * </ul>
  * @author heaven7
  */
 @Keep
 public final class LuaState extends INativeObject.BaseNativeObject {
 
-    //lua value type
+    //lua value types
     public static final int TYPE_NONE = -1;
     public static final int TYPE_NIL = 0;
     public static final int TYPE_BOOLEAN = 1;
@@ -23,7 +38,7 @@ public final class LuaState extends INativeObject.BaseNativeObject {
     public static final int TYPE_FUNCTION = 6;
     public static final int TYPE_USERDATA = 7;
     public static final int TYPE_THREAD = 8;
-    //collection type
+    //collection types
     public static final int COLLECTION_TYPE_LIST = 1;
     public static final int COLLECTION_TYPE_SET  = 2;
     public static final int COLLECTION_TYPE_MAP  = 3;
@@ -140,7 +155,7 @@ public final class LuaState extends INativeObject.BaseNativeObject {
     }
     /**
      * the normal doString which wrap the native .
-     * @param filename the full filename
+     * @param script the lua script
      * @return the result code. 0 means success.
      */
     //do return a table
@@ -149,7 +164,7 @@ public final class LuaState extends INativeObject.BaseNativeObject {
     }
     /**
      * the normal loadString which wrap the native .
-     * @param filename the full filename
+     * @param script the lua script
      * @return the result code. 0 means success.
      */
     //load return a function
@@ -301,6 +316,14 @@ public final class LuaState extends INativeObject.BaseNativeObject {
     public double toNumber(int idx) {
         return _toNumber(getNativePointer(), idx);
     }
+    /**
+     * get the number value
+     * @param idx the index
+     * @return the number
+     */
+    public boolean toBoolean(int idx) {
+        return _toBoolean(getNativePointer(), idx) == 1;
+    }
 
     /**
      * pcall the function with args.
@@ -388,6 +411,41 @@ public final class LuaState extends INativeObject.BaseNativeObject {
         _rawset(getNativePointer(), idx);
     }
 
+    /**
+     * raw get value from target table of index
+     * @param idx the idx
+     * @return the value type
+     */
+    public int rawGet(int idx) {
+        return _rawGet(getNativePointer(), idx);
+    }
+    /**
+     * raw get array value from target table of index
+     * @param idx the idx
+     * @param arrIndex the array index
+     * @return the value type
+     */
+    public int rawGeti(int idx, int arrIndex) {
+        return _rawGeti(getNativePointer(), idx, arrIndex);
+    }
+
+    /**
+     * set field . this will trigger '__index'
+     * @param idx the table index
+     * @param name the field name
+     */
+    public void setField(int idx, String name) {
+        _setField(getNativePointer(), idx, name);
+    }
+
+    /**
+     * get field
+     * @param idx the table index
+     * @param name the field name
+     */
+    public void getField(int idx, String name) {
+        _getField(getNativePointer(), idx, name);
+    }
     /**
      * simple dump the lua stack
      */
@@ -530,6 +588,7 @@ public final class LuaState extends INativeObject.BaseNativeObject {
 
     private static synchronized native String _toString(long ptr, int idx);
     private static synchronized native double _toNumber(long ptr, int idx);
+    private static synchronized native int _toBoolean(long ptr, int idx);
 
     private static synchronized native void  _pushString(long ptr, String var);
     private static synchronized native void _pushNumber(long ptr, double n);
@@ -547,6 +606,10 @@ public final class LuaState extends INativeObject.BaseNativeObject {
     private static synchronized native void _newTable(long ptr);
     private static synchronized native void _rawseti(long ptr, int index, long arrayIndex);
     private static synchronized native void _rawset(long ptr, int index);
+    private static synchronized native int _rawGet(long ptr, int index);
+    private static synchronized native int _rawGeti(long ptr, int idx, long index);
+    private static synchronized native void  _setField(long ptr, int index, String name);
+    private static synchronized native int  _getField(long ptr, int index, String name);
 
     private static synchronized native void _pop(long ptr, int count);
     private static synchronized native void _dumpLuaStack(long ptr);
