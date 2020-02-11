@@ -36,7 +36,6 @@ public final class TableObject {
             collType = LuaState.COLLECTION_TYPE_LIST;
         }
         lt.setCollectionType(collType);
-        final int k = luaState.saveLightly();
 
         //get travel method
         luaState.pushString(M_TRAVEL);
@@ -60,16 +59,12 @@ public final class TableObject {
             if(result != 0){
                 System.err.println("travel failed for idx = " + idx + " ," + luaState.toString(-1));
             }
-            luaState.restoreLightly(k);
+            luaState.setTop(0);
         }
         return true;
     }
-    public LuaValue call1(String name, LuaParameter... params){
-        LuaResult result = call(name, 1, params);
-        if(result != null){
-            return result.getValue1();
-        }
-        return null;
+    public LuaResult call1(String name, LuaParameter... params){
+        return call(name, 1, params);
     }
     public LuaResult call(String name, int resultCount, LuaParameter... params){
         if(resultCount > LuaResult.MAX_RESULT_COUNT){
@@ -77,33 +72,30 @@ public final class TableObject {
         }
         final LuaState luaState = getLuaState();
         final int idx = LuaUtils.adjustIdx(luaState, index);
-        final int k = luaState.saveLightly();
         //result=xx.$name(params)
         //1, get func
         luaState.pushString(name);
         luaState.getTable(idx);
-        try {
-            if(luaState.getType(-1) != LuaState.TYPE_FUNCTION){
-                throw new IllegalStateException("can't find method name = " + name);
-            }
-            //2, push params
-            final int pCount = params != null ? params.length : 0;
-            if(pCount > 0){
-                for (LuaParameter p : params){
-                    p.java2lua(luaState);
-                }
-            }
-            //3, for lua_pcall need result count. we here just make a correct count. like 5.
-            int result = luaState.pcall(pCount, resultCount, 0);
-            if(result != 0){
-                System.err.println("call method error. name = " + name + " ,error msg = " + luaState.toString(-1));
-            }else {
-                 return LuaResult.of(luaState, resultCount);
-            }
-        }finally {
-            //4, restore lua stack
-            luaState.restoreLightly(k);
+
+        if(luaState.getType(-1) != LuaState.TYPE_FUNCTION){
+            luaState.pop(1);
+            throw new IllegalStateException("can't find method name = " + name);
         }
+        //2, push params
+        final int pCount = params != null ? params.length : 0;
+        if(pCount > 0){
+            for (LuaParameter p : params){
+                p.java2lua(luaState);
+            }
+        }
+        //3, for lua_pcall need result count. we here just make a correct count. like 5.
+        int result = luaState.pcall(pCount, resultCount, 0);
+        if(result != 0){
+            System.err.println("call method error. name = " + name + " ,error msg = " + luaState.toString(-1));
+        }else {
+             return LuaResult.of(luaState, resultCount);
+        }
+        //4, restore lua stack. was called on LuaResult.release()
         return null;
     }
     public LuaValue getField(String name){
@@ -122,7 +114,6 @@ public final class TableObject {
         val.java2lua(luaState);
         luaState.setTable(idx);
     }
-
     private LuaState getLuaState(){
         final LuaState luaState = mWeakState.get();
         if(luaState == null){

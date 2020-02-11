@@ -81,6 +81,14 @@ public final class LuaState extends INativeObject.BaseNativeObject {
     }
 
     /**
+     * set the stack top as target index
+     * @param index target index or 0 to clear the stack
+     */
+    public void setTop(int index){
+        _setTop(getNativePointer(), index);
+    }
+
+    /**
      * relative to {@linkplain #doFile(String)}, the return is different. if has error this method return error message direct, or else return null.
      * @param filename the full file name
      * @return the error message . or null if call ok.
@@ -612,6 +620,7 @@ public final class LuaState extends INativeObject.BaseNativeObject {
     private static synchronized native int  _getField(long ptr, int index, String name);
 
     private static synchronized native void _pop(long ptr, int count);
+    private static synchronized native void _setTop(long ptr, int rc);
     private static synchronized native void _dumpLuaStack(long ptr);
     private static synchronized native long _nCreate();
     private static synchronized native void _nRelease(long ptr);

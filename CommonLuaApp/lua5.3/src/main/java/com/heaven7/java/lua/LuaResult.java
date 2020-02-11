@@ -10,10 +10,13 @@ public final class LuaResult {
     private LuaValue value4;
     private LuaValue value5;
 
+    private LuaState luaState;
+
     private LuaResult(){}
 
     public static LuaResult of(LuaState luaState, int resultCount) {
         LuaResult result = new LuaResult();
+        result.luaState = luaState;
         switch (resultCount){
             case 1:
                 result.value1 = luaState.getLuaValue(-1);
@@ -49,6 +52,33 @@ public final class LuaResult {
                 throw new UnsupportedOperationException("currently support max 5 result count.");
         }
         return result;
+    }
+
+    /**
+     * release all lua values
+     */
+    public void release(){
+        if(value1 != null){
+            value1.recycle();
+            value1 = null;
+        }
+        if(value2 != null){
+            value2.recycle();
+            value2 = null;
+        }
+        if(value3 != null){
+            value3.recycle();
+            value3 = null;
+        }
+        if(value4 != null){
+            value4.recycle();
+            value4 = null;
+        }
+        if(value5 != null){
+            value5.recycle();
+            value5 = null;
+        }
+        luaState.setTop(0);
     }
 
     public LuaValue getValue1() {

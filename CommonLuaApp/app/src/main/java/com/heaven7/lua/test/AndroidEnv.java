@@ -28,5 +28,6 @@ public final class AndroidEnv {
             System.err.println(state.toString(-1));
         }
         System.out.println("AndroidEnv init " + (result == 0 ? "success" : "failed"));
+        state.setTop(0);
     }
 }

@@ -33,6 +33,7 @@ void lua_remove_(JNIEnv *env, jclass clazz, jlong ptr,int i);  //rm i
 void lua_replace_(JNIEnv *env, jclass clazz, jlong ptr,int i); //rm i, mv top -> i
 void lua_settop_(JNIEnv *env, jclass clazz, jlong ptr,int i); //set stack size
 void lua_pop_(JNIEnv *env, jclass clazz, jlong ptr,int n);
+void lua_setTop_(JNIEnv *env, jclass clazz, jlong ptr,int n);
 
 //=============== read values from stack ====================
 jint lua_isboolean_(JNIEnv *env, jclass clazz, jlong ptr, int i); //is stack[i] a bool?

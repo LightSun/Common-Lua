@@ -1,5 +1,6 @@
 package com.heaven7.java.lua.adapter;
 
+import com.heaven7.java.lua.LuaResult;
 import com.heaven7.java.lua.LuaValue;
 import com.heaven7.java.lua.LuaState;
 import com.heaven7.java.lua.LuaTypeAdapter;
@@ -40,21 +41,27 @@ public final class ObjectLuaTypeAdapter<PR extends LuaTypeAdapter,
 
         List<MemberProxy> proxies = mReflecty.getMemberProxies(mClazz);
         LuaValue tempVal;
+        LuaResult luaResult = null;
         try {
             for (MemberProxy proxy : proxies){
                 if(proxy instanceof FieldProxy){
                     tempVal = tab.getField(proxy.getPropertyName());
-                }else {
-                    tempVal = tab.call1(proxy.getPropertyName());
-                }
-                if(tempVal != null){
                     LuaTypeAdapter lta = getTypeAdapter(proxy.getTypeNode(), mTAM);
                     proxy.setValue(obj, lta.readFromLua(luaState, tempVal));
                     tempVal.recycle();
+                }else {
+                    luaResult = tab.call1(proxy.getPropertyName());
+                    tempVal = luaResult != null ? luaResult.getValue1() : null;
+                    LuaTypeAdapter lta = getTypeAdapter(proxy.getTypeNode(), mTAM);
+                    proxy.setValue(obj, lta.readFromLua(luaState, tempVal));
                 }
             }
         }catch (Exception e){
             throw new RuntimeException(e);
+        }finally {
+            if(luaResult != null){
+                luaResult.release();
+            }
         }
         return obj;
     }

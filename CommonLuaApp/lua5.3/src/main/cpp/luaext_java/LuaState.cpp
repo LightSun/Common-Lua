@@ -197,6 +197,10 @@ void lua_pop_(JNIEnv *env, jclass clazz, jlong ptr, int n) {
     lua_State *L = reinterpret_cast<lua_State *>(ptr);
     lua_pop(L, n);
 }
+void lua_setTop_(JNIEnv *env, jclass clazz, jlong ptr, int n) {
+    lua_State *L = reinterpret_cast<lua_State *>(ptr);
+    lua_settop(L, n);
+}
 //-------------------- read from stack -----------------
 
 jstring lua_tostring_(JNIEnv *env, jclass clazz, jlong ptr, jint idx) {
@@ -508,6 +512,7 @@ static JNINativeMethod lua_state_methods[] = {
 
         {"_dumpLuaStack",            "(J)V",                                        (void *) dumpLuaStack_},
         {"_pop",                     "(JI)V",                                       (void *) lua_pop_},
+        {"_setTop",                     "(JI)V",                                       (void *) dfg},
         {"_isNativeWrapper",         "(JI)I",                                       (void *) isNativeWrapper_},
         {"_getJavaObject",           "(JI)" SIG_OBJECT,                             (void *) getJavaObject_},
         {"_travel",                  "(JI" SIG_OBJECT ")V",                         (void *) travel_},
