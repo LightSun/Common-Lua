@@ -81,6 +81,11 @@ void call_testLua(lua_State* L, char* luacontent){
     LuaPort<FooWrapper>::Register(L); // ok
 
     lua_pushinteger(L, 5);
+    auto value = lua_tointeger(L, -1);
+    char ch[50];
+    sprintf(ch, "call_testLua(). Long value is %lld, type is %d", value, lua_type(L, -1));
+    ext_getLuaPrint()(ch, 50, 1);
+
     int code = luaL_dostring(L, luacontent);
     const char* msg = lua_tostring(L, -1);
     ext_getLuaPrint()(const_cast<char *>(msg), 50, 1);

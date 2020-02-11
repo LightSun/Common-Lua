@@ -79,7 +79,10 @@ public final class LuaResult {
             value5.recycle();
             value5 = null;
         }
-        luaState.restoreLightly(k);
+        if(luaState != null){
+            luaState.restoreLightly(k);
+            luaState = null;
+        }
     }
 
     public LuaValue getValue1() {

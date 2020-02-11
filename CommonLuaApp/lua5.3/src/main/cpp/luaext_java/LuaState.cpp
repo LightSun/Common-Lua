@@ -484,6 +484,7 @@ static JNINativeMethod lua_state_methods[] = {
 
         {"_pushValue",               "(JI)V",                                       (void *) lua_pushvalue_},
         {"_pushString",              "(J" SIG_JSTRING ")V",                         (void *) lua_pushString_},
+        {"_pushLong",                "(JJ)V",                                       (void *) lua_pushinteger_},
         {"_pushNumber",              "(JD)V",                                       (void *) lua_pushNumber_},
         {"_pushnil",                 "(J)V",                                        (void *) lua_pushnil_},
         {"_pushBoolean",             "(JZ)V",                                       (void *) lua_pushBoolean_},
@@ -493,6 +494,7 @@ static JNINativeMethod lua_state_methods[] = {
 
         {"_toString",                "(JI)" SIG_JSTRING,                            (void *) lua_tostring_},
         {"_toNumber",                "(JI)D",                                       (void *) lua_tonumber_},
+        {"_toLong",                  "(JI)J",                                       (void *) lua_tointeger_},
         {"_toBoolean",               "(JI)I",                                       (void *) lua_toboolean_},
         {"_pcall",                   "(JIII)I",                                     (void *) lua_pcall_},
         {"_call",                    "(JII)V",                                      (void *) lua_call_},

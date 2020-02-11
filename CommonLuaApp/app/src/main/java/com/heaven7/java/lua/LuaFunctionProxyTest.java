@@ -5,7 +5,7 @@ public class LuaFunctionProxyTest {
     public static void test1(LuaState state){
         state.pushFunction(new TestFunction());
         LuaFunctionProxy proxy = new LuaFunctionProxy(state, -1);
-        proxy.execute1(new LuaParameter[]{new LuaParameter(null, "Google")}, new LuaCallback() {
+        proxy.execute1(new LuaParameter[]{LuaParameter.ofSimple("Google")}, new LuaCallback() {
             @Override
             public void onCallResult(LuaState state, String errorMsg) {
                 if(errorMsg != null){

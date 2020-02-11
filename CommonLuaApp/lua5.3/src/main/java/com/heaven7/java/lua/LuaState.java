@@ -206,6 +206,13 @@ public final class LuaState extends INativeObject.BaseNativeObject {
     }
 
     /**
+     * push long value as number
+     * @param val the long value
+     */
+    public void pushLong(long val){
+        _pushLong(getNativePointer(), val);
+    }
+    /**
      * push nil to lua stack
      */
     public void pushNil() {
@@ -323,6 +330,15 @@ public final class LuaState extends INativeObject.BaseNativeObject {
      */
     public double toNumber(int idx) {
         return _toNumber(getNativePointer(), idx);
+    }
+
+    /**
+     * get long value as number
+     * @param idx the index
+     * @return the long value
+     */
+    public long toLong(int idx){
+        return _toLong(getNativePointer(), idx);
     }
     /**
      * get the number value
@@ -596,10 +612,12 @@ public final class LuaState extends INativeObject.BaseNativeObject {
 
     private static synchronized native String _toString(long ptr, int idx);
     private static synchronized native double _toNumber(long ptr, int idx);
+    private static synchronized native long _toLong(long ptr, int idx);
     private static synchronized native int _toBoolean(long ptr, int idx);
 
     private static synchronized native void  _pushString(long ptr, String var);
-    private static synchronized native void _pushNumber(long ptr, double n);
+    private static synchronized native void _pushNumber(long ptr, double val);
+    private static synchronized native void _pushLong(long ptr, long val);
     private static synchronized native void _pushValue(long ptr, int idx);
     private static synchronized native void _pushnil(long ptr);
     private static synchronized native void _pushBoolean(long ptr, boolean val);

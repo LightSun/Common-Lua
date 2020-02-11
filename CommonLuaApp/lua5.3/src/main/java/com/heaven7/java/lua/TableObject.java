@@ -4,7 +4,10 @@ import com.heaven7.java.lua.internal.LuaUtils;
 
 import java.lang.ref.WeakReference;
 
-//lua table, lua_wrap_java, userdata.
+/**
+ * the table object that wrap lua table, userdata.
+ * @author heaven7
+ */
 public final class TableObject {
 
     private static final String M_TRAVEL          = "__travel";

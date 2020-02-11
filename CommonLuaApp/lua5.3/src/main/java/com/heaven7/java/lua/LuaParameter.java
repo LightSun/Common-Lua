@@ -9,12 +9,19 @@ public final class LuaParameter {
     private final Type type;
     private final Object value;
 
+    public static LuaParameter ofSimple(Object value){
+        return new LuaParameter(null, value);
+    }
+    public static LuaParameter of(Type type, Object value){
+        return new LuaParameter(type, value);
+    }
     /**
      * create lua parameter
      * @param type the type of value. if value is simple value. type can be null.
+     *             eg: if value is collection/map. the type must assigned
      * @param value the value
      */
-    public LuaParameter(Type type, Object value) {
+    private LuaParameter(Type type, Object value) {
         this.type = type;
         this.value = value;
     }
