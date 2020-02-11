@@ -28,7 +28,7 @@ public final class JavaCallerTest {
         p.setName("heaven7");
 
         luaState.push(p);
-        String msg = luaState.pcallm(1, 1, 0);
+        String msg = luaState.pcallM(1, 1, 0);
         if(msg != null){
             System.err.println(msg);
             return;

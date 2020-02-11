@@ -28,14 +28,14 @@ void nRelease_(JNIEnv *env, jclass clazz, jlong ptr) {
     ext_closeLuaState(state);
 }
 
-jstring lua_pushString_(JNIEnv *env, jclass clazz, jlong ptr, jstring str) {
+void lua_pushString_(JNIEnv *env, jclass clazz, jlong ptr, jstring str) {
     lua_State *L = reinterpret_cast<lua_State *>(ptr);
 
     const char *uniStr = (env)->GetStringUTFChars(str, NULL);
-    const char *const result = lua_pushstring(L, uniStr);
+    auto result = lua_pushstring(L, uniStr);
 
     (env)->ReleaseStringUTFChars(str, uniStr);
-    return env->NewStringUTF(result);
+    //return env->NewStringUTF(result);
 }
 void lua_pushNumber_(JNIEnv *env, jclass clazz, jlong ptr, jdouble val) {
     lua_State *L = reinterpret_cast<lua_State *>(ptr);
@@ -269,9 +269,9 @@ jstring luaL_typename_(JNIEnv *env, jclass clazz, jlong ptr, int i) {
     const char *tn = luaL_typename(L, i);
     return (env)->NewStringUTF(tn);
 }
-jint toInt_(JNIEnv *env, jclass clazz, jlong ptr, int idx) {
+jdouble toNumber_(JNIEnv *env, jclass clazz, jlong ptr, int idx) {
     lua_State *L = reinterpret_cast<lua_State *>(ptr);
-    return static_cast<jint>(lua_tonumber(L, idx));
+    return lua_tonumber(L, idx);
 }
 
 //--------------------- table op -------------------------
@@ -487,7 +487,7 @@ static JNINativeMethod lua_state_methods[] = {
         {"_hasGlobal",               "(J" SIG_JSTRING ")Z",                         (void *) hasGlobal},
 
         {"_pushValue",               "(JI)V",                                       (void *) lua_pushvalue_},
-        {"_pushString",              "(J" SIG_JSTRING ")" SIG_JSTRING,              (void *) lua_pushString_},
+        {"_pushString",              "(J" SIG_JSTRING ")V",                         (void *) lua_pushString_},
         {"_pushNumber",              "(JD)V",                                       (void *) lua_pushNumber_},
         {"_pushnil",                 "(J)V",                                        (void *) lua_pushnil_},
         {"_pushBoolean",             "(JZ)V",                                       (void *) lua_pushBoolean_},
@@ -496,7 +496,7 @@ static JNINativeMethod lua_state_methods[] = {
         {"_pushClass",               "(J" SIG_JSTRING SIG_JSTRING "Z)V",            (void *) wrapClass},
 
         {"_toString",                "(JI)" SIG_JSTRING,                            (void *) lua_tostring_},
-        {"_toInt",                   "(JI)I",                                       (void *) toInt_},
+        {"_toNumber",                "(JI)D",                                       (void *) toNumber_},
         {"_pcall",                   "(JIII)I",                                     (void *) lua_pcall_},
         {"_call",                    "(JII)V",                                      (void *) lua_call_},
         {"_getTop",                  "(J)I",                                        (void *) lua_gettop_},

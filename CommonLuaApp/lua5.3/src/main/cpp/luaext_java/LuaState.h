@@ -17,7 +17,7 @@ void pushJNIEnv(JNIEnv *env, lua_State *L);
 JNIEnv *getEnvFromState(lua_State *L);
 
 //=============== push to stack ================
-jstring lua_pushString_(JNIEnv *env, jclass clazz, jlong ptr, jstring str);
+void lua_pushString_(JNIEnv *env, jclass clazz, jlong ptr, jstring str);
 void lua_pushNumber_(JNIEnv *env, jclass clazz, jlong ptr, jdouble val);
 void lua_pushBoolean_(JNIEnv *env, jclass clazz, jlong ptr, jboolean val);
 void lua_pushnil_(JNIEnv *env, jclass clazz, jlong ptr);
