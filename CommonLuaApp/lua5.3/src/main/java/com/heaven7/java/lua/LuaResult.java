@@ -4,6 +4,7 @@ public final class LuaResult {
 
     public static final int MAX_RESULT_COUNT = 5;
 
+    /*public*/ int k;
     private LuaValue value1;
     private LuaValue value2;
     private LuaValue value3;
@@ -14,7 +15,7 @@ public final class LuaResult {
 
     private LuaResult(){}
 
-    public static LuaResult of(LuaState luaState, int resultCount) {
+    /*public*/ static LuaResult of(LuaState luaState, int resultCount) {
         LuaResult result = new LuaResult();
         result.luaState = luaState;
         switch (resultCount){
@@ -78,7 +79,7 @@ public final class LuaResult {
             value5.recycle();
             value5 = null;
         }
-        luaState.setTop(0);
+        luaState.restoreLightly(k);
     }
 
     public LuaValue getValue1() {

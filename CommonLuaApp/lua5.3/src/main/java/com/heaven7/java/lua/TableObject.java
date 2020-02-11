@@ -72,6 +72,7 @@ public final class TableObject {
         }
         final LuaState luaState = getLuaState();
         final int idx = LuaUtils.adjustIdx(luaState, index);
+        final int k = luaState.saveLightly();
         //result=xx.$name(params)
         //1, get func
         luaState.pushString(name);
@@ -92,8 +93,11 @@ public final class TableObject {
         int result = luaState.pcall(pCount, resultCount, 0);
         if(result != 0){
             System.err.println("call method error. name = " + name + " ,error msg = " + luaState.toString(-1));
+            luaState.restoreLightly(k);
         }else {
-             return LuaResult.of(luaState, resultCount);
+            LuaResult lr = LuaResult.of(luaState, resultCount);
+            lr.k = k;
+            return lr;
         }
         //4, restore lua stack. was called on LuaResult.release()
         return null;

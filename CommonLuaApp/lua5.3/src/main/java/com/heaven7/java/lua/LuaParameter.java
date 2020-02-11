@@ -9,6 +9,11 @@ public final class LuaParameter {
     private final Type type;
     private final Object value;
 
+    /**
+     * create lua parameter
+     * @param type the type of value. if value is simple value. type can be null.
+     * @param value the value
+     */
     public LuaParameter(Type type, Object value) {
         this.type = type;
         this.value = value;

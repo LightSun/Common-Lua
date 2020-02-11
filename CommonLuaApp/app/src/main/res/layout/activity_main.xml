@@ -119,6 +119,14 @@
             android:onClick="onClickJavaCallerTest"
             android:text="test JavaCaller(lua-java-lua)"
             />
+
+        <Button
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="15dp"
+            android:onClick="onClickLuaFunctionProxyTest"
+            android:text="test LuaFunctionProxy"
+            />
     </LinearLayout>
 
 </ScrollView>

@@ -7,16 +7,16 @@ import android.os.Environment;
 import android.view.View;
 
 import com.heaven7.android.lua.app.R;
-import com.heaven7.lua.test.AndroidEnv;
+import com.heaven7.core.util.Logger;
+import com.heaven7.core.util.PermissionHelper;
+import com.heaven7.java.lua.LuaFunctionProxyTest;
+import com.heaven7.java.lua.LuaTest;
 import com.heaven7.lua.test.AndroidEnvTest;
 import com.heaven7.lua.test.JavaCallerTest;
 import com.heaven7.lua.test.LuaTravellerTest;
 import com.heaven7.lua.test.LuaTypeAdapterTests;
 import com.heaven7.lua.test.WrapClassTest;
 import com.heaven7.lua.test.WrapJavaTest;
-import com.heaven7.core.util.Logger;
-import com.heaven7.core.util.PermissionHelper;
-import com.heaven7.java.lua.LuaTest;
 
 import java.nio.charset.Charset;
 import java.util.Arrays;
@@ -125,6 +125,9 @@ public class MainActivity extends Activity {
     }
     public void onClickJavaCallerTest(View view){
         JavaCallerTest.test1(mLuaer);
+    }
+    public void onClickLuaFunctionProxyTest(View view){
+        LuaFunctionProxyTest.test1(mLuaer.getLuaState());
     }
 
     private void initLua() {

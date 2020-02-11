@@ -15,6 +15,15 @@ public final class LuaFunctionProxy {
         this.mFuncIdx = func_idx;
     }
     /**
+     * execute the function by target parameters with one result.
+     * @param args the params to push to stack
+     * @param cb the callback of receive result or error msg
+     * @return the result count.
+     */
+    public final int execute1(LuaParameter[] args, LuaCallback cb){
+        return execute(args, 1, cb);
+    }
+    /**
      * execute the function by target parameters.
      * @param args the params to push to stack
      * @param resultCount the result count of function
@@ -25,6 +34,7 @@ public final class LuaFunctionProxy {
         //adjust to positive
         int func_idx = LuaUtils.adjustIdx(mState, mFuncIdx);
         final int k = mState.saveLightly();
+        mState.dumpLuaStack();
         // push error
         mState.pushFunction(new ErrorFunction(cb));
         final int errFunc = mState.getTop();
@@ -38,14 +48,18 @@ public final class LuaFunctionProxy {
             }
         }
         int result = mState.pcall(pCount, resultCount, errFunc);
-        if(result != 0){
-            //error
-            String msg = mState.toString(-1);
-            cb.onCallResult(mState, msg);
-        }else {
-            cb.onCallResult(mState, null);
+        try {
+            if(result != 0){
+                //error
+                String msg = mState.toString(-1);
+                mState.pop(1);
+                cb.onCallResult(mState, msg);
+            }else {
+                cb.onCallResult(mState, null);
+            }
+        }finally {
+            mState.restoreLightly(k);
         }
-        mState.restoreLightly(k);
         return resultCount;
     }
 
