@@ -1,0 +1,63 @@
+-- text, image, adapter, toast. dialog
+context{
+}
+api{
+
+}
+imageLoader{
+
+}
+tv_name{
+    textSize=18
+    textColor=R.color.xx
+    text="heaven7"
+}
+tv_head{
+    scaleType=ScaleType.center_crop
+    image=R.drawable.xx
+    image=Image.asset("/img/xx.jpg")
+    image=imageLoader.async("www.xxx.xx/a.png")
+}
+Adapter(items){
+    bind(item, pos){
+        R.layout.a{
+            tv_text{
+
+            }
+            iv_image{
+                 image=imageLoader.async("www.xxx.xx/a.png")
+            }
+        }
+
+        R.layout.b{
+            tv_text{
+
+            }
+            iv_image{
+                 image=imageLoader.async("www.xxx.xx/a.png")
+            }
+        }
+    }
+}
+
+rv{
+  adapter = Adapter(null);
+}
+
+context.showLoading();
+reqData(...);
+
+===LUA
+--req type: body, form, raw
+local function reqData(api, header, params){
+   -- api.get/post
+   api.post(header, params, function(s)){
+       local datas = transform(s);
+       rv.adapter.replaceAll(datas);
+       context.dismissLoading();
+   })
+end
+}
+===
+
+
