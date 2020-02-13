@@ -1,5 +1,11 @@
 -- text, image, adapter, toast. dialog
 context{
+    onStart = function(){
+
+    }
+}
+application{
+
 }
 api{
 
@@ -18,25 +24,31 @@ tv_head{
     image=Image.asset("/img/xx.jpg")
     image=imageLoader.async("www.xxx.xx/a.png")
 }
-Adapter(items){
-    bind(item, pos){
-        R.layout.a{
-            tv_text{
-
-            }
-            iv_image{
-                 image=imageLoader.async("www.xxx.xx/a.png")
-            }
+class Adapter(items){
+    static layout = function(item, pos){
+        if (pos == 1) {
+           return  R.layout.b;
         }
+        return R.layout.a
+    }
+    bind = function(item, pos, layout){
+           R.layout.a{
+                 tv_text{
 
-        R.layout.b{
-            tv_text{
+                }
+                iv_image{
+                     image=imageLoader.async("www.xxx.xx/a.png")
+                }
+           }
+            R.layout.b{
+                       tv_text{
 
+                       }
+                       iv_image{
+                            image=imageLoader.async("www.xxx.xx/a.png")
+                       }
             }
-            iv_image{
-                 image=imageLoader.async("www.xxx.xx/a.png")
-            }
-        }
+
     }
 }
 
