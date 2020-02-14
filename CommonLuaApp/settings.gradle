@@ -1,1 +1,1 @@
-include ':app', ':lua5.3'
+include ':app'
