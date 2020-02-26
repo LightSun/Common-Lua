@@ -5,8 +5,7 @@ import android.support.annotation.Keep;
 import static com.heaven7.java.lua.LuaJavaCaller.registerJavaClass;
 
 /**
- * Created by heaven7 on 2019/7/1.
- * the state/stack manager. wrap large methods for lua. for example:
+ * the Lua state/stack manager. wrap large methods for lua. for example:
  * <ul> you can
  *     <li>load script. by {@linkplain #loadFile(String)}, {@linkplain #loadString(String)}, {@linkplain #loadFileM(String)}, {@linkplain #loadStringM(String)}</li>
  *     <li>execute script. by {@linkplain #doFile(String)}, {@linkplain #doString(String)}, {@linkplain #doFileM(String)}, {@linkplain #doStringM(String)}</li>

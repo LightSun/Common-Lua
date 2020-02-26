@@ -2,6 +2,7 @@ package com.heaven7.java.lua;
 
 import android.support.annotation.Keep;
 
+import com.heaven7.java.base.util.Predicates;
 import com.heaven7.java.lua.internal.ClassInfo;
 import com.heaven7.java.lua.internal.FieldInfo;
 import com.heaven7.java.lua.internal.CallJavaMethodFunction;
@@ -56,7 +57,7 @@ public final class LuaJavaCaller {
         }
         List<MethodInfo> list = info.getStaticMethods(name, pCount);
 
-        if(list == null){
+        if(Predicates.isEmpty(list)){
             return false;
         }
         new LuaState(luaStatePtr).pushFunction(new CallJavaMethodFunction(clazz, list));
@@ -231,7 +232,7 @@ public final class LuaJavaCaller {
                 out[i] = args[i];
             }
         }
-        //补全
+        //handle lack of args
         if (args.length < types.length) {
             for (int i = args.length, end = types.length; i < end; i++) {
                 LuaTypeAdapter adapter = LuaTypeAdapter.get(types[i]);
