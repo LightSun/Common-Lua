@@ -8,13 +8,9 @@ import android.view.View;
 
 import com.heaven7.core.util.Logger;
 import com.heaven7.core.util.PermissionHelper;
-import com.heaven7.java.base.util.IOUtils;
-import com.heaven7.java.lua.LuaState;
 import com.heaven7.java.lua.LuaTest;
 
 
-import java.io.IOException;
-import java.io.InputStreamReader;
 import java.nio.charset.Charset;
 import java.util.Arrays;
 
@@ -39,7 +35,7 @@ public class MainActivity extends Activity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
+        setContentView(R.layout.ac_viewer);
 
         mLuaer = new Luaer(this);
         mHelper.startRequestPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE, 1, new PermissionHelper.ICallback() {
