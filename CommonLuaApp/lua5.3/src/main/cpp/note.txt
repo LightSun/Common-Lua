@@ -19,10 +19,28 @@ lbaselib.c:  luaB_print 函数
 add  lua/config.h
 
 any 'start h7'
+============lua.h ==========
+add #include "pthread.h"
 
-=======  next =======
-java-> lua . primitives, primitive-array, object, object-array. list, set, map
+----------------- 为解决Lua同步问题 sync ----------------
+========= lstate.h ================
+在global_State结构体中增加
+  pthread_mutex_t lock;
 
+lstate.c 中 close_state方法添加2行：
+  pthread_mutex_unlock(&g->lock);
+  pthread_mutex_destroy(&g->lock);
+
+========== llimits.h =======
+替换lua_lock 和 lua_unlock 实现
+  // #define lua_lock(L)	((void) 0)
+  // #define lua_unlock(L)	((void) 0)
+
+#include "pthread.h"
+#define lua_lock(L) pthread_mutex_lock(&(G(L)->lock));
+#define lua_unlock(L) pthread_mutex_unlock(&(G(L)->lock));
+--------------------- end sync ------------------
 
 ======== lua bug fixed ===========
 in lgc.c :  in function 'clearkeys'
+

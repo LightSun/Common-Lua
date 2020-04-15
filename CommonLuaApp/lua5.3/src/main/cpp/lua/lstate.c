@@ -238,7 +238,6 @@ static void preinit_thread (lua_State *L, global_State *g) {
   L->errfunc = 0;
 }
 
-
 static void close_state (lua_State *L) {
   global_State *g = G(L);
   luaF_close(L, L->stack);  /* close all upvalues for this thread */
@@ -248,6 +247,10 @@ static void close_state (lua_State *L) {
   luaM_freearray(L, G(L)->strt.hash, G(L)->strt.size);
   freestack(L);
   lua_assert(gettotalbytes(g) == sizeof(LG));
+
+  pthread_mutex_unlock(&g->lock);
+  pthread_mutex_destroy(&g->lock);
+
   (*g->frealloc)(g->ud, fromstate(L), sizeof(LG), 0);  /* free main block */
 }
 

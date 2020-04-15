@@ -212,8 +212,12 @@ typedef unsigned long Instruction;
 */
 // let you self-define lua_lock and lua_unlock
 #if !defined(lua_lock)
-#define lua_lock(L)	((void) 0)
-#define lua_unlock(L)	((void) 0)
+//#define lua_lock(L)	((void) 0)
+//#define lua_unlock(L)	((void) 0)
+#include "pthread.h"
+#define lua_lock(L) pthread_mutex_lock(&(G(L)->lock));
+#define lua_unlock(L) pthread_mutex_unlock(&(G(L)->lock));
+
 #endif
 
 /*
