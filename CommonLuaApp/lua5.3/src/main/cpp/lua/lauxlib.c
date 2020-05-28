@@ -718,7 +718,7 @@ LUALIB_API int luaL_loadfilex (lua_State *L, const char *filename,
     if (lf.f == NULL) return errfile(L, "open", fnameindex);
   }
   int handled = 0;
-  // txt 文件 or 二进制
+  // txt or binary
   if (skipcomment(&lf, &c)) { /* read initial portion */
       lf.buff[lf.n++] = '\n';  /* add line to correct line numbers */
   } else{

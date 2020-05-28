@@ -22,8 +22,6 @@ typedef void (*Lua_print)(char* cs, int len, int flag);
 
 typedef char* (*CreateTempFile)(const char * filename);
 
-typedef int (*LuaStdFunc)(lua_State* L);
-
 // map function to lua. any like: int (*lua_CFunction) (lua_State *L);
 LUALIB_API void lua_BindFunctions(lua_State *L, luaL_Reg funcs[], int flag);
 
