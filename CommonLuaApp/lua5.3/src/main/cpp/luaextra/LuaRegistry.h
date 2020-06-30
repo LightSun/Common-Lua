@@ -178,6 +178,14 @@ class LuaBridgeCaller{
 public:
     ~LuaBridgeCaller(){};
 
+    /**
+     * called on invoke method for target class and method name
+     * @param L  the lua state
+     * @param cn the class name
+     * @param mName the method name
+     * @param holder the parameter holder
+     * @return the result count.
+     */
     virtual int call(lua_State* L, const char *cn, const char *mName ,LuaMediator * holder) = 0;
 
     //opt impl. used for user data.
