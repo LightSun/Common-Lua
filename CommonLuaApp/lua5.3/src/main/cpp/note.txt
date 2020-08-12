@@ -1,7 +1,8 @@
 
 
-lua原始修改点
+lua原始修改点: HEAVEN7 start
 
+[1], add "config.h"
 
 == add lua_internal.h ========
 ============= 1 ===================
@@ -20,7 +21,7 @@ add  lua/config.h
 
 any 'start h7'
 ============lua.h ==========
-add #include "pthread.h"
+add #include "config.h"
 
 ----------------- 为解决Lua同步问题 sync ----------------
 ========= lstate.h ================
@@ -44,3 +45,5 @@ lstate.c 中 close_state方法添加2行：
 ======== lua bug fixed ===========
 in lgc.c :  in function 'clearkeys'
 
+================= 迁移pthread到 config.h ===========
+增加宏： __USE_PTHREAD

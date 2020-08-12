@@ -479,9 +479,9 @@ static const luaL_Reg base_funcs[] = {
   {"tostring", luaB_tostring},
   {"type", luaB_type},
   {"xpcall", luaB_xpcall},
-//=========================== add this ========
+//=================== HEAVEN7 start ========
   {"dumpStack", luaB_dumpStack},
-//===================
+//=================== heaven7 end ===========
   /* placeholders */
   {"_G", NULL},
   {"_VERSION", NULL},
