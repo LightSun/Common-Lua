@@ -7,9 +7,7 @@
 #include "sstream"
 #include "class_info.h"
 
-extern "C" {
-#include "../lua/lua.h"
-}
+#include "../lua/lua.hpp"
 #include <android/log.h>
 
 #define TAG "LuaJavaCaller"

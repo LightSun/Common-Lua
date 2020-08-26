@@ -10,7 +10,7 @@
 #include "../lua/lua.hpp"
 #include "../luaextra/lua_bridge.h"
 
-extern int executeLuaFunction(jobject obj, lua_State* L);
+extern int executeLuaFunction(jobject obj, lua_State *L);
 
 void pushFunc(JNIEnv *env, jclass clazz, jlong ptr, jobject func, jstring classname,
               jstring globalKey, jboolean toStack);

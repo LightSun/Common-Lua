@@ -22,6 +22,9 @@
 #define DTYPE_FUNC 6
 #define DTYPE_LUA2JAVA_VALUE 12
 
+#ifdef __cplusplus
+extern "C" {
+#endif
 /*
 #include "../lua/lua.hpp"
 extern "C"{
@@ -46,16 +49,16 @@ extern "C"{
  * @param ptrOrIndex the pointer or stack index
  * @return  the java object
  */
-typedef void* (*LuaValue_Creator)(int type, long long ptrOrIndex);
+typedef void *(*LuaValue_Creator)(int type, long long ptrOrIndex);
 typedef void (*Java_Object_Releaser)(void *obj);
 
 void setLuaValue_Creator(LuaValue_Creator creator);
 void setJava_Object_Releaser(Java_Object_Releaser releaser);
 
-void* newLuaValue(int type, long long ptrOrIndex);
-void releaseJavaObject(void * obj);
+void *newLuaValue(int type, long long ptrOrIndex);
+void releaseJavaObject(void *obj);
 
-void* getLuaValue(lua_State *L, int id_value);
+void *getLuaValue(lua_State *L, int id_value);
 
 
 /**
@@ -64,6 +67,10 @@ void* getLuaValue(lua_State *L, int id_value);
  * @param idx the table idx
  * @param tt the traveller to travel table. return true means need break travel.
  */
-void travelTable(lua_State* L, int idx, std::function<int(lua_State*)> func);
+void travelTable(lua_State *L, int idx, std::function<int(lua_State *)> func);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif //COMMONLUAAPP_LUA_BRIDGE_H

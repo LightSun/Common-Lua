@@ -9,7 +9,9 @@
 #include "java_env.h"
 #include "class_wrapper.h"
 
+#ifdef __cplusplus
 extern "C" {
+#endif
 #include "../luaextra/lua_extra.h"
 
 void pushJNIEnv(JNIEnv *env, lua_State *L);
@@ -28,11 +30,11 @@ void lua_pushinteger_(JNIEnv *env, jclass clazz, jlong ptr, jlong val);
 jint lua_checkstack_(JNIEnv *env, jclass clazz, jlong ptr, int n); //检查容量
 jint lua_gettop_(JNIEnv *env, jclass clazz, jlong ptr);           //获取栈的大小
 void lua_insert_(JNIEnv *env, jclass clazz, jlong ptr, jint i);  //移动top 到 i
-void lua_pushvalue_(JNIEnv *env, jclass clazz, jlong ptr,int i); //cp i -> top
-void lua_remove_(JNIEnv *env, jclass clazz, jlong ptr,int i);  //rm i
-void lua_replace_(JNIEnv *env, jclass clazz, jlong ptr,int i); //rm i, mv top -> i
-void lua_settop_(JNIEnv *env, jclass clazz, jlong ptr,int i); //set stack size
-void lua_pop_(JNIEnv *env, jclass clazz, jlong ptr,int n);
+void lua_pushvalue_(JNIEnv *env, jclass clazz, jlong ptr, int i); //cp i -> top
+void lua_remove_(JNIEnv *env, jclass clazz, jlong ptr, int i);  //rm i
+void lua_replace_(JNIEnv *env, jclass clazz, jlong ptr, int i); //rm i, mv top -> i
+void lua_settop_(JNIEnv *env, jclass clazz, jlong ptr, int i); //set stack size
+void lua_pop_(JNIEnv *env, jclass clazz, jlong ptr, int n);
 
 //=============== read values from stack ====================
 jint lua_isboolean_(JNIEnv *env, jclass clazz, jlong ptr, int i); //is stack[i] a bool?
@@ -58,7 +60,8 @@ jstring luaL_typename_(JNIEnv *env, jclass clazz, jlong ptr, int i); // typename
 
 //======================= table op =============
 void lua_newtable_(JNIEnv *env, jclass clazz, jlong ptr);
-void lua_createtable_(JNIEnv *env, jclass clazz, jlong ptr, jint marr, jint n);  //m,n=arr,rec capacity
+void
+lua_createtable_(JNIEnv *env, jclass clazz, jlong ptr, jint marr, jint n);  //m,n=arr,rec capacity
 void lua_settable_(JNIEnv *env, jclass clazz, jlong ptr, jint i);
 void lua_setfield_(JNIEnv *env, jclass clazz, jlong ptr, jint i, jstring k);
 void lua_rawset_(JNIEnv *env, jclass clazz, jlong ptr, jint i);
@@ -82,8 +85,8 @@ jint lua_getglobal_(JNIEnv *env, jclass clazz, jlong ptr, jstring name);
 //jint lua_equal_(JNIEnv *env, jclass clazz, jlong ptr,jint i, jint j);
 //jint lua_lessthan_(JNIEnv *env, jclass clazz, jlong ptr,jint i, jint j);
 
-void lua_concat_(JNIEnv *env, jclass clazz, jlong ptr,jint n);
-jint lua_rawequal_(JNIEnv *env, jclass clazz, jlong ptr,jint i, jint j); // no metacalls
+void lua_concat_(JNIEnv *env, jclass clazz, jlong ptr, jint n);
+jint lua_rawequal_(JNIEnv *env, jclass clazz, jlong ptr, jint i, jint j); // no metacalls
 
 //========================== function calls ==================
 //void lua_atpanic_(JNIEnv *env, jclass clazz, jlong ptr);
@@ -106,7 +109,9 @@ jdouble luaL_checknumber_(JNIEnv *env, jclass clazz, jlong ptr, jint n);
 jstring luaL_checkstring_(JNIEnv *env, jclass clazz, jlong ptr, jint n);
 void luaL_checktype_(JNIEnv *env, jclass clazz, jlong ptr, jint n, jint tp);
 //luaL_error(L, str fmt, ...) ,luaL_checklstring
+#ifdef __cplusplus
 }
+#endif
 
 #if LUA_VERSION_NUM == 503
 #define luaL_checkint(L, arg) (int)(luaL_checkinteger(L, arg))

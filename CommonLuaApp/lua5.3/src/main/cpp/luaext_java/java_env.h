@@ -11,21 +11,25 @@
 #define SIG_OBJECT "Ljava/lang/Object;"
 #define SIG_CLASS "Ljava/lang/Class;"
 
-typedef struct Registration{
-    char* clazz;
-    JNINativeMethod* methods;
-    int len; //method count
-}Registration;
+#ifdef __cplusplus
+extern "C" {
+#endif
 
-Registration createRegistration(char* clazz, JNINativeMethod methods[], int len);
+typedef struct Registration {
+    char *clazz;
+    JNINativeMethod *methods;
+    int len; //method count
+} Registration;
+
+Registration createRegistration(char *clazz, JNINativeMethod methods[], int len);
 
 extern Registration getLuaStateRegistration();
 extern Registration getLua2JavaRegistration();
 extern void initLuaJavaCaller();
 extern void deInitLuaJavaCaller();
-jclass getGlobalClass(JNIEnv * env, const char* classname);
+jclass getGlobalClass(JNIEnv *env, const char *classname);
 
-int registerMethods(JNIEnv* env,Registration n);
+int registerMethods(JNIEnv *env, Registration n);
 
 JNIEnv *getJNIEnv();
 
@@ -35,6 +39,9 @@ void detachJNIEnv();
 
 void dumpReferenceTables(JNIEnv *env);
 
-const char * stringReplace(const char* str, const char* src, const char* dst);
+const char *stringReplace(const char *str, const char *src, const char *dst);
 
+#ifdef __cplusplus
+}
+#endif
 #endif //COMMONLUAAPP_JAVA_ENV_H
