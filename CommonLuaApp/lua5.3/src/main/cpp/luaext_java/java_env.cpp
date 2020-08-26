@@ -92,8 +92,12 @@ JNIEnv *attachJNIEnv() {
     return env;
 }
 
+//for sub thread need call this.
 void detachJNIEnv() {
-    g_jvm->DetachCurrentThread();
+    JNIEnv *pEnv = getJNIEnv();
+    if(pEnv != nullptr){
+        g_jvm->DetachCurrentThread();
+    }
 }
 
 void dumpReferenceTables(JNIEnv *env) {
