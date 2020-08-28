@@ -47,3 +47,8 @@ in lgc.c :  in function 'clearkeys'
 
 ================= 迁移pthread到 config.h ===========
 增加宏： __USE_PTHREAD
+
+========================= add luaL_openlibs2 ======================
+//=============== HEAVEN7 start =================
+LUALIB_API void luaL_openlibs2(lua_State *L, const luaL_Reg libs[]);
+//=============== HEAVEN7 end =================
