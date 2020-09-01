@@ -28,25 +28,22 @@ jmethodID mid_c_search;
 jmethodID mid_print;
 jmethodID mid_createTempFile;
 
-/*std::string android_temp_folder(struct android_app *app ) {
-    JNIEnv* env;
-    app->activity->vm->AttachCurrentThread(&env, NULL );
+jstring _tojString(JNIEnv* env,const char *input) {
+    std::string in = std::string(input); // has a bit of a code smell, there is probably a better way.
+    // cite: http://stackoverflow.com/questions/27303316/c-stdstring-to-jstring-with-a-fixed-length
+    jbyteArray array = env->NewByteArray(in.length());
+    env->SetByteArrayRegion(array, 0, in.length(),(jbyte*)in.c_str());
 
-    jclass activityClass = env->FindClass( "android/app/NativeActivity" );
-    jmethodID getCacheDir = env->GetMethodID( activityClass, "getCacheDir", "()Ljava/io/File;" );
-    jobject cache_dir = env->CallObjectMethod( app->activity->clazz, getCacheDir );
-
-    jclass fileClass = env->FindClass( "java/io/File" );
-    jmethodID getPath = env->GetMethodID( fileClass, "getPath", "()Ljava/lang/String;" );
-    jstring path_string = (jstring)env->CallObjectMethod( cache_dir, getPath );
-
-    const char *path_chars = env->GetStringUTFChars( path_string, NULL );
-    std::string temp_folder( path_chars );
-
-    env->ReleaseStringUTFChars( path_string, path_chars );
-    app->activity->vm->DetachCurrentThread();
-    return temp_folder;
-}*/
+    // cite: http://discuss.cocos2d-x.org/t/jni-return-string/9982/3
+    jclass class_str = env->FindClass((const char*)"java/lang/String");
+    jmethodID mid = env->GetMethodID(class_str, "<init>", "([BLjava/lang/String;)V");
+    jstring code = env->NewStringUTF("utf-8");
+    jstring str = (jstring)env->NewObject(class_str, mid, array, code);
+    env->DeleteLocalRef(array);
+    env->DeleteLocalRef(class_str);
+    env->DeleteLocalRef(code);
+    return str;
+}
 
 extern "C" char* search(const char* moduleName, jmethodID mid){
     JNIEnv * pEnv = getJNIEnv();
@@ -83,7 +80,9 @@ extern "C" void Lua_printImpl(char* cs, int len, int flag){
         pEnv = attachJNIEnv();
     }
     jobject obj = weakM.getRefObject();
-    jstring str = pEnv->NewStringUTF(cs);
+    //may have bug. because c or c++ char may not be utf-8.
+    //jstring str = pEnv->NewStringUTF(fn);
+    jstring str = _tojString(pEnv, cs);
     jboolean concat = static_cast<jboolean>(flag != 1); // 1 means end
     pEnv->CallVoidMethod(obj, mid_print, str, concat);
 
@@ -98,14 +97,17 @@ extern "C" char* createTempFileImpl(const char* fn){
         pEnv = attachJNIEnv();
     }
     jobject obj = weakM.getRefObject();
-    jstring str = pEnv->NewStringUTF(fn);
+    //may have bug. because c or c++ char may not be utf-8.
+    //jstring str = pEnv->NewStringUTF(fn);
+    jstring str = _tojString(pEnv, fn);
+
     jstring result = static_cast<jstring>(pEnv->CallObjectMethod(obj, mid_createTempFile, str));
     const char * act = pEnv->GetStringUTFChars(result, nullptr);
     // recycle
     pEnv->DeleteLocalRef(obj);
     pEnv->DeleteLocalRef(str);
     pEnv->DeleteLocalRef(result);
-    return ( char *)act;
+    return (char *)act;
 }
 
 extern "C" JNIEXPORT
