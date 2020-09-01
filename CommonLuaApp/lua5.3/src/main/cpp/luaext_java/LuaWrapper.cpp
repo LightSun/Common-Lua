@@ -81,6 +81,10 @@ extern "C" char* searchC(const char* moduleName){
 std::ostringstream _strBuf;
 
 extern "C" void Lua_printImpl(char* cs, int len, int flag){
+    //ignore \t
+    if(len == 1 && cs[0] == '\t'){
+        return;
+    }
     jboolean concat = static_cast<jboolean>(flag != 1);// 1 means end
     _strBuf << cs;
     if(!concat){
