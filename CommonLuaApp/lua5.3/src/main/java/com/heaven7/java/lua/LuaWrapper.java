@@ -15,8 +15,6 @@ public final class LuaWrapper {
 
     private static final String SALT = "heaven7";
     private final Set<LuaSearcher> mList = new ArraySet<>();
-  //  private final Map<String, LuaFunction>
-    private final StringBuilder mSb = new StringBuilder();
 
     private static class Creator{
         static LuaWrapper INSTANCE = new LuaWrapper();
@@ -50,20 +48,6 @@ public final class LuaWrapper {
             dst.delete();
         }
         return dst.getAbsolutePath();
-    }
-    @Keep
-    public void print(String str, boolean concat){
-        if(concat){
-            mSb.append(str);
-        }else {
-            if(str != null){
-                mSb.append(str);
-            }
-            String content = mSb.toString();
-            mSb.delete(0, mSb.length());
-            //log it
-            Log.i("Lua_Print", content);
-        }
     }
     @Keep //called by native
     public String searchLuaModule(String module){

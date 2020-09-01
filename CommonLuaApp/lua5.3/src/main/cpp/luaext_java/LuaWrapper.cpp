@@ -19,17 +19,14 @@ extern  "C" {
 
 #define SEARCH_LUA_METHOD "searchLuaModule"
 #define SEARCH_C_METHOD "searchCModule"
-#define PRINT_METHOD "print"
 #define CREATE_TEMP_FILE_METHOD "createTempFile"
 
-#define PRINT_METHOD_SIG "(Ljava/lang/String;Z)V"
 #define SEARCH_METHOD_SIG "(Ljava/lang/String;)Ljava/lang/String;"
 #define CREATE_TEMP_FILE_SIG "(Ljava/lang/String;)Ljava/lang/String;"
 
 WeakObjectM weakM;
 jmethodID mid_lua_search;
 jmethodID mid_c_search;
-jmethodID mid_print;
 jmethodID mid_createTempFile;
 
 jstring _tojString(JNIEnv* env,const char *input) {
@@ -82,9 +79,9 @@ std::ostringstream _strBuf;
 
 extern "C" void Lua_printImpl(char* cs, int len, int flag){
     //ignore \t
-    if(len == 1 && cs[0] == '\t'){
+   /* if(len == 1 && cs[0] == '\t'){
         return;
-    }
+    }*/
     jboolean concat = static_cast<jboolean>(flag != 1);// 1 means end
     _strBuf << cs;
     if(!concat){
@@ -122,7 +119,6 @@ void JNICALL Java_com_heaven7_java_lua_LuaWrapper_nNativeInit(
     jclass clazz = env->GetObjectClass(obj);
     mid_lua_search = env->GetMethodID(clazz, SEARCH_LUA_METHOD, SEARCH_METHOD_SIG);
     mid_c_search = env->GetMethodID(clazz, SEARCH_C_METHOD, SEARCH_METHOD_SIG);
-    mid_print = env->GetMethodID(clazz, PRINT_METHOD, PRINT_METHOD_SIG);
     mid_createTempFile = env->GetMethodID(clazz, CREATE_TEMP_FILE_METHOD, CREATE_TEMP_FILE_SIG);
     env->DeleteLocalRef(clazz);
 
