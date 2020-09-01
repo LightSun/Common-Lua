@@ -99,8 +99,8 @@ extern "C" char* createTempFileImpl(const char* fn){
     }
     jobject obj = weakM.getRefObject();
     //may have bug. because c or c++ char may not be utf-8.
-    //jstring str = pEnv->NewStringUTF(fn);
-    jstring str = _tojString(pEnv, fn);
+    jstring str = pEnv->NewStringUTF(fn);
+    //jstring str = _tojString(pEnv, fn);
 
     jstring result = static_cast<jstring>(pEnv->CallObjectMethod(obj, mid_createTempFile, str));
     const char * act = pEnv->GetStringUTFChars(result, nullptr);
