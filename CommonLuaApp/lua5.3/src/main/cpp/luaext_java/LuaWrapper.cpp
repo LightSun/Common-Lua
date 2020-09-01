@@ -4,6 +4,7 @@
 
 #include <jni.h>
 #include <string>
+#include <sstream>
 
 // import c.h for cpp often need { extern "C"}
 extern  "C" {
@@ -11,6 +12,9 @@ extern  "C" {
 }
 #include "java_env.h"
 #include "LuaWrapper.h"
+
+#include "android/log.h"
+#define LOGI(...) __android_log_print(ANDROID_LOG_INFO, "LuaPrint", __VA_ARGS__)
 // just for test
 
 #define SEARCH_LUA_METHOD "searchLuaModule"
@@ -74,21 +78,17 @@ extern "C" char* searchC(const char* moduleName){
     return search(moduleName, mid_c_search);
 }
 
-extern "C" void Lua_printImpl(char* cs, int len, int flag){
-    JNIEnv * pEnv = getJNIEnv();
-    if(pEnv == nullptr){
-        pEnv = attachJNIEnv();
-    }
-    jobject obj = weakM.getRefObject();
-    //may have bug. because c or c++ char may not be utf-8.
-    //jstring str = pEnv->NewStringUTF(fn);
-    jstring str = _tojString(pEnv, cs);
-    jboolean concat = static_cast<jboolean>(flag != 1); // 1 means end
-    pEnv->CallVoidMethod(obj, mid_print, str, concat);
+std::ostringstream _strBuf;
 
-    // recycle
-    pEnv->DeleteLocalRef(obj);
-    pEnv->DeleteLocalRef(str);
+extern "C" void Lua_printImpl(char* cs, int len, int flag){
+    jboolean concat = static_cast<jboolean>(flag != 1);// 1 means end
+    _strBuf << cs;
+    if(!concat){
+        auto stdStr = _strBuf.str();
+        LOGI("%s", stdStr.c_str());
+        _strBuf.str("");
+        _strBuf.clear();
+    }
 }
 
 extern "C" char* createTempFileImpl(const char* fn){
