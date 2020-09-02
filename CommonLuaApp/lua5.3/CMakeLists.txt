@@ -67,7 +67,7 @@ add_library( # Sets the name of the library.
         src/main/cpp/lua/lzio.c
         #lua 5.4
         src/main/cpp/lua/lua.c
-        src/main/cpp/lua/ltests.c
+        # src/main/cpp/lua/ltests.c
 
         src/main/cpp/luaextra/lua_extra.c
         src/main/cpp/luaextra/lua_internal.c
