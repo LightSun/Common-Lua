@@ -5,7 +5,6 @@
 #include "../luaextra/LuaRegistry.h"
 #include "../luaextra/lua_extra.h"
 #include "sstream"
-#include "class_info.h"
 
 #include "../lua/lua.hpp"
 #include <android/log.h>
