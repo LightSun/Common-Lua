@@ -13,7 +13,8 @@ android {
 
         externalNativeBuild {
             cmake {
-                cppFlags "-std=c++14 -fexceptions -O0 -D__USE_PTHREAD"
+                cppFlags "-std=c++14 -fexceptions -O0 -D__USE_PTHREAD -DLUA_USE_DLOPEN"
+                cFlags "-D__USE_PTHREAD -DLUA_USE_DLOPEN"
             }
         }
         ndk {

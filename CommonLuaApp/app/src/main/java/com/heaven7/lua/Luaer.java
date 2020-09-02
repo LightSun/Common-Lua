@@ -124,8 +124,7 @@ public final class Luaer {
                 File dst = new File(getFilesDir(), "libcjson.so");
                 System.out.println("libcjson: path is " + dst.getPath());
                 if(dst.exists()){
-                    System.out.println("libcjson load ok(already copied).");
-                    return;
+                    dst.delete();
                 }
                 //lua load libcjson .the c json can't be load on sdcard.
                 try {
