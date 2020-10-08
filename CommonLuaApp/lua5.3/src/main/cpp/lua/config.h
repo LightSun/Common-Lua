@@ -17,8 +17,8 @@
 
 #ifdef __USE_PTHREAD
 #include "pthread.h"
-#define lua_lock(L) pthread_mutex_lock(&(G(L)->lock));
-#define lua_unlock(L) pthread_mutex_unlock(&(G(L)->lock));
+#define lua_lock(L) pthread_mutex_lock(&(G(L)->lock))
+#define lua_unlock(L) pthread_mutex_unlock(&(G(L)->lock))
 #else
 /*
 ** macros that are executed whenever program enters the Lua core
