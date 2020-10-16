@@ -86,3 +86,6 @@ static void close_state (lua_State *L) {
 }
 
 ============================================================
+
+change:  stat = system(cmd);
+to:      stat = run_cmd(cmd);
